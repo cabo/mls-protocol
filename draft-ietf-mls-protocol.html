@@ -1303,10 +1303,10 @@ in size ranging from two to thousands.<a href="#section-abstract-1" class="pilcr
                 <p id="section-toc.1-1.9.2.5.1"><a href="#section-9.5" class="xref">9.5</a>.  <a href="#name-exporters" class="xref">Exporters</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.6">
-                <p id="section-toc.1-1.9.2.6.1"><a href="#section-9.6" class="xref">9.6</a>.  <a href="#name-resumption-secret" class="xref">Resumption Secret</a></p>
+                <p id="section-toc.1-1.9.2.6.1"><a href="#section-9.6" class="xref">9.6</a>.  <a href="#name-resumption-psk" class="xref">Resumption PSK</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.7">
-                <p id="section-toc.1-1.9.2.7.1"><a href="#section-9.7" class="xref">9.7</a>.  <a href="#name-state-authentication-keys" class="xref">State Authentication Keys</a></p>
+                <p id="section-toc.1-1.9.2.7.1"><a href="#section-9.7" class="xref">9.7</a>.  <a href="#name-state-authentication-codes" class="xref">State Authentication Codes</a></p>
 </li>
             </ul>
 </li>
@@ -4463,7 +4463,7 @@ proceeds as shown in the following diagram:<a href="#section-9-9" class="pilcrow
           </svg><a href="#section-9-10.1" class="pilcrow">¶</a>
 </div>
 </div>
-<p id="section-9-11">A number of secrets are derived from the epoch secret for different purposes:<a href="#section-9-11" class="pilcrow">¶</a></p>
+<p id="section-9-11">A number of values are derived from the epoch secret for different purposes:<a href="#section-9-11" class="pilcrow">¶</a></p>
 <span id="name-epoch-derived-secrets"></span><div id="epoch-derived-secrets">
 <table class="center" id="table-3">
         <caption>
@@ -4472,71 +4472,83 @@ proceeds as shown in the following diagram:<a href="#section-9-9" class="pilcrow
         </caption>
 <thead>
           <tr>
-            <th class="text-left" rowspan="1" colspan="1">Secret</th>
             <th class="text-left" rowspan="1" colspan="1">Label</th>
+            <th class="text-left" rowspan="1" colspan="1">Secret</th>
+            <th class="text-left" rowspan="1" colspan="1">Purpose</th>
           </tr>
         </thead>
         <tbody>
           <tr>
+            <td class="text-left" rowspan="1" colspan="1">"sender data"</td>
             <td class="text-left" rowspan="1" colspan="1">
               <code>sender_data_secret</code>
 </td>
-            <td class="text-left" rowspan="1" colspan="1">"sender data"</td>
+            <td class="text-left" rowspan="1" colspan="1">Deriving keys to encrypt sender data</td>
           </tr>
           <tr>
+            <td class="text-left" rowspan="1" colspan="1">"encryption"</td>
             <td class="text-left" rowspan="1" colspan="1">
               <code>encryption_secret</code>
 </td>
-            <td class="text-left" rowspan="1" colspan="1">"encryption"</td>
+            <td class="text-left" rowspan="1" colspan="1">Deriving message encryption keys (via the secret tree)</td>
           </tr>
           <tr>
+            <td class="text-left" rowspan="1" colspan="1">"exporter"</td>
             <td class="text-left" rowspan="1" colspan="1">
               <code>exporter_secret</code>
 </td>
-            <td class="text-left" rowspan="1" colspan="1">"exporter"</td>
+            <td class="text-left" rowspan="1" colspan="1">Deriving exported secrets</td>
           </tr>
           <tr>
-            <td class="text-left" rowspan="1" colspan="1">
-              <code>authentication_secret</code>
-</td>
-            <td class="text-left" rowspan="1" colspan="1">"authentication"</td>
-          </tr>
-          <tr>
+            <td class="text-left" rowspan="1" colspan="1">"external"</td>
             <td class="text-left" rowspan="1" colspan="1">
               <code>external_secret</code>
 </td>
-            <td class="text-left" rowspan="1" colspan="1">"external"</td>
+            <td class="text-left" rowspan="1" colspan="1">Deriving the external init key</td>
           </tr>
           <tr>
+            <td class="text-left" rowspan="1" colspan="1">"confirm"</td>
             <td class="text-left" rowspan="1" colspan="1">
               <code>confirmation_key</code>
 </td>
-            <td class="text-left" rowspan="1" colspan="1">"confirm"</td>
+            <td class="text-left" rowspan="1" colspan="1">Computing the confirmation MAC for an epoch</td>
           </tr>
           <tr>
+            <td class="text-left" rowspan="1" colspan="1">"membership"</td>
             <td class="text-left" rowspan="1" colspan="1">
               <code>membership_key</code>
 </td>
-            <td class="text-left" rowspan="1" colspan="1">"membership"</td>
+            <td class="text-left" rowspan="1" colspan="1">Computing the membership MAC for an MLSPlaintext</td>
           </tr>
           <tr>
-            <td class="text-left" rowspan="1" colspan="1">
-              <code>resumption_secret</code>
-</td>
             <td class="text-left" rowspan="1" colspan="1">"resumption"</td>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>resumption_psk</code>
+</td>
+            <td class="text-left" rowspan="1" colspan="1">Proving membership in this epoch (via a PSK injected later)</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">"authentication"</td>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>authentication_code</code>
+</td>
+            <td class="text-left" rowspan="1" colspan="1">Confirming that two clients have the same view of the group</td>
           </tr>
         </tbody>
       </table>
 </div>
-<p id="section-9-13">The "external secret" is used to derive an HPKE key pair whose private key is
-held by the entire group:<a href="#section-9-13" class="pilcrow">¶</a></p>
-<div id="section-9-14">
+<p id="section-9-13">(In general, we use "secret" to refer to a value that is used derive further
+secret values, and "key" to refer to a value that is used with an algorithm such
+as HMAC or an AEAD algorithm.)<a href="#section-9-13" class="pilcrow">¶</a></p>
+<p id="section-9-14">The <code>external_secret</code> is used to derive an HPKE key pair whose private key is
+held by the entire group:<a href="#section-9-14" class="pilcrow">¶</a></p>
+<div id="section-9-15">
 <pre class="lang-pseudocode sourcecode">
 external_priv, external_pub = KEM.DeriveKeyPair(external_secret)
-</pre><a href="#section-9-14" class="pilcrow">¶</a>
+</pre><a href="#section-9-15" class="pilcrow">¶</a>
 </div>
-<p id="section-9-15">The public key <code>external_pub</code> can be published as part of the GroupInfo struct
-in order to allow non-members to join the group using an external commit.<a href="#section-9-15" class="pilcrow">¶</a></p>
+<p id="section-9-16">The public key <code>external_pub</code> can be published as part of the GroupInfo struct
+in order to allow non-members to join the group using an external commit.<a href="#section-9-16" class="pilcrow">¶</a></p>
 <div id="group-context">
 <section id="section-9.1">
         <h3 id="name-group-context">
@@ -4746,7 +4758,7 @@ struct {
 <p id="section-9.4-7">On receiving a Commit with a <code>PreSharedKey</code> proposal or a GroupSecrets object
 with the <code>psks</code> field set, the receiving Client includes them in the key
 schedule in the order listed in the Commit, or in the <code>psks</code> field respectively.
-For resumption PSKs, the PSK is defined as the <code>resumption_secret</code> of the group and
+For resumption PSKs, the PSK is defined as the <code>resumption_psk</code> of the group and
 epoch specified in the <code>PreSharedKeyID</code> object. Specifically, <code>psk_secret</code> is
 computed as follows:<a href="#section-9.4-7" class="pilcrow">¶</a></p>
 <div id="section-9.4-8">
@@ -4865,31 +4877,31 @@ the group.<a href="#section-9.5-4" class="pilcrow">¶</a></p>
 to refresh those values after a Commit is processed.<a href="#section-9.5-5" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="resumption-secret">
+<div id="resumption-psk">
 <section id="section-9.6">
-        <h3 id="name-resumption-secret">
-<a href="#section-9.6" class="section-number selfRef">9.6. </a><a href="#name-resumption-secret" class="section-name selfRef">Resumption Secret</a>
+        <h3 id="name-resumption-psk">
+<a href="#section-9.6" class="section-number selfRef">9.6. </a><a href="#name-resumption-psk" class="section-name selfRef">Resumption PSK</a>
         </h3>
-<p id="section-9.6-1">The main MLS key schedule provides a <code>resumption_secret</code> that is used as a PSK
+<p id="section-9.6-1">The main MLS key schedule provides a <code>resumption_psk</code> that is used as a PSK
 to inject entropy from one epoch into another.  This functionality is used in the
 reinitialization and branching processes described in <a href="#reinitialization" class="xref">Section 12.2</a> and
 <a href="#sub-group-branching" class="xref">Section 12.3</a>, but may be used by applications for other purposes.<a href="#section-9.6-1" class="pilcrow">¶</a></p>
 <p id="section-9.6-2">Some uses of resumption PSKs might call for the use of PSKs from historical
 epochs. The application SHOULD specify an upper limit on the number of past
-epochs for which the <code>resumption_secret</code> may be stored.<a href="#section-9.6-2" class="pilcrow">¶</a></p>
+epochs for which the <code>resumption_psk</code> may be stored.<a href="#section-9.6-2" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="state-authentication-keys">
+<div id="state-authentication-codes">
 <section id="section-9.7">
-        <h3 id="name-state-authentication-keys">
-<a href="#section-9.7" class="section-number selfRef">9.7. </a><a href="#name-state-authentication-keys" class="section-name selfRef">State Authentication Keys</a>
+        <h3 id="name-state-authentication-codes">
+<a href="#section-9.7" class="section-number selfRef">9.7. </a><a href="#name-state-authentication-codes" class="section-name selfRef">State Authentication Codes</a>
         </h3>
-<p id="section-9.7-1">The main MLS key schedule provides a per-epoch <code>authentication_secret</code>.
+<p id="section-9.7-1">The main MLS key schedule provides a per-epoch <code>authentication_code</code>.
 If one of the parties is being actively impersonated by an attacker, their
-<code>authentication_secret</code> will differ from that of the other group members.
-Thus, members of a group MAY use their <code>authentication_secrets</code> within
-an out-of-band authentication protocol to ensure that they
-share the same view of the group.<a href="#section-9.7-1" class="pilcrow">¶</a></p>
+<code>authentication_code</code> will differ from that of the other group members.  Thus,
+members of a group MAY verify out of band that their <code>authentication_code</code>
+values are all the same, in order to ensure that they share the same view of the
+group.<a href="#section-9.7-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
