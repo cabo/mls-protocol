@@ -4463,7 +4463,7 @@ proceeds as shown in the following diagram:<a href="#section-9-9" class="pilcrow
           </svg><a href="#section-9-10.1" class="pilcrow">¶</a>
 </div>
 </div>
-<p id="section-9-11">A number of secrets are derived from the epoch secret for different purposes:<a href="#section-9-11" class="pilcrow">¶</a></p>
+<p id="section-9-11">A number of values are derived from the epoch secret for different purposes:<a href="#section-9-11" class="pilcrow">¶</a></p>
 <span id="name-epoch-derived-secrets"></span><div id="epoch-derived-secrets">
 <table class="center" id="table-3">
         <caption>
@@ -4537,15 +4537,18 @@ proceeds as shown in the following diagram:<a href="#section-9-9" class="pilcrow
         </tbody>
       </table>
 </div>
-<p id="section-9-13">The "external secret" is used to derive an HPKE key pair whose private key is
-held by the entire group:<a href="#section-9-13" class="pilcrow">¶</a></p>
-<div id="section-9-14">
+<p id="section-9-13">(In general, we use "secret" to refer to a value that is used derive further
+secret values, and "key" to refer to a value that is used with an algorithm such
+as HMAC or an AEAD algorithm.)<a href="#section-9-13" class="pilcrow">¶</a></p>
+<p id="section-9-14">The <code>external_secret</code> is used to derive an HPKE key pair whose private key is
+held by the entire group:<a href="#section-9-14" class="pilcrow">¶</a></p>
+<div id="section-9-15">
 <pre class="lang-pseudocode sourcecode">
 external_priv, external_pub = KEM.DeriveKeyPair(external_secret)
-</pre><a href="#section-9-14" class="pilcrow">¶</a>
+</pre><a href="#section-9-15" class="pilcrow">¶</a>
 </div>
-<p id="section-9-15">The public key <code>external_pub</code> can be published as part of the GroupInfo struct
-in order to allow non-members to join the group using an external commit.<a href="#section-9-15" class="pilcrow">¶</a></p>
+<p id="section-9-16">The public key <code>external_pub</code> can be published as part of the GroupInfo struct
+in order to allow non-members to join the group using an external commit.<a href="#section-9-16" class="pilcrow">¶</a></p>
 <div id="group-context">
 <section id="section-9.1">
         <h3 id="name-group-context">
