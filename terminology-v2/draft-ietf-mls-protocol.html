@@ -4905,11 +4905,11 @@ by the other group members.<a href="#section-9.7-1" class="pilcrow">¶</a></p>
 <p id="section-9.7-2">This property can be used to construct defenses against impersonation attacks
 that are effective even if members' signature keys are compromised. As a trivial
 example, if the users of the clients in an MLS group were to meet in person and
-confirm that their epoch authenticator values were equal (using some suitable
-user interface), then each user would be assured that the others were not being
-impersonated in the current epoch. As soon as the epoch changed, though, they
-would need to re-do this confirmation. The state of the group would have
-changed, possibly introducing an attacker.<a href="#section-9.7-2" class="pilcrow">¶</a></p>
+reliably confirm that their epoch authenticator values were equal (using some
+suitable user interface), then each user would be assured that the others were
+not being impersonated in the current epoch. As soon as the epoch changed,
+though, they would need to re-do this confirmation. The state of the group would
+have changed, possibly introducing an attacker.<a href="#section-9.7-2" class="pilcrow">¶</a></p>
 <p id="section-9.7-3">More generally, in order for the members of an MLS group to obtain concrete
 authentication protections using the <code>epoch_authenticator</code>, they will need to
 use it in some secondary protocol (such as the face-to-face protocol above).
