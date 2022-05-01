@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-04-28T02:31:55.245275+00:00",
+  "timestamp": "2022-05-01T02:17:35.093438+00:00",
   "repo": "mlswg/mls-protocol",
   "labels": [
     {
@@ -6361,16 +6361,24 @@
       "id": "I_kwDOBoyH6c5G7N8Q",
       "title": "Secrets and Keys",
       "url": "https://github.com/mlswg/mls-protocol/issues/630",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "br-hale",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "The spec currently uses a mix of terminologies for keys/secrets. In the key schedule we have the following:\r\n------\r\nsender_data_secret | \"sender data\"\r\nencryption_secret | \"encryption\"\r\nexporter_secret | \"exporter\"\r\nauthentication_secret | \"authentication\"\r\nexternal_secret | \"external\"\r\nconfirmation_key | \"confirm\"\r\nmembership_key | \"membership\"\r\nresumption_secret | \"resumption\"\r\n-------\r\n\r\nIt would be best to provide a coherency to how we use these terms and check for consistency throughout, to avoid confusion for readers:\r\n\r\n- A simple solution would be to use \"secret\" for all cases, i.e., changing membership_key to membership_secret. \r\n\r\n- Another alternative, which may take more refining but could be useful to readers is to separate out terms based on items that are for internal protocol use versus external protocol use. For example, encryption, confirmation, membership, etc., would use \"key\" and exporter, authentication, etc., could use \"secret\", or vice versa. \r\n\r\n\r\n--Break--\r\n\r\n\r\nRef the mailinglist on confirmation vs authentication secrets, perhaps the naming of these two are a little misleading - authentication normally being within bounds of a protocol while confirmation is external to it. This confusion probably sparked some of that discussion to begin with. It _could_ be worth considering switching those terms for clarity.\r\n\r\n",
       "createdAt": "2022-04-01T15:04:35Z",
-      "updatedAt": "2022-04-12T22:26:31Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2022-04-28T16:50:38Z",
+      "closedAt": "2022-04-28T16:50:38Z",
+      "comments": [
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I actually think we have a fairly coherent taxonomy here:\r\n\r\n* \"secret\" is something that gets fed into HKDF to derive further things\r\n* \"key\" is something that gets fed into another algorithm, e.g., HMAC\r\n\r\nLooking through the list, the ones that deviate from this pattern are:\r\n\r\n1. `resumption_secret`, which is exported to the application but expected to be kept private\r\n2. `authentication_secret`, which is exported to the application but not expected to be kept private\r\n\r\nGiven that, I would propose we update the table in question to something like the following, using `resumption_psk` because that's how it's used, and `authentication_code` to follow the \"security code\" terminology used by applications:\r\n\r\n| Label           | Secret                | Usage                                             |\r\n|:----------------|:----------------------|:--------------------------------------------------|\r\n| \"sender data\"   | `sender_data_secret`  | Deriving keys to encrypt sender data              |\r\n| \"encryption\"    | `encryption_secret`   | Deriving message encryption keys                  |\r\n| \"exporter\"      | `exporter_secret`     | Deriving exported secrets                         |\r\n| \"external\"      | `external_secret`     | Deriving the external init key                    |\r\n| \"confirm\"       | `confirmation_key`    | Computing the confirmation MAC for an epoch       |\r\n| \"membership\"    | `membership_key`      | Computing the membership MAC for an MLSPlaintext  |\r\n| \"resumption\"    | `resumption_psk`      | Proving membership in a prior epoch (via a PSK)   |\r\n| \"authentication\"| `authentication_code` | Confirming that two clients are in the same epoch |\r\n\r\n",
+          "createdAt": "2022-04-28T13:15:50Z",
+          "updatedAt": "2022-04-28T13:15:50Z"
+        }
+      ]
     },
     {
       "number": 633,
@@ -6387,6 +6395,114 @@
       "updatedAt": "2022-04-12T22:26:15Z",
       "closedAt": "2022-04-12T22:26:15Z",
       "comments": []
+    },
+    {
+      "number": 638,
+      "id": "I_kwDOBoyH6c5IqMv1",
+      "title": "Keys and Secrets",
+      "url": "https://github.com/mlswg/mls-protocol/issues/638",
+      "state": "OPEN",
+      "author": "br-hale",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Reopening #630 due to incomplete discussion and inaccuracy.\r\n\r\nThe claims presented are incorrect in response by @bifurcation demonstrate a misunderstanding of the roles of these keys and uses, and #636 constitutes a change to the fundamental uses thereof.\r\n\r\nThe authentication_secret is NOT a public value nor was it ever introduced as such. If an application is using it as a public value, that onus is on the developers, and I advise against using Cisco's implementation as a standard for MLS. As shown in the name and all original discussion, the authentication_secret is intended as a secret value (or else 'public' in the same way that the group secret is 'public). It is used for further derivation to support authentication.\r\n\r\nThis should be corrected, and such foundational changes without WG discussion should be avoided.\r\n",
+      "createdAt": "2022-04-28T17:03:21Z",
+      "updatedAt": "2022-04-29T20:56:08Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Clearly we have a disagreement here @br-hale, but maybe let's hold off on attributing misunderstanding.\r\n\r\nIt seems like you are claiming that in order for MLS to be secure, the `authentication_secret` needs to be protected to the same level as the `epoch_secret`.  What is this based on?\r\n\r\nIf that is true, then we should probably remove the `authentication_secret` altogether.  The \"out-of-band\" protocol in which it would be confirmed would have to be part of the MLS security analysis, thus no longer out-of-band.",
+          "createdAt": "2022-04-28T17:46:10Z",
+          "updatedAt": "2022-04-28T17:46:10Z"
+        },
+        {
+          "author": "br-hale",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "@bifurcation that is not the claim at all - different uses imply different compromise risks. This should not be a new concept to understand. As demonstrated in the terminology, the authentication_secret is linked to authentication, not confidentiality. \r\n\r\nMLS, per specification, outsources authentication (the AS is not explicitly defined and all entity authentication within MLS relies on it). Even though it is definitionally out-of-scope and therefore out-of-band (certificates, authentication verification are entirely out-of-band of the protocol spec), we do not say that signature secret keys can be \"public\" - yet you are asserting that an authentication_secret which can support epoch-level authentication would be public. The authentication_secret is private in the same way that the exporter_value is: based on key schedule derivation, compromise of these keys should not undermine MLS, but secrecy of them can be leveraged. So, unless you are now proposing removing mention of certificates, etc. from the core protocol, there really isn't a logical basis for removing 'out-of-band' authentication mechanisms.",
+          "createdAt": "2022-04-28T18:06:08Z",
+          "updatedAt": "2022-04-28T18:06:08Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "What I'm trying to get at here is: What is the negative consequence if an `authentication_secret` is known by someone other than the members of a group?\r\n\r\nFor example, leaking a signature private key would enable the attacker to impersonate the corresponding member.  Leaking the `encryption_secret` would allow the attacker to decrypt all of the group's messages.\r\n\r\nWhat is the bad consequence of an `authentication_secret` becoming public?",
+          "createdAt": "2022-04-28T18:14:45Z",
+          "updatedAt": "2022-04-28T18:15:26Z"
+        },
+        {
+          "author": "br-hale",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "@bifurcation I am also assuming that this push to use epoch-level authentication values as public codes is based on Cisco's implementation choice. I would be curious to know why there is such insistence that all implementations also go about using authentication in the same way. If an implementation chooses to use it as a secret value to then derive an authentication code based on yet other information, why is that a problem?",
+          "createdAt": "2022-04-28T18:15:32Z",
+          "updatedAt": "2022-04-28T18:15:32Z"
+        },
+        {
+          "author": "br-hale",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Publishing the authentication_secret as a public value has a similar effect as publishing the exporter_value as public - it is not an issue for MLS per protocol spec, but it would definitely be an issue for the application if it is then used for something secret thereafter. \r\n\r\nOne reason not to specify these as public values is that they are derived following the conditions placed on keys and therefore _could_ be used as secret values if desired by an application. Forcing or annotating them as immediately public, or as final 'codes', when such a use as a secret key is an out-of-scope potential is artificial and unnecessary. ",
+          "createdAt": "2022-04-28T18:26:37Z",
+          "updatedAt": "2022-04-28T18:26:37Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I'm not pushing anything, I'm just trying to get the protocol to be clear.  If this thing needs to be secret, then it needs to be secret, and we need to document that so that people keep it secret.\r\n\r\nThanks for elaborating more on your concerns.  I see what you're saying -- basically the same point that @kkohbrok and I discussed [in the PR](https://github.com/mlswg/mls-protocol/pull/636#discussion_r860994871).  \r\n\r\nI think the core of the disagreement here is what we mean when we say that a value is \"public\" or \"secret\".  I mean something very specific: That the security guarantees of MLS will not be harmed if a public value is provided to the attacker, and they will be harmed if a secret value is provided to the attacker.  Importantly, \"public\" does not mean that the value must be published, or that the security guarantees of an application using MLS will not be harmed if you publish the value.  \r\n\r\nIt seems to me that in that specific taxonomy, the `authentication_secret` is \"public\" and not \"secret\".  Do you disagree?\r\n",
+          "createdAt": "2022-04-28T18:54:24Z",
+          "updatedAt": "2022-04-28T18:54:24Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "BTW, the notion of something being \"public\" at one layer but \"secret\" at another is not new. For example, values exported from TLS aren't secret in the sense that publishing them would compromise TLS.  You could authenticate your TLS connection by exporting a value and shouting it through megaphones across a crowd.  But the main way people use them in practice is as secrets in some other protocol.  Every WebRTC call uses SRTP keys that are exported from TLS, and many people would be very sad if these \"public\" values were published.",
+          "createdAt": "2022-04-28T19:12:30Z",
+          "updatedAt": "2022-04-28T19:12:30Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "If it would help, I would be happy to add some text to the Security Considerations clarifying this distinction.  Basically, draw a clear boundary around which values have to be kept confidential to the client in order to realize the security properties of the protocol.\r\n\r\nBut I still think `authentication_code` is a clearer name.  Doesn't mean you have to use it in any particular way in your application; doesn't prevent it being used as a shared secret; but also doesn't imply that the MLS library has to worry about its secrecy.",
+          "createdAt": "2022-04-28T19:23:29Z",
+          "updatedAt": "2022-04-28T19:23:29Z"
+        },
+        {
+          "author": "br-hale",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Within the bounds of that particular taxonomy there is not an issue. However, while you may be following a given taxonomy, that is not a general one, one that would be widely understood by implementors, nor is it specified in the protocol spec. It is not an unreasonable taxonomy, but it certainly not a general one. If you are looking for MLS usage spec to align to your taxonomy then I do think that there should be a clarification section added.\r\n\r\nBTW as a point case on more standard terminology use, the TLS 1.3 spec uses the exact phrasing for exporters as \"exporter_master_secret\", from which the actual exporter may be derived. This aligns very closely to the authentication_secret, from which an authentication code _later_ may be derived. TLS is generic in 'exporters' after an exporter_master_secret is derived. Thus there is alignment of the term 'secret' to things that can be used for keys (have sufficient entropy), not as an alignment to public/secret at different layers. \r\n\r\nI am strongly opposed to the use of authentication_code, and see no clear definition for that in your customized taxonomy. As such, it would follow the more standard interpretations, such as message authentication codes, etc. which are indeed explicitly public values. Codes are normally an end-state in themselves, not keys. Perhaps it is a clearer name for the Cisco implementation design, but it is not a clear name for something that can/should be used for further derivations as may be more generally applicable. Following the TLS norm for exporters, the name would be \"authentication_master_secret\". The shortened \"authentication_secret\" was a good name. If you are going to provide a write-up for the custom taxonomy, then an adjustment to \"authentication_exporter\" could perhaps be made.",
+          "createdAt": "2022-04-28T19:44:08Z",
+          "updatedAt": "2022-04-28T19:44:42Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "The notion of a having boundary to the protocol and values that may or may not safely be exported across the boundary is not exotic or customized.  You see it in FIPS 140-2, PKCS#11, and WebCrypto, and in tools like ProVerif and Tamarin.  The only choice I'm making is in the specific words, in particular reserving \"secret\" for \"something that should not be exposed outside the protocol implementation because it would compromise the protocol\".\r\n\r\nI hope you agree that `authentication_secret` is different from say `epoch_secret` in this regard.  It would be OK for an MLS implementation to have an API for an application to access the `authentication_secret`, but it would not be OK to have an API to access the `epoch_secret`.\r\n\r\nI'm not wedded to `_code`, I just want something other than `_secret`.  If you want to align with the exported values (to which I agree it is similar), we could call it an `authentication_value`.\r\n\r\n",
+          "createdAt": "2022-04-28T21:04:26Z",
+          "updatedAt": "2022-04-28T21:04:26Z"
+        },
+        {
+          "author": "br-hale",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "The distinction between those documents and tools, and the MLS spec is that those tools clearly define the boundaries and terminology, vs. just anyone making terminology assumptions without them being specified in the document. Not to be pedantic, but if you want to assume specific meanings for terms relative to a threat model for MLS only, versus a general usage (\"exporter secrets\" being secrets used in other things), then you really do need to specify those assumptions within the specification itself and not various side discussions. Such specification is part of what a standard is meant to do. Within other documents this is clearly defined - i.e., what is known as a threat model - such as one sees in ProVerif and Tamarin. \r\n\r\nAssuming that you are going to add such a taxonomy, and that it follows that described by you in #630, then the correct term would be \"authentication_key\". To quote you what you said there, \r\n> \"key\" is something that gets fed into another algorithm, e.g., HMAC\r\n \r\n- which correctly aligns to a reasonable usage of the authentication_key. \r\n\r\n\r\n#630 pointed out that there is a lack of consistency in the usage of \"keys\" vs \"secrets\" throughout the document - something that still has not been addressed and should not be dropped from the issue for edits. Regardless of what taxonomy is being used or even assumed, there is no consistency in it in the spec. You seem to be commenting on adjustments only for the \"_key\" and \"_secret\" uses that appear as variables, but the commentary within the spec interchangeably use these terms for the same thing. Whatever is used should be applied consistently. It is not reasonable to assume that developers will correctly guess reasons for terminology separations particularly when they are inconsistently enforced. \r\n\r\n",
+          "createdAt": "2022-04-29T00:17:30Z",
+          "updatedAt": "2022-04-29T00:17:53Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "On your latter point about usage of \"keys\" vs \"secrets\" throughout the document \u2014 Sorry if I misinterpreted your intent here.  If you're seeing places where there are inconsistencies, it would be helpful if you could highlight those more specifically, or ideally send a PR to fix them.",
+          "createdAt": "2022-04-29T19:24:43Z",
+          "updatedAt": "2022-04-29T19:24:43Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@br-hale had a call about this today and hashed out a couple of things:\r\n\r\n* We should be clear in general about what we mean by secrets/keys, in that we generally use them interchangeably, but sometimes use one or the other to indicate how a specific value is used\r\n* The need for secrecy of the value labeled `authentication_secret` depends on the context in which it is used.  So we should provide some text to suggest that there are different ways to use it, and use a fairly neutral name.  @br-hale  suggested `epoch_authenticator`, which I like a lot.\r\n\r\nI have attempted to implement these in #639",
+          "createdAt": "2022-04-29T20:56:08Z",
+          "updatedAt": "2022-04-29T20:56:08Z"
+        }
+      ]
     }
   ],
   "pulls": [
@@ -45968,7 +46084,7 @@
       "labels": [],
       "body": "I was thinking about a possible proliferation of credentials. This could mean a lot more KeyPackages and it could lead to situations where some members are added to a group and use some fancy or rather esoteric credential scheme and then want to invite other new clients, but not all the new clients support that credential scheme.\r\n\r\nThis strikes me as potentially unnecessary. If all clients support BasicCredential, why not include a BasicCredential in every other Credential (it would be a copy of the identity and public key from your X.509Certificate or ProofCredential or JsonWebCredential or CborWebTokenCredential or whatever).\r\n\r\nMaybe this makes it a lot easier to add new credential types later as in the ProofCredential discussion [1] because the new credential does not prevent communication with other other clients.\r\n\r\n[1] https://github.com/mlswg/mls-protocol/pull/592",
       "createdAt": "2022-04-01T02:22:40Z",
-      "updatedAt": "2022-04-12T22:38:39Z",
+      "updatedAt": "2022-04-29T17:53:03Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "75dc112c95e546ea7c888202c14e154798439355",
@@ -46014,6 +46130,13 @@
           "body": "Strong disagree on removing credential types @kkohbrok.  This protocol needs to be clear on what's in the `authentication_info`, even if that information is ultimately only processed by the application.\r\n\r\nOn thinking on this a bit further: I think the concerns about \"Fail slow / fail open\" are adequately addressed by #631.  And it's not clear to me that any format besides X.509 will end up with the duplication that causes the other issues.  (Though there will be some, since the `auth_info` will have to have some binding to the key.)\r\n\r\nSo I would be OK with this PR if we refactor to the \"public key + auth_info\" framework I sketched. ",
           "createdAt": "2022-04-12T22:38:39Z",
           "updatedAt": "2022-04-12T22:38:39Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@rohan-wire Note that I filed #637 as an alternative approach here.  But as discusssed there, I think any of these approaches where we factor the public key out of the credential risks invites bad design patterns in future credentials.\r\n\r\nSo I'm inclined to burn down this strawman, and close both this PR and #637.",
+          "createdAt": "2022-04-29T17:53:03Z",
+          "updatedAt": "2022-04-29T17:53:03Z"
         }
       ],
       "reviews": []
@@ -46173,24 +46296,26 @@
       "id": "PR_kwDOBoyH6c42cWK5",
       "title": "Fix parent hash",
       "url": "https://github.com/mlswg/mls-protocol/pull/635",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "mulmarta",
-      "authorAssociation": "NONE",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "The current draft implements the original incorrect version of the tree-hash-for-parent-hash mechanism proposed in #527. That version [breaks in some border cases](https://github.com/mlswg/mls-protocol/pull/527#issuecomment-1020387612). This PR implements the corrected \"full-extension + tree hash\" mechanism proposed by @TWal [here](https://github.com/mlswg/mls-protocol/pull/527#issuecomment-1035122916).",
       "createdAt": "2022-04-19T18:09:25Z",
-      "updatedAt": "2022-04-27T20:36:57Z",
+      "updatedAt": "2022-04-28T12:56:00Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "172b7235d91491efb066c4808327fc600f61b0cd",
       "headRepository": "mulmarta/mls-protocol",
       "headRefName": "fix-parent-hash",
-      "headRefOid": "9374a5d36e6204fa4656064dcd28c4d229c1ba80",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "57241833637e1e3e4100d80f7d3210a9902f74f8",
+      "closedAt": "2022-04-28T12:55:59Z",
+      "mergedAt": "2022-04-28T12:55:59Z",
+      "mergedBy": "bifurcation",
+      "mergeCommit": {
+        "oid": "e9ab1075a816fdc88851d1b6c4db5987dd537aec"
+      },
       "comments": [],
       "reviews": [
         {
@@ -46222,6 +46347,460 @@
               "body": "```suggestion\r\n* A adds a new member at F in a partial Commit, adding F as unmerged at X, Y, and W\r\n```",
               "createdAt": "2022-04-27T20:33:30Z",
               "updatedAt": "2022-04-27T20:36:58Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c45AEQr",
+          "commit": {
+            "abbreviatedOid": "9374a5d"
+          },
+          "author": "mulmarta",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-04-28T12:04:07Z",
+          "updatedAt": "2022-04-28T12:04:08Z",
+          "comments": [
+            {
+              "originalPosition": 35,
+              "body": "Actually, it's the result below that's wrong. This tree couldn't result from any execution. Reason: after the \"omit redundant nodes\" PR, X would never be inserted by E's commit if F was blank at the time. I changed the result.",
+              "createdAt": "2022-04-28T12:04:07Z",
+              "updatedAt": "2022-04-28T12:04:08Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c45AEVl",
+          "commit": {
+            "abbreviatedOid": "9374a5d"
+          },
+          "author": "mulmarta",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-04-28T12:04:24Z",
+          "updatedAt": "2022-04-28T12:04:24Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": "Done. Hope it's better now.",
+              "createdAt": "2022-04-28T12:04:24Z",
+              "updatedAt": "2022-04-28T12:04:25Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c45AEih",
+          "commit": {
+            "abbreviatedOid": "9374a5d"
+          },
+          "author": "mulmarta",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-04-28T12:05:10Z",
+          "updatedAt": "2022-04-28T12:05:10Z",
+          "comments": [
+            {
+              "originalPosition": 118,
+              "body": "I removed X from the tree, so the current version is correct again.",
+              "createdAt": "2022-04-28T12:05:10Z",
+              "updatedAt": "2022-04-28T12:05:10Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 636,
+      "id": "PR_kwDOBoyH6c428kNB",
+      "title": "Clean up terminology of derived secrets/keys",
+      "url": "https://github.com/mlswg/mls-protocol/pull/636",
+      "state": "MERGED",
+      "author": "bifurcation",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Fixes #630 ",
+      "createdAt": "2022-04-28T13:23:34Z",
+      "updatedAt": "2022-04-29T06:06:14Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "e9ab1075a816fdc88851d1b6c4db5987dd537aec",
+      "headRepository": "mlswg/mls-protocol",
+      "headRefName": "secret-key",
+      "headRefOid": "a5b94c05a56e28f2d6d3b89503b4ea71f7c40614",
+      "closedAt": "2022-04-28T16:50:38Z",
+      "mergedAt": "2022-04-28T16:50:38Z",
+      "mergedBy": "bifurcation",
+      "mergeCommit": {
+        "oid": "66a59c7c3880b21a49f32cd8aaf2af3e93c8d40e"
+      },
+      "comments": [
+        {
+          "author": "mulmarta",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Looks good! I would maybe add 1 sentence explaining the rule for what is called a secret and what is called a key. The rule says that a secret will go through some key derivation to obtain a key/keys, is that right?",
+          "createdAt": "2022-04-28T16:20:08Z",
+          "updatedAt": "2022-04-28T16:20:08Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@mulmarta Yep, that's exactly right.  Added a sentence.\r\n\r\nThanks for the feedback everyone!",
+          "createdAt": "2022-04-28T16:49:01Z",
+          "updatedAt": "2022-04-28T16:49:01Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOBoyH6c45Ax_L",
+          "commit": {
+            "abbreviatedOid": "1d9359b"
+          },
+          "author": "TWal",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "Things are easier to understand like this!\r\n\r\nThe \"Purpose\" column is quite valuable I think, I remember I was quite overwhelmed when I first read it and had no idea what all those secret / keys were used for. This helps to understand the big picture.",
+          "createdAt": "2022-04-28T14:08:37Z",
+          "updatedAt": "2022-04-28T14:10:59Z",
+          "comments": [
+            {
+              "originalPosition": 22,
+              "body": "Isn't it to prove the membership of the current epoch, to be used in a future epoch?",
+              "createdAt": "2022-04-28T14:08:37Z",
+              "updatedAt": "2022-04-28T14:10:59Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c45Azn9",
+          "commit": {
+            "abbreviatedOid": "1d9359b"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-04-28T14:12:40Z",
+          "updatedAt": "2022-04-28T14:12:40Z",
+          "comments": [
+            {
+              "originalPosition": 22,
+              "body": "Ah, good point, will revise.",
+              "createdAt": "2022-04-28T14:12:40Z",
+              "updatedAt": "2022-04-28T14:12:40Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c45A_yz",
+          "commit": {
+            "abbreviatedOid": "af3c5ec"
+          },
+          "author": "kkohbrok",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "Looks good in general, although I think we should keep the authentication secret a secret rather than a code, since it might be used to do other things than just straight-up compare it. Since it's up to the application to decide how exactly to use it, we should call it a secret and if the application wants to do something with it, it should probably do an additional derivation anyway to make sure there's no potential key-reuse.",
+          "createdAt": "2022-04-28T14:41:31Z",
+          "updatedAt": "2022-04-28T14:47:25Z",
+          "comments": [
+            {
+              "originalPosition": 23,
+              "body": "I'd still call this \"secret\" instead of \"code\", since it's not clear that it's just going to be compared. I could also be used to derive keys for other primitives that are then used for authentication, e.g. to compute a MAC. This also applies to the text changes below.",
+              "createdAt": "2022-04-28T14:41:31Z",
+              "updatedAt": "2022-04-28T14:47:25Z"
+            },
+            {
+              "originalPosition": 22,
+              "body": "The text calls this a PSK, but come to think of it, this is really more of a secret that is then used to derive the proper PSK(s). But then again, I guess it is a key and it is pre-shared, so why wouldn't it be called a PSK?",
+              "createdAt": "2022-04-28T14:44:35Z",
+              "updatedAt": "2022-04-28T14:47:25Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c45BDWm",
+          "commit": {
+            "abbreviatedOid": "af3c5ec"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-04-28T14:49:34Z",
+          "updatedAt": "2022-04-28T14:49:35Z",
+          "comments": [
+            {
+              "originalPosition": 22,
+              "body": "Yeah, it gets used via the `PreSharedKey` proposal, so let's just call it that :)",
+              "createdAt": "2022-04-28T14:49:35Z",
+              "updatedAt": "2022-04-28T14:49:35Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c45BEoc",
+          "commit": {
+            "abbreviatedOid": "af3c5ec"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-04-28T14:52:17Z",
+          "updatedAt": "2022-04-28T14:52:17Z",
+          "comments": [
+            {
+              "originalPosition": 23,
+              "body": "I don't like \"secret\" for this because that makes it sound like the security of the protocol is degraded if it is revealed -- which is true of all the other \"secrets\" here. (Also \"keys\" and sort of \"psk\".)  The authentication value, by contrast, is intended to be safe to send raw out-of-band (e.g., displayed in a Webex meeting!) without degrading the security of the protocol.",
+              "createdAt": "2022-04-28T14:52:17Z",
+              "updatedAt": "2022-04-28T14:52:17Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c45BFmz",
+          "commit": {
+            "abbreviatedOid": "af3c5ec"
+          },
+          "author": "kkohbrok",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-04-28T14:54:39Z",
+          "updatedAt": "2022-04-28T14:54:39Z",
+          "comments": [
+            {
+              "originalPosition": 23,
+              "body": "Ah, I see what you mean. But the same goes for the exporter secret, doesn't it?",
+              "createdAt": "2022-04-28T14:54:39Z",
+              "updatedAt": "2022-04-28T14:54:39Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c45BGZW",
+          "commit": {
+            "abbreviatedOid": "af3c5ec"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-04-28T14:56:39Z",
+          "updatedAt": "2022-04-28T14:56:39Z",
+          "comments": [
+            {
+              "originalPosition": 23,
+              "body": "Same goes for the export**ed** secrets, and we just call those `exported_value`.  But the `exporter_secret` is an input to the key derivation, so in keeping with the \"secret\" == \"input to HKDF\" scheme, it makes sense.",
+              "createdAt": "2022-04-28T14:56:39Z",
+              "updatedAt": "2022-04-28T14:56:39Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c45BIiy",
+          "commit": {
+            "abbreviatedOid": "af3c5ec"
+          },
+          "author": "kkohbrok",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-04-28T15:01:55Z",
+          "updatedAt": "2022-04-28T15:01:55Z",
+          "comments": [
+            {
+              "originalPosition": 23,
+              "body": "Ah, good point. I had missed that. I guess if we wanted to use the authentication secret/code for something else than comparison, we'd have to go the same route as with the exporter secret/exported values. I'd be ok to call it \"code\", at least until we figure out a good way to use it beyond comparison.",
+              "createdAt": "2022-04-28T15:01:55Z",
+              "updatedAt": "2022-04-28T15:01:55Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c45B0w6",
+          "commit": {
+            "abbreviatedOid": "a5b94c0"
+          },
+          "author": "br-hale",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-04-28T17:05:30Z",
+          "updatedAt": "2022-04-28T17:05:31Z",
+          "comments": [
+            {
+              "originalPosition": 23,
+              "body": "I am not OK with it being called a 'code' as that implies it should be used directly without further derivation. If an application uses it directly without proper combinations of other information, that is the responsibility of the developer (or perhaps the \"irresponsibilty\"). Such behavior should not be inferred in the spec.",
+              "createdAt": "2022-04-28T17:05:30Z",
+              "updatedAt": "2022-04-28T17:05:31Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 637,
+      "id": "PR_kwDOBoyH6c428ulN",
+      "title": "Ensure that a signature public key is always intelligible",
+      "url": "https://github.com/mlswg/mls-protocol/pull/637",
+      "state": "OPEN",
+      "author": "bifurcation",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This PR moves the signature key from `Credential` to `LeafNode`, to ensure that an MLS client always has a signature public key with which to verify messages, even if it does not support a member's credential type.\r\n\r\nThis is an alternative approach to #628, and IMO a bit cleaner.  We no longer need the notion of a SignatureScheme, since BasicCredential doesn't stand alone.  And since Credential only appears in LeafNode, common fields can be hoisted up into LeafNode. The Credential struct really only exists as a conceptual boundary, to make the exposition clearer; otherwise you could just shove the `select` into LeafNode.\r\n\r\nNote that this does not obviate the need for #631.  This PR only ensures that the signatures can be processed; that PR helps ensure that the signatures are meaningful.",
+      "createdAt": "2022-04-28T13:58:50Z",
+      "updatedAt": "2022-04-29T17:50:20Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "e9ab1075a816fdc88851d1b6c4db5987dd537aec",
+      "headRepository": "mlswg/mls-protocol",
+      "headRefName": "always-pk",
+      "headRefOid": "af23d9ed248eff2a5cab816d991e6e82c91283d1",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@kkohbrok - As I noted in the intro comment, I think you can view these two PRs as addressing different levels of interop -- the mechanics of verifying signatures vs. the ability to actually meaningfully interpret a credential.  Always having the key in the same place could also allow some minor simplification to implementation logic\r\n\r\nIt's also interesting to consider what this would imply for future credential types.  On the one hand, they wouldn't need to recite the public key, just provide a binding to it, like a hash or a signature where the public key was filled in from outside.  On the other hand, it would open up the door to credential types that aren't actually bound to the public key, which creates replay risk.\r\n\r\nIn any case, as the above might hint, I don't have strong feelings about this.  I mainly wanted to present an alternative to #628 that was more palatable to me.  Given the replay risk noted above, though, I think I'm trending toward closing both this PR and #628, and just keeping the current structure with the improved compatibilty bounds provided by #631.",
+          "createdAt": "2022-04-29T17:50:19Z",
+          "updatedAt": "2022-04-29T17:50:19Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOBoyH6c45DvD-",
+          "commit": {
+            "abbreviatedOid": "483ab6b"
+          },
+          "author": "kkohbrok",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "CHANGES_REQUESTED",
+          "body": "Can you elaborate on why we need this if we also mandate that all clients have to support the credential types of all other clients? I would think that if a client supports a credential type, it knows how to extract the signature public key from that credential.",
+          "createdAt": "2022-04-29T06:10:08Z",
+          "updatedAt": "2022-04-29T06:16:58Z",
+          "comments": [
+            {
+              "originalPosition": 38,
+              "body": "```suggestion\r\napplication to decide which identifier or identifiers to use at the application\r\n```",
+              "createdAt": "2022-04-29T06:10:09Z",
+              "updatedAt": "2022-04-29T06:16:58Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 639,
+      "id": "PR_kwDOBoyH6c43GZvK",
+      "title": "Clarify secret/key; change to epoch authenticator",
+      "url": "https://github.com/mlswg/mls-protocol/pull/639",
+      "state": "OPEN",
+      "author": "bifurcation",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Fixes #638 ",
+      "createdAt": "2022-04-29T20:55:59Z",
+      "updatedAt": "2022-04-29T21:17:29Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "66a59c7c3880b21a49f32cd8aaf2af3e93c8d40e",
+      "headRepository": "mlswg/mls-protocol",
+      "headRefName": "terminology-v2",
+      "headRefOid": "7fe8b3e16173487ba2b16cf764200c75866e636f",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "br-hale",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "That looks like a good change and clarification. I added a couple small changes in in-line comments above.",
+          "createdAt": "2022-04-29T21:11:06Z",
+          "updatedAt": "2022-04-29T21:11:06Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Thanks for the review @br-hale, and thanks for hashing through this.",
+          "createdAt": "2022-04-29T21:15:38Z",
+          "updatedAt": "2022-04-29T21:15:38Z"
+        },
+        {
+          "author": "br-hale",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "The latest edit looks good and that works. ",
+          "createdAt": "2022-04-29T21:17:28Z",
+          "updatedAt": "2022-04-29T21:17:28Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOBoyH6c45HdPK",
+          "commit": {
+            "abbreviatedOid": "cd0f800"
+          },
+          "author": "br-hale",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-04-29T21:08:22Z",
+          "updatedAt": "2022-04-29T21:08:22Z",
+          "comments": [
+            {
+              "originalPosition": 51,
+              "body": "A slight suggested rewording: \"...in an MLS group were to reliably confirm out-of-band that their epoch authenticator values were equal, then...\"\r\n[this is just because actually showing the epoch authenticators face-to-face depends on other device/display attributes as well, which we do not want to make claims on here]",
+              "createdAt": "2022-04-29T21:08:22Z",
+              "updatedAt": "2022-04-29T21:08:22Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c45HdY3",
+          "commit": {
+            "abbreviatedOid": "cd0f800"
+          },
+          "author": "br-hale",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-04-29T21:09:18Z",
+          "updatedAt": "2022-04-29T21:09:19Z",
+          "comments": [
+            {
+              "originalPosition": 58,
+              "body": "Corresponding to the above edit:\r\n\"...secondary protocol (such as a face-to-face protocol)...\"",
+              "createdAt": "2022-04-29T21:09:19Z",
+              "updatedAt": "2022-04-29T21:09:19Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c45HeVq",
+          "commit": {
+            "abbreviatedOid": "cd0f800"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-04-29T21:14:47Z",
+          "updatedAt": "2022-04-29T21:14:48Z",
+          "comments": [
+            {
+              "originalPosition": 51,
+              "body": "Added a hand-wave \"(using some suitable user interface)\".  I would like to keep the in-person aspect, since it makes clear that this is really just a toy example, and if you did something real you would need to do real analysis.",
+              "createdAt": "2022-04-29T21:14:48Z",
+              "updatedAt": "2022-04-29T21:14:48Z"
             }
           ]
         }
