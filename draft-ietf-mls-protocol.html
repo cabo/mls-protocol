@@ -1027,11 +1027,11 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">MLS</td>
-<td class="right">April 2022</td>
+<td class="right">May 2022</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Barnes, et al.</td>
-<td class="center">Expires 30 October 2022</td>
+<td class="center">Expires 2 November 2022</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1044,12 +1044,12 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 <dd class="internet-draft">draft-ietf-mls-protocol-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2022-04-28" class="published">28 April 2022</time>
+<time datetime="2022-05-01" class="published">1 May 2022</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2022-10-30">30 October 2022</time></dd>
+<dd class="expires"><time datetime="2022-11-02">2 November 2022</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1119,7 +1119,7 @@ in size ranging from two to thousands.<a href="#section-abstract-1" class="pilcr
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 30 October 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 2 November 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1306,7 +1306,7 @@ in size ranging from two to thousands.<a href="#section-abstract-1" class="pilcr
                 <p id="section-toc.1-1.9.2.6.1"><a href="#section-9.6" class="xref">9.6</a>.  <a href="#name-resumption-psk" class="xref">Resumption PSK</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.7">
-                <p id="section-toc.1-1.9.2.7.1"><a href="#section-9.7" class="xref">9.7</a>.  <a href="#name-state-authentication-codes" class="xref">State Authentication Codes</a></p>
+                <p id="section-toc.1-1.9.2.7.1"><a href="#section-9.7" class="xref">9.7</a>.  <a href="#name-epoch-authenticators" class="xref">Epoch Authenticators</a></p>
 </li>
             </ul>
 </li>
@@ -1924,6 +1924,11 @@ object, as opposed to application data.<a href="#section-2-2.14.1" class="pilcro
 </dl>
 <p id="section-2-3">Terminology specific to tree computations is described in
 <a href="#ratchet-tree-terminology" class="xref">Section 5.1</a>.<a href="#section-2-3" class="pilcrow">¶</a></p>
+<p id="section-2-4">In general, symmetric values are referred to as "keys" or "secrets"
+interchangeably.  Either term denotes a value that MUST be kept confidential to
+a Client.  When labelling individual values, we typically use "secret" to refer
+to a value that is used derive further secret values, and "key" to refer to a
+value that is used with an algorithm such as HMAC or an AEAD algorithm.<a href="#section-2-4" class="pilcrow">¶</a></p>
 <div id="presentation-langauge">
 <section id="section-2.1">
         <h3 id="name-presentation-langauge">
@@ -4530,25 +4535,22 @@ proceeds as shown in the following diagram:<a href="#section-9-9" class="pilcrow
           <tr>
             <td class="text-left" rowspan="1" colspan="1">"authentication"</td>
             <td class="text-left" rowspan="1" colspan="1">
-              <code>authentication_code</code>
+              <code>epoch_authenticator</code>
 </td>
             <td class="text-left" rowspan="1" colspan="1">Confirming that two clients have the same view of the group</td>
           </tr>
         </tbody>
       </table>
 </div>
-<p id="section-9-13">(In general, we use "secret" to refer to a value that is used derive further
-secret values, and "key" to refer to a value that is used with an algorithm such
-as HMAC or an AEAD algorithm.)<a href="#section-9-13" class="pilcrow">¶</a></p>
-<p id="section-9-14">The <code>external_secret</code> is used to derive an HPKE key pair whose private key is
-held by the entire group:<a href="#section-9-14" class="pilcrow">¶</a></p>
-<div id="section-9-15">
+<p id="section-9-13">The <code>external_secret</code> is used to derive an HPKE key pair whose private key is
+held by the entire group:<a href="#section-9-13" class="pilcrow">¶</a></p>
+<div id="section-9-14">
 <pre class="lang-pseudocode sourcecode">
 external_priv, external_pub = KEM.DeriveKeyPair(external_secret)
-</pre><a href="#section-9-15" class="pilcrow">¶</a>
+</pre><a href="#section-9-14" class="pilcrow">¶</a>
 </div>
-<p id="section-9-16">The public key <code>external_pub</code> can be published as part of the GroupInfo struct
-in order to allow non-members to join the group using an external commit.<a href="#section-9-16" class="pilcrow">¶</a></p>
+<p id="section-9-15">The public key <code>external_pub</code> can be published as part of the GroupInfo struct
+in order to allow non-members to join the group using an external commit.<a href="#section-9-15" class="pilcrow">¶</a></p>
 <div id="group-context">
 <section id="section-9.1">
         <h3 id="name-group-context">
@@ -4891,17 +4893,28 @@ epochs. The application SHOULD specify an upper limit on the number of past
 epochs for which the <code>resumption_psk</code> may be stored.<a href="#section-9.6-2" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="state-authentication-codes">
+<div id="epoch-authenticators">
 <section id="section-9.7">
-        <h3 id="name-state-authentication-codes">
-<a href="#section-9.7" class="section-number selfRef">9.7. </a><a href="#name-state-authentication-codes" class="section-name selfRef">State Authentication Codes</a>
+        <h3 id="name-epoch-authenticators">
+<a href="#section-9.7" class="section-number selfRef">9.7. </a><a href="#name-epoch-authenticators" class="section-name selfRef">Epoch Authenticators</a>
         </h3>
-<p id="section-9.7-1">The main MLS key schedule provides a per-epoch <code>authentication_code</code>.
-If one of the parties is being actively impersonated by an attacker, their
-<code>authentication_code</code> will differ from that of the other group members.  Thus,
-members of a group MAY verify out of band that their <code>authentication_code</code>
-values are all the same, in order to ensure that they share the same view of the
-group.<a href="#section-9.7-1" class="pilcrow">¶</a></p>
+<p id="section-9.7-1">The main MLS key schedule provides a per-epoch <code>epoch_authenticator</code>. If one
+member of the group is being impersonated by an active attacker, the
+<code>epoch_authenticator</code> computed by their client will differ from those computed
+by the other group members.<a href="#section-9.7-1" class="pilcrow">¶</a></p>
+<p id="section-9.7-2">This property can be used to construct defenses against impersonation attacks
+that are effective even if members' signature keys are compromised. As a trivial
+example, if the users of the clients in an MLS group were to meet in person and
+reliably confirm that their epoch authenticator values were equal (using some
+suitable user interface), then each user would be assured that the others were
+not being impersonated in the current epoch. As soon as the epoch changed,
+though, they would need to re-do this confirmation. The state of the group would
+have changed, possibly introducing an attacker.<a href="#section-9.7-2" class="pilcrow">¶</a></p>
+<p id="section-9.7-3">More generally, in order for the members of an MLS group to obtain concrete
+authentication protections using the <code>epoch_authenticator</code>, they will need to
+use it in some secondary protocol (such as the face-to-face protocol above).
+The details of that protocol will then determine the specific authentication
+protections provided to the MLS group.<a href="#section-9.7-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>

@@ -5,7 +5,7 @@
 Network Working Group                                          R. Barnes
 Internet-Draft                                                     Cisco
 Intended status: Informational                             B. Beurdouche
-Expires: 30 October 2022                                 Inria & Mozilla
+Expires: 2 November 2022                                 Inria & Mozilla
                                                                R. Robert
                                                                         
                                                              J. Millican
@@ -14,7 +14,7 @@ Expires: 30 October 2022                                 Inria & Mozilla
                                                                   Google
                                                           K. Cohn-Gordon
                                                     University of Oxford
-                                                           28 April 2022
+                                                              1 May 2022
 
 
               The Messaging Layer Security (MLS) Protocol
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 30 October 2022.
+   This Internet-Draft will expire on 2 November 2022.
 
 Copyright Notice
 
@@ -119,7 +119,7 @@ Table of Contents
      9.4.  Pre-Shared Keys
      9.5.  Exporters
      9.6.  Resumption PSK
-     9.7.  State Authentication Codes
+     9.7.  Epoch Authenticators
    10. Secret Tree
      10.1.  Encryption Keys
      10.2.  Deletion Schedule
@@ -557,6 +557,13 @@ Table of Contents
 
    Terminology specific to tree computations is described in
    Section 5.1.
+
+   In general, symmetric values are referred to as "keys" or "secrets"
+   interchangeably.  Either term denotes a value that MUST be kept
+   confidential to a Client.  When labelling individual values, we
+   typically use "secret" to refer to a value that is used derive
+   further secret values, and "key" to refer to a value that is used
+   with an algorithm such as HMAC or an AEAD algorithm.
 
 2.1.  Presentation Langauge
 
@@ -2653,16 +2660,12 @@ psk_secret (or 0) --> KDF.Extract
     |                  |                     | this epoch (via a PSK |
     |                  |                     | injected later)       |
     +------------------+---------------------+-----------------------+
-    | "authentication" | authentication_code | Confirming that two   |
+    | "authentication" | epoch_authenticator | Confirming that two   |
     |                  |                     | clients have the same |
     |                  |                     | view of the group     |
     +------------------+---------------------+-----------------------+
 
                       Table 3: Epoch-derived secrets
-
-   (In general, we use "secret" to refer to a value that is used derive
-   further secret values, and "key" to refer to a value that is used
-   with an algorithm such as HMAC or an AEAD algorithm.)
 
    The external_secret is used to derive an HPKE key pair whose private
    key is held by the entire group:
@@ -2946,14 +2949,30 @@ psk_secret (or 0) --> KDF.Extract
    historical epochs.  The application SHOULD specify an upper limit on
    the number of past epochs for which the resumption_psk may be stored.
 
-9.7.  State Authentication Codes
+9.7.  Epoch Authenticators
 
-   The main MLS key schedule provides a per-epoch authentication_code.
-   If one of the parties is being actively impersonated by an attacker,
-   their authentication_code will differ from that of the other group
-   members.  Thus, members of a group MAY verify out of band that their
-   authentication_code values are all the same, in order to ensure that
-   they share the same view of the group.
+   The main MLS key schedule provides a per-epoch epoch_authenticator.
+   If one member of the group is being impersonated by an active
+   attacker, the epoch_authenticator computed by their client will
+   differ from those computed by the other group members.
+
+   This property can be used to construct defenses against impersonation
+   attacks that are effective even if members' signature keys are
+   compromised.  As a trivial example, if the users of the clients in an
+   MLS group were to meet in person and reliably confirm that their
+   epoch authenticator values were equal (using some suitable user
+   interface), then each user would be assured that the others were not
+   being impersonated in the current epoch.  As soon as the epoch
+   changed, though, they would need to re-do this confirmation.  The
+   state of the group would have changed, possibly introducing an
+   attacker.
+
+   More generally, in order for the members of an MLS group to obtain
+   concrete authentication protections using the epoch_authenticator,
+   they will need to use it in some secondary protocol (such as the
+   face-to-face protocol above).  The details of that protocol will then
+   determine the specific authentication protections provided to the MLS
+   group.
 
 10.  Secret Tree
 
