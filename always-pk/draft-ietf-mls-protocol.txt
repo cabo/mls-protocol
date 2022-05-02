@@ -5,7 +5,7 @@
 Network Working Group                                          R. Barnes
 Internet-Draft                                                     Cisco
 Intended status: Informational                             B. Beurdouche
-Expires: 31 October 2022                                 Inria & Mozilla
+Expires: 3 November 2022                                 Inria & Mozilla
                                                                R. Robert
                                                                         
                                                              J. Millican
@@ -14,7 +14,7 @@ Expires: 31 October 2022                                 Inria & Mozilla
                                                                   Google
                                                           K. Cohn-Gordon
                                                     University of Oxford
-                                                           29 April 2022
+                                                              2 May 2022
 
 
               The Messaging Layer Security (MLS) Protocol
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 31 October 2022.
+   This Internet-Draft will expire on 3 November 2022.
 
 Copyright Notice
 
@@ -1310,6 +1310,18 @@ Table of Contents
    in the credentials in the leaves of the tree (including the leaf node
    information in KeyPackages used to add new members).
 
+   Like HPKE public keys, signature public keys are represented as
+   opaque values in a format defined by the cipher suite's signature
+   scheme.
+
+   opaque SignaturePublicKey<V>;
+
+   For ciphersuites using Ed25519 or Ed448 signature schemes, the public
+   key is in the format specified in [RFC8032].  For ciphersuites using
+   ECDSA with the NIST curves (P-256, P-384, or P-521), the public key
+   is the output of the uncompressed Elliptic-Curve-Point-to-Octet-
+   String conversion according to [SECG].
+
    To disambiguate different signatures used in MLS, each signed value
    is prefixed by a label as shown below:
 
@@ -1365,21 +1377,6 @@ Table of Contents
    Each member of a group presents a credential that associates an
    identity with the member's key material.  This information is
    verified according to the Authentication Service in use for a group.
-
-   Identity information is associated with a member's signature public
-   key, which is transmitted to other members as an opaque value,
-   encoded according to the signature scheme defined by the relevant
-   ciphersuite: the group ciphersuite for a credential in a leaf node of
-   a ratchet tree or the KeyPackage ciphersuite for a credential in a
-   KeyPackage object.
-
-   opaque SignaturePublicKey<V>;
-
-   For ciphersuites using Ed25519 or Ed448 signature schemes, the public
-   key is in the format specified in [RFC8032].  For ciphersuites using
-   ECDSA with the NIST curves (P-256, P-384, or P-521), the public key
-   is the output of the uncompressed Elliptic-Curve-Point-to-Octet-
-   String conversion according to [SECG].
 
    A Credential can provide multiple identifiers for the client.  It is
    up to the application to decide which identifier or identifiers to
@@ -1843,14 +1840,14 @@ Table of Contents
    simpler:
 
    struct {
-       HPKEPublicKey public_key;
+       HPKEPublicKey encryption_key;
        opaque parent_hash<V>;
        uint32 unmerged_leaves<V>;
    } ParentNode;
 
-   The public_key field contains an HPKE public key whose private key is
-   held only by the members at the leaves among its descendants.  The
-   parent_hash field contains a hash of this node's parent node, as
+   The encryption_key field contains an HPKE public key whose private
+   key is held only by the members at the leaves among its descendants.
+   The parent_hash field contains a hash of this node's parent node, as
    described in Section 8.8.  The unmerged_leaves field lists the leaves
    under this parent node that are unmerged, according to their indices
    among all the leaves in the tree.
@@ -1891,7 +1888,7 @@ Table of Contents
    } Extension;
 
    struct {
-       HPKEPublicKey public_key;
+       HPKEPublicKey encryption_key;
        SignaturePublicKey signature_key;
        Credential credential;
        Capabilities capabilities;
@@ -1914,7 +1911,8 @@ Table of Contents
    } LeafNode;
 
    struct {
-       HPKEPublicKey public_key;
+       HPKEPublicKey encryption_key;
+       SignaturePublicKey signature_key;
        Credential credential;
        Capabilities capabilities;
 
@@ -1944,8 +1942,8 @@ Table of Contents
        }
    } LeafNodeTBS;
 
-   The public_key field conains an HPKE public key whose private key is
-   held only by the member occupying this leaf (or in the case of a
+   The encryption_key field conains an HPKE public key whose private key
+   is held only by the member occupying this leaf (or in the case of a
    LeafNode in a KeyPackage object, the issuer of the KeyPackage).  The
    credential contains authentication information for this member, as
    described in Section 6.3.
@@ -2045,9 +2043,9 @@ Table of Contents
       the members of the group (including any other members added in the
       same Commit):
 
-      -  public_key
+      -  encryption_key
 
-      -  credential.signature_key
+      -  signature_key
 
    *  Verify that the extensions in the leaf node are supported.  The ID
       for each extension in the extensions field MUST be listed in the
@@ -2356,13 +2354,13 @@ Table of Contents
    obtained by hashing P's ParentHashInput struct.
 
    struct {
-       HPKEPublicKey public_key;
+       HPKEPublicKey encryption_key;
        opaque parent_hash<V>;
        opaque original_sibling_tree_hash<V>;
    } ParentHashInput;
 
-   The field public_key contains the HPKE public key of P.  If P is the
-   root, then the parent_hash field is set to a zero-length octet
+   The field encryption_key contains the HPKE public key of P.  If P is
+   the root, then the parent_hash field is set to a zero-length octet
    string.  Otherwise, parent_hash is the Parent Hash of the next node
    after P on the filtered direct path of U.  This way, P's Parent Hash
    fixes the new HPKE public key of each node V on the path from P to
@@ -2502,7 +2500,7 @@ Table of Contents
    } HPKECiphertext;
 
    struct {
-       HPKEPublicKey public_key;
+       HPKEPublicKey encryption_key;
        HPKECiphertext encrypted_path_secret<V>;
    } UpdatePathNode;
 
@@ -3107,8 +3105,8 @@ psk_secret (or 0) --> KDF.Extract
    encryption scheme defined by cipher_suite, and it MUST be unique
    among the set of KeyPackages created by this client.  Likewise, the
    leaf_node field MUST be valid for the ciphersuite, including both the
-   public_key and credential fields.  The whole structure is signed
-   using the client's signature key.  A KeyPackage object with an
+   encryption_key and signature_key fields.  The whole structure is
+   signed using the client's signature key.  A KeyPackage object with an
    invalid signature field MUST be considered malformed.
 
    The signature is computed by the function SignWithLabel with a label
@@ -3175,8 +3173,8 @@ psk_secret (or 0) --> KDF.Extract
    *  Verify that the signature on the KeyPackage is valid using the
       public key in leaf_node.credential.
 
-   *  Verify that the value of leaf_node.public_key is different from
-      the value of the init_key field.
+   *  Verify that the value of leaf_node.encryption_key is different
+      from the value of the init_key field.
 
 11.2.  KeyPackage Identifiers
 
@@ -3454,8 +3452,8 @@ psk_secret (or 0) --> KDF.Extract
    *  Validate the LeafNode as specified in Section 8.3.  The
       leaf_node_source field MUST be set to update.
 
-   *  Verify that the public_key value in the LeafNode is different from
-      the corresponding field in the LeafNode being replaced.
+   *  Verify that the encryption_key value in the LeafNode is different
+      from the corresponding field in the LeafNode being replaced.
 
    *  Replace the sender's LeafNode with the one contained in the Update
       proposal
@@ -3733,7 +3731,7 @@ psk_secret (or 0) --> KDF.Extract
    the rest invalid.  The committer MUST consider invalid any Add or
    Update proposal if the Credential in the contained KeyPackage shares
    the same signature key with a Credential in any leaf of the group, or
-   if the LeafNode in the KeyPackage shares the same public_key with
+   if the LeafNode in the KeyPackage shares the same encryption_key with
    another LeafNode in the group.
 
    The Commit MUST NOT combine proposals sent within different epochs.
@@ -4000,8 +3998,8 @@ psk_secret (or 0) --> KDF.Extract
       -  Validate the LeafNode as specified in Section 8.3.  The
          leaf_node_source field MUST be set to commit.
 
-      -  Verify that the public_key value in the LeafNode is different
-         from the committer's current leaf node.
+      -  Verify that the encryption_key value in the LeafNode is
+         different from the committer's current leaf node.
 
       -  Apply the UpdatePath to the tree, as described in Section 8.6,
          and store leaf_node at the committer's leaf.
