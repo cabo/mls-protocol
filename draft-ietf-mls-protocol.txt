@@ -5,7 +5,7 @@
 Network Working Group                                          R. Barnes
 Internet-Draft                                                     Cisco
 Intended status: Informational                             B. Beurdouche
-Expires: 2 November 2022                                 Inria & Mozilla
+Expires: 3 November 2022                                 Inria & Mozilla
                                                                R. Robert
                                                                         
                                                              J. Millican
@@ -14,7 +14,7 @@ Expires: 2 November 2022                                 Inria & Mozilla
                                                                   Google
                                                           K. Cohn-Gordon
                                                     University of Oxford
-                                                              1 May 2022
+                                                              2 May 2022
 
 
               The Messaging Layer Security (MLS) Protocol
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 2 November 2022.
+   This Internet-Draft will expire on 3 November 2022.
 
 Copyright Notice
 
@@ -149,7 +149,7 @@ Table of Contents
    14. Extensibility
      14.1.  Ciphersuites
      14.2.  Proposals
-     14.3.  Extensions
+     14.3.  Credential Extensibility
    15. Sequencing of State Changes
      15.1.  Server-Enforced Ordering
      15.2.  Client-Enforced Ordering
@@ -1892,6 +1892,7 @@ Table of Contents
        CipherSuite ciphersuites<V>;
        ExtensionType extensions<V>;
        ProposalType proposals<V>;
+       CredentialType credentials<V>;
    } Capabilities;
 
    struct {
@@ -1967,11 +1968,14 @@ Table of Contents
    described in Section 6.3.
 
    The capabilities field indicates what protocol versions,
-   ciphersuites, protocol extensions, and non-default proposal types are
-   supported by a client.  Proposal types defined in this document are
-   considered "default" and thus need not be listed.  Extensions that
-   appear in the extensions field of a LeafNode MUST be included in the
-   extensions field of the capabilities field.
+   ciphersuites, extensions, credential types, and non-default proposal
+   types are supported by a client.  Proposal and extension types
+   defined in this document are considered "default" and thus need not
+   be listed, while any credential types the application wishes to use
+   MUST be listed.  Extensions that appear in the extensions field of a
+   LeafNode MUST be included in the extensions field of the capabilities
+   field, and the credential type used in the LeafNode MUST be included
+   in the credentials field of the capabilities field.
 
    The leaf_node_source field indicates how this LeafNode came to be
    added to the tree.  This signal tells other members of the group
@@ -2036,8 +2040,14 @@ Table of Contents
 
    *  Verify that the LeafNode is compatible with the group's
       parameters.  If the GroupContext has a required_capabilities
-      extension, then the required extensions and proposals MUST be
-      listed in the LeafNode's capabilities field.
+      extension, then the required extensions, proposals, and credential
+      types MUST be listed in the LeafNode's capabilities field.
+
+   *  Verify that the credential type is supported by all members of the
+      group, as specified by the capabilities field of each member's
+      LeafNode, and that the capabilities field of this LeafNode
+      indicates support for all the credential types currently in use by
+      other members.
 
    *  Verify the lifetime field:
 
@@ -3184,12 +3194,13 @@ psk_secret (or 0) --> KDF.Extract
    KeyPackage in an Add proposal.
 
    The field leaf_node.capabilities indicates what protocol versions,
-   ciphersuites, protocol extensions, and non-default proposal types are
-   supported by the client.  (Proposal types defined in this document
-   are considered "default" and not listed.)  This information allows
-   MLS session establishment to be safe from downgrade attacks on the
-   parameters described (as discussed in Section 12), while still only
-   advertising one version / ciphersuite per KeyPackage.
+   ciphersuites, credential types, and non-default proposal/extension
+   types are supported by the client.  (Proposal and extension types
+   defined in this document are considered "default" and not listed.)
+   This information allows MLS session establishment to be safe from
+   downgrade attacks on the parameters described (as discussed in
+   Section 12), while still only advertising one version / ciphersuite
+   per KeyPackage.
 
    The field leaf_node.leaf_node_source of the LeafNode in a KeyPackage
    MUST be set to key_package.
@@ -3301,12 +3312,13 @@ psk_secret (or 0) --> KDF.Extract
    struct {
        ExtensionType extension_types<V>;
        ProposalType proposal_types<V>;
+       CredentialType credential_types<V>;
    } RequiredCapabilities;
 
-   This extension lists the extensions and proposal types that must be
-   supported by all members of the group.  The "default" proposal and
-   extension types defined in this document are assumed to be
-   implemented by all clients, and need not be listed in
+   This extension lists the extensions, proposals, and credential types
+   that must be supported by all members of the group.  The "default"
+   proposal and extension types defined in this document are assumed to
+   be implemented by all clients, and need not be listed in
    RequiredCapabilities in order to be safely used.
 
    For new members, support for required capabilities is enforced by
@@ -4528,7 +4540,37 @@ psk_secret (or 0) --> KDF.Extract
    unless the proposal type is supported by all the members of the group
    that will process the Commit.
 
-14.3.  Extensions
+14.3.  Credential Extensibility
+
+   In order to ensure that MLS provides meaningful authentication it is
+   important that each member is able to authenticate some identity
+   information for each other member.  Identity information is encoded
+   in Credentials, so this property is assured by ensuring that members
+   use compatible credential types.
+
+   The types of credential that may be used in a group is restricted to
+   what all members of the group support, as specified by the
+   capabilities field of each LeafNode in the RatchetTree.  An
+   application can introduce new credential types by choosing an
+   unallocated identifier from the registry in Section 18.4 and
+   indicating support for the credential type in published LeafNodes,
+   whether in Update proposals to existing groups or KeyPackages that
+   are added to new groups.  Once all members in a group indicate
+   support for the credential type, members can start using LeafNodes
+   with the new credential.  Application may enforce that certain
+   credential types always remain supported by adding a
+   required_capabilities extension to the group's GroupContext, which
+   would prevent any member from being added to the group that doesn't
+   support them.
+
+   In future extensions to MLS, it may be useful to allow a member to
+   present more than one credential.  For example, such credentials
+   might present different attributes attested by different authorities.
+   To be consistent with the general principle stated at the beginning
+   of this section, such an extension would need to ensure that each
+   member can authenticate some identity for each other member.  For
+   each pair of members (Alice, Bob), Alice would need to present at
+   least one credential of a type that Bob supports. ## Extensions
 
    This protocol includes a mechanism for negotiating extension
    parameters similar to the one in TLS [RFC8446].  In TLS, extension

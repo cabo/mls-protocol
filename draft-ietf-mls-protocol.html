@@ -1031,7 +1031,7 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Barnes, et al.</td>
-<td class="center">Expires 2 November 2022</td>
+<td class="center">Expires 3 November 2022</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1044,12 +1044,12 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 <dd class="internet-draft">draft-ietf-mls-protocol-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2022-05-01" class="published">1 May 2022</time>
+<time datetime="2022-05-02" class="published">2 May 2022</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2022-11-02">2 November 2022</time></dd>
+<dd class="expires"><time datetime="2022-11-03">3 November 2022</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1119,7 +1119,7 @@ in size ranging from two to thousands.<a href="#section-abstract-1" class="pilcr
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 2 November 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 3 November 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1410,7 +1410,7 @@ in size ranging from two to thousands.<a href="#section-abstract-1" class="pilcr
                 <p id="section-toc.1-1.14.2.2.1"><a href="#section-14.2" class="xref">14.2</a>.  <a href="#name-proposals-2" class="xref">Proposals</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.3">
-                <p id="section-toc.1-1.14.2.3.1"><a href="#section-14.3" class="xref">14.3</a>.  <a href="#name-extensions" class="xref">Extensions</a></p>
+                <p id="section-toc.1-1.14.2.3.1"><a href="#section-14.3" class="xref">14.3</a>.  <a href="#name-credential-extensibility" class="xref">Credential Extensibility</a></p>
 </li>
             </ul>
 </li>
@@ -3579,6 +3579,7 @@ struct {
     CipherSuite ciphersuites&lt;V&gt;;
     ExtensionType extensions&lt;V&gt;;
     ProposalType proposals&lt;V&gt;;
+    CredentialType credentials&lt;V&gt;;
 } Capabilities;
 
 struct {
@@ -3653,10 +3654,13 @@ by the member occupying this leaf (or in the case of a LeafNode in a KeyPackage
 object, the issuer of the KeyPackage).  The <code>credential</code> contains authentication
 information for this member, as described in <a href="#credentials" class="xref">Section 6.3</a>.<a href="#section-8.2-3" class="pilcrow">¶</a></p>
 <p id="section-8.2-4">The <code>capabilities</code> field indicates what protocol versions, ciphersuites,
-protocol extensions, and non-default proposal types are supported by a client.
-Proposal types defined in this document are considered "default" and thus need
-not be listed.  Extensions that appear in the <code>extensions</code> field of a LeafNode
-MUST be included in the <code>extensions</code> field of the <code>capabilities</code> field.<a href="#section-8.2-4" class="pilcrow">¶</a></p>
+extensions, credential types, and non-default proposal types are supported by a client.
+Proposal and extension types defined in this document are considered "default" and thus need
+not be listed, while any credential types the application wishes to use MUST
+be listed. Extensions that appear in the <code>extensions</code> field of a LeafNode
+MUST be included in the <code>extensions</code> field of the <code>capabilities</code> field, and the
+credential type used in the LeafNode MUST be included in the <code>credentials</code> field
+of the <code>capabilities</code> field.<a href="#section-8.2-4" class="pilcrow">¶</a></p>
 <p id="section-8.2-5">The <code>leaf_node_source</code> field indicates how this LeafNode came to be added to the
 tree.  This signal tells other members of the group whether the leaf node is
 required to have a <code>lifetime</code> or <code>parent_hash</code>, and whether the <code>group_id</code> is
@@ -3716,45 +3720,50 @@ in the LeafNode's credential<a href="#section-8.3-4.2" class="pilcrow">¶</a>
 </li>
           <li class="normal" id="section-8.3-4.3">Verify that the LeafNode is compatible with the group's parameters.  If the
 GroupContext has a <code>required_capabilities</code> extension, then the required
-extensions and proposals MUST be listed in the LeafNode's <code>capabilities</code>
+extensions, proposals, and credential types MUST be listed in the LeafNode's <code>capabilities</code>
 field.<a href="#section-8.3-4.3" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-8.3-4.4">
-            <p id="section-8.3-4.4.1">Verify the <code>lifetime</code> field:<a href="#section-8.3-4.4.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-8.3-4.4">Verify that the credential type is supported by all members of the group, as
+specified by the <code>capabilities</code> field of each member's LeafNode, and that the
+<code>capabilities</code> field of this LeafNode indicates support for all the credential
+types currently in use by other members.<a href="#section-8.3-4.4" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-8.3-4.5">
+            <p id="section-8.3-4.5.1">Verify the <code>lifetime</code> field:<a href="#section-8.3-4.5.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-8.3-4.4.2.1">When validating a LeafNode in a KeyPackage before sending an Add proposal,
+<li class="normal" id="section-8.3-4.5.2.1">When validating a LeafNode in a KeyPackage before sending an Add proposal,
 the current time MUST be within the <code>lifetime</code> range.  A KeyPackage
 containing a LeafNode that is expired or not yet valid MUST NOT be sent in
-an Add proposal.<a href="#section-8.3-4.4.2.1" class="pilcrow">¶</a>
+an Add proposal.<a href="#section-8.3-4.5.2.1" class="pilcrow">¶</a>
 </li>
-              <li class="normal" id="section-8.3-4.4.2.2">When receiving an Add or validating a tree, checking the <code>lifetime</code> is
+              <li class="normal" id="section-8.3-4.5.2.2">When receiving an Add or validating a tree, checking the <code>lifetime</code> is
 RECOMMENDED, if it is feasible in a given application context.  Because of
 the asynchronous nature of MLS, the <code>lifetime</code> may have been valid when the
 leaf node was proposed for addition, even if it is expired at these later
-points in the protocol.<a href="#section-8.3-4.4.2.2" class="pilcrow">¶</a>
+points in the protocol.<a href="#section-8.3-4.5.2.2" class="pilcrow">¶</a>
 </li>
             </ul>
 </li>
-          <li class="normal" id="section-8.3-4.5">Verify that the <code>leaf_node_source</code> field has the appropriate value for the
+          <li class="normal" id="section-8.3-4.6">Verify that the <code>leaf_node_source</code> field has the appropriate value for the
 context in which the LeafNode is being validated (as defined in
-<a href="#leaf-node-contents" class="xref">Section 8.2</a>).<a href="#section-8.3-4.5" class="pilcrow">¶</a>
+<a href="#leaf-node-contents" class="xref">Section 8.2</a>).<a href="#section-8.3-4.6" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-8.3-4.6">
-            <p id="section-8.3-4.6.1">Verify that the following fields in the LeafNode are unique among the
+          <li class="normal" id="section-8.3-4.7">
+            <p id="section-8.3-4.7.1">Verify that the following fields in the LeafNode are unique among the
 members of the group (including any other members added in the same
-Commit):<a href="#section-8.3-4.6.1" class="pilcrow">¶</a></p>
+Commit):<a href="#section-8.3-4.7.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-8.3-4.6.2.1">
-                <code>public_key</code><a href="#section-8.3-4.6.2.1" class="pilcrow">¶</a>
+<li class="normal" id="section-8.3-4.7.2.1">
+                <code>public_key</code><a href="#section-8.3-4.7.2.1" class="pilcrow">¶</a>
 </li>
-              <li class="normal" id="section-8.3-4.6.2.2">
-                <code>credential.signature_key</code><a href="#section-8.3-4.6.2.2" class="pilcrow">¶</a>
+              <li class="normal" id="section-8.3-4.7.2.2">
+                <code>credential.signature_key</code><a href="#section-8.3-4.7.2.2" class="pilcrow">¶</a>
 </li>
             </ul>
 </li>
-          <li class="normal" id="section-8.3-4.7">Verify that the extensions in the leaf node are supported.  The ID for each
+          <li class="normal" id="section-8.3-4.8">Verify that the extensions in the leaf node are supported.  The ID for each
 extension in the <code>extensions</code> field MUST be listed in the field
-<code>capabilities.extensions</code> of the LeafNode.<a href="#section-8.3-4.7" class="pilcrow">¶</a>
+<code>capabilities.extensions</code> of the LeafNode.<a href="#section-8.3-4.8" class="pilcrow">¶</a>
 </li>
         </ul>
 </section>
@@ -5212,8 +5221,8 @@ MUST verify that the <code>version</code> field of the KeyPackage has the same v
 provides an explicit signal of the intended version to the other members of
 group when they receive the KeyPackage in an Add proposal.<a href="#section-11-7" class="pilcrow">¶</a></p>
 <p id="section-11-8">The field <code>leaf_node.capabilities</code> indicates what protocol versions,
-ciphersuites, protocol extensions, and non-default proposal types are supported
-by the client.  (Proposal types defined in this document are considered
+ciphersuites, credential types, and non-default proposal/extension types are supported
+by the client.  (Proposal and extension types defined in this document are considered
 "default" and not listed.)  This information allows MLS session
 establishment to be safe from downgrade attacks on the parameters described (as
 discussed in <a href="#group-creation" class="xref">Section 12</a>), while still only advertising one version /
@@ -5346,10 +5355,11 @@ including a <code>required_capabilities</code> extension in the GroupContext.<a 
 struct {
     ExtensionType extension_types&lt;V&gt;;
     ProposalType proposal_types&lt;V&gt;;
+    CredentialType credential_types&lt;V&gt;;
 } RequiredCapabilities;
 </pre><a href="#section-12.1-2" class="pilcrow">¶</a>
 </div>
-<p id="section-12.1-3">This extension lists the extensions and proposal types that must be supported by
+<p id="section-12.1-3">This extension lists the extensions, proposals, and credential types that must be supported by
 all members of the group. The "default" proposal and extension types defined in this
 document are assumed to be implemented by all clients, and need not be listed in
 RequiredCapabilities in order to be safely used.<a href="#section-12.1-3" class="pilcrow">¶</a></p>
@@ -6715,69 +6725,93 @@ type MUST NOT be included in a commit unless the proposal type is supported by
 all the members of the group that will process the Commit.<a href="#section-14.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="extensions">
+<div id="credential-extensibility">
 <section id="section-14.3">
-        <h3 id="name-extensions">
-<a href="#section-14.3" class="section-number selfRef">14.3. </a><a href="#name-extensions" class="section-name selfRef">Extensions</a>
+        <h3 id="name-credential-extensibility">
+<a href="#section-14.3" class="section-number selfRef">14.3. </a><a href="#name-credential-extensibility" class="section-name selfRef">Credential Extensibility</a>
         </h3>
-<p id="section-14.3-1">This protocol includes a mechanism for negotiating extension parameters similar
+<p id="section-14.3-1">In order to ensure that MLS provides meaningful authentication it is important
+that each member is able to authenticate some identity information for each
+other member.  Identity information is encoded in Credentials, so this property
+is assured by ensuring that members use compatible credential types.<a href="#section-14.3-1" class="pilcrow">¶</a></p>
+<p id="section-14.3-2">The types of credential that may be used in a group is restricted to what all
+members of the group support, as specified by the <code>capabilities</code> field of each
+LeafNode in the RatchetTree. An application can introduce new credential types
+by choosing an unallocated identifier from the registry in
+<a href="#mls-credential-types" class="xref">Section 18.4</a> and indicating support for the credential type in
+published LeafNodes, whether in Update proposals to existing groups or
+KeyPackages that are added to new groups. Once all members in a group indicate
+support for the credential type, members can start using LeafNodes with the new
+credential. Application may enforce that certain credential types always remain
+supported by adding a <code>required_capabilities</code> extension to the group's
+GroupContext, which would prevent any member from being added to the group that
+doesn't support them.<a href="#section-14.3-2" class="pilcrow">¶</a></p>
+<p id="section-14.3-3">In future extensions to MLS, it may be useful to allow a member to present more
+than one credential.  For example, such credentials might present different
+attributes attested by different authorities.  To be consistent with the general
+principle stated at the beginning of this section, such an extension would need
+to ensure that each member can authenticate some identity for each other member.
+For each pair of members (Alice, Bob), Alice would need to present at least one
+credential of a type that Bob supports.
+## Extensions<a href="#section-14.3-3" class="pilcrow">¶</a></p>
+<p id="section-14.3-4">This protocol includes a mechanism for negotiating extension parameters similar
 to the one in TLS <span>[<a href="#RFC8446" class="xref">RFC8446</a>]</span>.  In TLS, extension negotiation is one-to-one: The
 client offers extensions in its ClientHello message, and the server expresses
 its choices for the session with extensions in its ServerHello and
 EncryptedExtensions messages.  In MLS, extensions appear in the following
-places:<a href="#section-14.3-1" class="pilcrow">¶</a></p>
+places:<a href="#section-14.3-4" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-14.3-2.1">In KeyPackages, to describe additional information related to the client<a href="#section-14.3-2.1" class="pilcrow">¶</a>
+<li class="normal" id="section-14.3-5.1">In KeyPackages, to describe additional information related to the client<a href="#section-14.3-5.1" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-14.3-2.2">In LeafNodes, to describe additional information about the client or its
-participation in the group (once in the ratchet tree)<a href="#section-14.3-2.2" class="pilcrow">¶</a>
+          <li class="normal" id="section-14.3-5.2">In LeafNodes, to describe additional information about the client or its
+participation in the group (once in the ratchet tree)<a href="#section-14.3-5.2" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-14.3-2.3">In the GroupInfo, to tell new members of a group what parameters are
+          <li class="normal" id="section-14.3-5.3">In the GroupInfo, to tell new members of a group what parameters are
 being used by the group, and to provide any additional details required to
-join the group<a href="#section-14.3-2.3" class="pilcrow">¶</a>
+join the group<a href="#section-14.3-5.3" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-14.3-2.4">In the GroupContext object, to ensure that all members of the group have the
-same view of the parameters in use<a href="#section-14.3-2.4" class="pilcrow">¶</a>
+          <li class="normal" id="section-14.3-5.4">In the GroupContext object, to ensure that all members of the group have the
+same view of the parameters in use<a href="#section-14.3-5.4" class="pilcrow">¶</a>
 </li>
         </ul>
-<p id="section-14.3-3">In other words, an application can use GroupContext extensions to ensure that
+<p id="section-14.3-6">In other words, an application can use GroupContext extensions to ensure that
 all members of the group agree on a set of parameters. Clients indicate their
 support for parameters in the <code>capabilities</code> field of their LeafNode. New
 members of a group are informed of the group's GroupContext extensions via the
 <code>group_context_extensions</code> field in the GroupInfo object. The <code>other_extensions</code>
 field in a GroupInfo object can be used to provide additional parameters to new
-joiners that are used to join the group.<a href="#section-14.3-3" class="pilcrow">¶</a></p>
-<p id="section-14.3-4">This extension mechanism is designed to allow for secure and forward-compatible
+joiners that are used to join the group.<a href="#section-14.3-6" class="pilcrow">¶</a></p>
+<p id="section-14.3-7">This extension mechanism is designed to allow for secure and forward-compatible
 negotiation of extensions.  For this to work, implementations MUST correctly
-handle extensible fields:<a href="#section-14.3-4" class="pilcrow">¶</a></p>
+handle extensible fields:<a href="#section-14.3-7" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-14.3-5.1">A client that posts a KeyPackage MUST support all parameters advertised in
+<li class="normal" id="section-14.3-8.1">A client that posts a KeyPackage MUST support all parameters advertised in
 it.  Otherwise, another client might fail to interoperate by selecting one of
-those parameters.<a href="#section-14.3-5.1" class="pilcrow">¶</a>
+those parameters.<a href="#section-14.3-8.1" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-14.3-5.2">A client initiating a group MUST ignore all unrecognized ciphersuites,
+          <li class="normal" id="section-14.3-8.2">A client initiating a group MUST ignore all unrecognized ciphersuites,
 extensions, and other parameters.  Otherwise, it may fail to interoperate with
-newer clients.<a href="#section-14.3-5.2" class="pilcrow">¶</a>
+newer clients.<a href="#section-14.3-8.2" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-14.3-5.3">A client adding a new member to a group MUST verify that the LeafNode for the
+          <li class="normal" id="section-14.3-8.3">A client adding a new member to a group MUST verify that the LeafNode for the
 new member is compatible with the group's extensions.  The <code>capabilities</code>
-field MUST indicate support for each extension in the GroupContext.<a href="#section-14.3-5.3" class="pilcrow">¶</a>
+field MUST indicate support for each extension in the GroupContext.<a href="#section-14.3-8.3" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-14.3-5.4">If any extension in a GroupInfo message is unrecognized (i.e., not contained
+          <li class="normal" id="section-14.3-8.4">If any extension in a GroupInfo message is unrecognized (i.e., not contained
 in the <code>capabilities</code> of the corresponding KeyPackage), then the client MUST
-reject the Welcome message and not join the group.<a href="#section-14.3-5.4" class="pilcrow">¶</a>
+reject the Welcome message and not join the group.<a href="#section-14.3-8.4" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-14.3-5.5">The extensions populated into a GroupContext object are drawn from those in
-the GroupInfo object, according to the definitions of those extensions.<a href="#section-14.3-5.5" class="pilcrow">¶</a>
+          <li class="normal" id="section-14.3-8.5">The extensions populated into a GroupContext object are drawn from those in
+the GroupInfo object, according to the definitions of those extensions.<a href="#section-14.3-8.5" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-14.3-5.6">Any field containing a list of extensions MUST NOT have more than one extension of any given type.<a href="#section-14.3-5.6" class="pilcrow">¶</a>
+          <li class="normal" id="section-14.3-8.6">Any field containing a list of extensions MUST NOT have more than one extension of any given type.<a href="#section-14.3-8.6" class="pilcrow">¶</a>
 </li>
         </ul>
-<p id="section-14.3-6">Note that the latter two requirements mean that all MLS extensions are
+<p id="section-14.3-9">Note that the latter two requirements mean that all MLS extensions are
 mandatory, in the sense that an extension in use by the group MUST be supported
-by all members of the group.<a href="#section-14.3-6" class="pilcrow">¶</a></p>
-<p id="section-14.3-7">This document does not define any way for the parameters of the group to change
-once it has been created; such a behavior could be implemented as an extension.<a href="#section-14.3-7" class="pilcrow">¶</a></p>
+by all members of the group.<a href="#section-14.3-9" class="pilcrow">¶</a></p>
+<p id="section-14.3-10">This document does not define any way for the parameters of the group to change
+once it has been created; such a behavior could be implemented as an extension.<a href="#section-14.3-10" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
