@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-05-01T02:17:35.093438+00:00",
+  "timestamp": "2022-05-03T01:58:31.791800+00:00",
   "repo": "mlswg/mls-protocol",
   "labels": [
     {
@@ -6401,15 +6401,15 @@
       "id": "I_kwDOBoyH6c5IqMv1",
       "title": "Keys and Secrets",
       "url": "https://github.com/mlswg/mls-protocol/issues/638",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "br-hale",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "Reopening #630 due to incomplete discussion and inaccuracy.\r\n\r\nThe claims presented are incorrect in response by @bifurcation demonstrate a misunderstanding of the roles of these keys and uses, and #636 constitutes a change to the fundamental uses thereof.\r\n\r\nThe authentication_secret is NOT a public value nor was it ever introduced as such. If an application is using it as a public value, that onus is on the developers, and I advise against using Cisco's implementation as a standard for MLS. As shown in the name and all original discussion, the authentication_secret is intended as a secret value (or else 'public' in the same way that the group secret is 'public). It is used for further derivation to support authentication.\r\n\r\nThis should be corrected, and such foundational changes without WG discussion should be avoided.\r\n",
       "createdAt": "2022-04-28T17:03:21Z",
-      "updatedAt": "2022-04-29T20:56:08Z",
-      "closedAt": null,
+      "updatedAt": "2022-05-01T14:24:16Z",
+      "closedAt": "2022-05-01T14:24:16Z",
       "comments": [
         {
           "author": "bifurcation",
@@ -44821,21 +44821,21 @@
       "id": "PR_kwDOBoyH6c4zYkEA",
       "title": "Add mime_type object before application_data",
       "url": "https://github.com/mlswg/mls-protocol/pull/605",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "rohan-wire",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "This allows applications to express the MIME type of the application_data if desired.",
       "createdAt": "2022-02-24T05:10:27Z",
-      "updatedAt": "2022-04-01T02:13:16Z",
+      "updatedAt": "2022-05-02T18:27:44Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "13955995bc4bb81f8f15f92014fad49494a4acf1",
       "headRepository": "rohan-wire/mls-protocol",
       "headRefName": "rohan/mime_app_data",
       "headRefOid": "5589c90ecd6accc930d95394a9365bfc68b06127",
-      "closedAt": null,
+      "closedAt": "2022-05-02T18:27:44Z",
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
@@ -44902,6 +44902,20 @@
           "body": "Just submitted the following:\r\nhttps://www.ietf.org/archive/id/draft-mahy-mls-content-neg-00.html\r\n",
           "createdAt": "2022-04-01T02:13:16Z",
           "updatedAt": "2022-04-01T02:13:16Z"
+        },
+        {
+          "author": "rohan-wire",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Also, there is a PR for the architecture draft which covers the general advise here:\r\nhttps://github.com/mlswg/mls-architecture/pull/94\r\n",
+          "createdAt": "2022-05-02T18:25:29Z",
+          "updatedAt": "2022-05-02T18:25:29Z"
+        },
+        {
+          "author": "rohan-wire",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Closing as the changes have all moved elsewhere.",
+          "createdAt": "2022-05-02T18:27:43Z",
+          "updatedAt": "2022-05-02T18:27:43Z"
         }
       ],
       "reviews": []
@@ -46077,21 +46091,21 @@
       "id": "PR_kwDOBoyH6c41dKSR",
       "title": "Strawman proposal to include BasicCredential in any Credential type",
       "url": "https://github.com/mlswg/mls-protocol/pull/628",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "rohan-wire",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "I was thinking about a possible proliferation of credentials. This could mean a lot more KeyPackages and it could lead to situations where some members are added to a group and use some fancy or rather esoteric credential scheme and then want to invite other new clients, but not all the new clients support that credential scheme.\r\n\r\nThis strikes me as potentially unnecessary. If all clients support BasicCredential, why not include a BasicCredential in every other Credential (it would be a copy of the identity and public key from your X.509Certificate or ProofCredential or JsonWebCredential or CborWebTokenCredential or whatever).\r\n\r\nMaybe this makes it a lot easier to add new credential types later as in the ProofCredential discussion [1] because the new credential does not prevent communication with other other clients.\r\n\r\n[1] https://github.com/mlswg/mls-protocol/pull/592",
       "createdAt": "2022-04-01T02:22:40Z",
-      "updatedAt": "2022-04-29T17:53:03Z",
+      "updatedAt": "2022-05-02T18:17:12Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "75dc112c95e546ea7c888202c14e154798439355",
       "headRepository": "rohan-wire/mls-protocol",
       "headRefName": "rohan/basic-cred",
       "headRefOid": "2883d6319d9e7e8571ad24544ee52746ff5733bb",
-      "closedAt": null,
+      "closedAt": "2022-05-02T18:17:12Z",
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
@@ -46137,6 +46151,20 @@
           "body": "@rohan-wire Note that I filed #637 as an alternative approach here.  But as discusssed there, I think any of these approaches where we factor the public key out of the credential risks invites bad design patterns in future credentials.\r\n\r\nSo I'm inclined to burn down this strawman, and close both this PR and #637.",
           "createdAt": "2022-04-29T17:53:03Z",
           "updatedAt": "2022-04-29T17:53:03Z"
+        },
+        {
+          "author": "rohan-wire",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "> I think any of these approaches where we factor the public key out of the credential risks invites bad design patterns in future credentials.\r\n\r\nI don't think that is happening at all here. We are putting the public key in a consistent place. The individual credential types can reference it or duplicate it as required by their syntax, but the public key is always there.\r\n",
+          "createdAt": "2022-05-02T06:40:51Z",
+          "updatedAt": "2022-05-02T06:40:51Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Closing in favor of #637 ",
+          "createdAt": "2022-05-02T18:17:12Z",
+          "updatedAt": "2022-05-02T18:17:12Z"
         }
       ],
       "reviews": []
@@ -46174,24 +46202,26 @@
       "id": "PR_kwDOBoyH6c41gvhl",
       "title": "Specify compatibility behavior around new credentials.",
       "url": "https://github.com/mlswg/mls-protocol/pull/631",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "Bren2010",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "This PR adds a way for the members of a group to indicate the credential types they support, and how to negotiate which credential types may be used in a group.",
       "createdAt": "2022-04-01T20:10:55Z",
-      "updatedAt": "2022-04-13T10:38:02Z",
+      "updatedAt": "2022-05-02T18:21:32Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "d21177766dc0f3e245dcd8d668695c4283c3d58a",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "brendan/credentials2",
-      "headRefOid": "3ba066fdabb9d246553d8c9cdf040fd5f9edf769",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "f35409362c551b6b3901e901c06352fc16451d0f",
+      "closedAt": "2022-05-02T18:21:32Z",
+      "mergedAt": "2022-05-02T18:21:32Z",
+      "mergedBy": "bifurcation",
+      "mergeCommit": {
+        "oid": "e472c65195e0b3795dc914dfd38829729afdd353"
+      },
       "comments": [],
       "reviews": [
         {
@@ -46232,6 +46262,32 @@
           "createdAt": "2022-04-13T10:38:02Z",
           "updatedAt": "2022-04-13T10:38:02Z",
           "comments": []
+        },
+        {
+          "id": "PRR_kwDOBoyH6c45Lnm5",
+          "commit": {
+            "abbreviatedOid": "3ba066f"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "I discussed this offline with @rohan-wire and we arrived at:\r\n\r\n* We might need multiple credentials later (as I suspect)\r\n* If we do that (say in an extension), we will need to update this text\r\n* We should capture the general theory that covers both single- and multiple-credential cases\r\n\r\nThe proposed additions here just abstract the principle of universal compatibility (which we need in a single-credential world) to one of \"at least something\" compatibility (which is more compatible with a multi-credential world).",
+          "createdAt": "2022-05-02T17:31:53Z",
+          "updatedAt": "2022-05-02T17:38:49Z",
+          "comments": [
+            {
+              "originalPosition": 71,
+              "body": "```suggestion\r\n## Credential Extensibility\r\n\r\nIn order to ensure that MLS provides meaningful authentication it is important\r\nthat each member is able to authenticate some identity information for each\r\nother member.  Identity information is encoded in Credentials, so this property\r\nis assured by ensuring that members use compatible credential types.\r\n\r\n```",
+              "createdAt": "2022-05-02T17:31:53Z",
+              "updatedAt": "2022-05-02T17:38:49Z"
+            },
+            {
+              "originalPosition": 84,
+              "body": "```suggestion\r\n\r\nIn future extensions to MLS, it may be useful to allow a member to present more\r\nthan one credential.  For example, such credentials might present different\r\nattributes attested by different authorities.  To be consistent with the general\r\nprinciple stated at the beginning of this section, such an extension would need\r\nto ensure that each member can authenticate some identity for each other member.\r\nFor each pair of members (Alice, Bob), Alice would need to present at least one\r\ncredential of a type that Bob supports.\r\n```",
+              "createdAt": "2022-05-02T17:32:19Z",
+              "updatedAt": "2022-05-02T17:38:49Z"
+            }
+          ]
         }
       ]
     },
@@ -46647,24 +46703,26 @@
       "id": "PR_kwDOBoyH6c428ulN",
       "title": "Ensure that a signature public key is always intelligible",
       "url": "https://github.com/mlswg/mls-protocol/pull/637",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "bifurcation",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "This PR moves the signature key from `Credential` to `LeafNode`, to ensure that an MLS client always has a signature public key with which to verify messages, even if it does not support a member's credential type.\r\n\r\nThis is an alternative approach to #628, and IMO a bit cleaner.  We no longer need the notion of a SignatureScheme, since BasicCredential doesn't stand alone.  And since Credential only appears in LeafNode, common fields can be hoisted up into LeafNode. The Credential struct really only exists as a conceptual boundary, to make the exposition clearer; otherwise you could just shove the `select` into LeafNode.\r\n\r\nNote that this does not obviate the need for #631.  This PR only ensures that the signatures can be processed; that PR helps ensure that the signatures are meaningful.",
       "createdAt": "2022-04-28T13:58:50Z",
-      "updatedAt": "2022-04-29T17:50:20Z",
+      "updatedAt": "2022-05-02T18:21:49Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "e9ab1075a816fdc88851d1b6c4db5987dd537aec",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "always-pk",
-      "headRefOid": "af23d9ed248eff2a5cab816d991e6e82c91283d1",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "4957d50bd09b54efe9233808b5efcd500be3e001",
+      "closedAt": "2022-05-02T18:21:49Z",
+      "mergedAt": "2022-05-02T18:21:49Z",
+      "mergedBy": "bifurcation",
+      "mergeCommit": {
+        "oid": "28354251c1ee5a2e8a96304c6604461a834a0063"
+      },
       "comments": [
         {
           "author": "bifurcation",
@@ -46672,6 +46730,13 @@
           "body": "@kkohbrok - As I noted in the intro comment, I think you can view these two PRs as addressing different levels of interop -- the mechanics of verifying signatures vs. the ability to actually meaningfully interpret a credential.  Always having the key in the same place could also allow some minor simplification to implementation logic\r\n\r\nIt's also interesting to consider what this would imply for future credential types.  On the one hand, they wouldn't need to recite the public key, just provide a binding to it, like a hash or a signature where the public key was filled in from outside.  On the other hand, it would open up the door to credential types that aren't actually bound to the public key, which creates replay risk.\r\n\r\nIn any case, as the above might hint, I don't have strong feelings about this.  I mainly wanted to present an alternative to #628 that was more palatable to me.  Given the replay risk noted above, though, I think I'm trending toward closing both this PR and #628, and just keeping the current structure with the improved compatibilty bounds provided by #631.",
           "createdAt": "2022-04-29T17:50:19Z",
           "updatedAt": "2022-04-29T17:50:19Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Latest commit responds to some offline comments from @rohan-wire: \r\n\r\n* Having `public_key` and `signature_key` makes it a little confusing what `public_key` is about.  So changed to `encryption_key` and propagated that change throughout.\r\n* The definition of `SignaturePublicKey` fits better in the ciphersuites section (next to `HPKEPublicKey`) than it does in the credentials section\r\n\r\nHaving done that, I'm more positive on this change.  The `encryption_key` change is a good clarification, and having the signature public key separate from the credential provides a stonger decoupling of the credential from the MLS crypto. The only thing the credential layer needs to know now is how to bind to the signature key.",
+          "createdAt": "2022-05-02T18:14:30Z",
+          "updatedAt": "2022-05-02T18:14:30Z"
         }
       ],
       "reviews": [
@@ -46694,6 +46759,19 @@
               "updatedAt": "2022-04-29T06:16:58Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c45Ly1H",
+          "commit": {
+            "abbreviatedOid": "4957d50"
+          },
+          "author": "rohan-wire",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2022-05-02T18:14:23Z",
+          "updatedAt": "2022-05-02T18:14:23Z",
+          "comments": []
         }
       ]
     },
@@ -46702,24 +46780,26 @@
       "id": "PR_kwDOBoyH6c43GZvK",
       "title": "Clarify secret/key; change to epoch authenticator",
       "url": "https://github.com/mlswg/mls-protocol/pull/639",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "bifurcation",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Fixes #638 ",
       "createdAt": "2022-04-29T20:55:59Z",
-      "updatedAt": "2022-04-29T21:17:29Z",
+      "updatedAt": "2022-05-01T14:24:17Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "66a59c7c3880b21a49f32cd8aaf2af3e93c8d40e",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "terminology-v2",
       "headRefOid": "7fe8b3e16173487ba2b16cf764200c75866e636f",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2022-05-01T14:24:16Z",
+      "mergedAt": "2022-05-01T14:24:16Z",
+      "mergedBy": "bifurcation",
+      "mergeCommit": {
+        "oid": "7a995af42e9a9047b83dc4a9169b1fedd445052e"
+      },
       "comments": [
         {
           "author": "br-hale",
