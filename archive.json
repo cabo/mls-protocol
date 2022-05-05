@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-05-03T01:58:31.791800+00:00",
+  "timestamp": "2022-05-05T01:49:30.484486+00:00",
   "repo": "mlswg/mls-protocol",
   "labels": [
     {
@@ -6503,6 +6503,110 @@
           "updatedAt": "2022-04-29T20:56:08Z"
         }
       ]
+    },
+    {
+      "number": 640,
+      "id": "I_kwDOBoyH6c5JE_h5",
+      "title": "Weak transcript binding of proposals by reference",
+      "url": "https://github.com/mlswg/mls-protocol/issues/640",
+      "state": "OPEN",
+      "author": "bifurcation",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "In #510 we changed from using full-size hash references to using truncated hashes.  This is fine for cases where the reference is only acting as a reference, so unambiguous identification is the only concern.\r\n\r\nFor proposal references, however, the hash-based reference is also the way that the proposal is incorporated into the transcript.  In this case, we end up with a looser binding with truncated hashes, since a malicious transcript need only match a subset of the bits of the hash.\r\n\r\nThis doesn\u2019t seem like a huge issue in practice, since if the hash function is broken enough to allow 128-bit collisions, we likely have deeper problems.  But it might mean that transcript integrity fails before other aspects of the protocol.\r\n\r\nTo fix this, we could either restore all hash-based identifiers to full size (basically, revert #510), or we could revert just the proposal references.  The former would be more uniform; the latter would be more parsimonious.  I\u2019m pretty ambivalent between the two.",
+      "createdAt": "2022-05-04T22:56:59Z",
+      "updatedAt": "2022-05-04T22:56:59Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 641,
+      "id": "I_kwDOBoyH6c5JE_s9",
+      "title": "Remove confirmation_tag from transcript",
+      "url": "https://github.com/mlswg/mls-protocol/issues/641",
+      "state": "OPEN",
+      "author": "bifurcation",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "On the one hand: It would simplify the transcript hash a fair bit if we omitted the confirmation_tag from the transcript.  We could get rid of the notion of the interim transcript hash.  It doesn\u2019t seem like there\u2019s much security being added by its inclusion, since it\u2019s determined by what came before.  In other words, including the confirmation tag in the transcript only serves to feed it into the next epoch secret, but the confirmation tag just summarizes the previous transcript and epoch secret, which are already fed into the next epoch secret via the init_secret.\r\n\r\nOn the other hand: The analogous value in TLS is the Finished messages, which are included in the transcript.\r\n\r\nWe should obviously only do this if supported by updated proofs.  @TWal ?\r\n",
+      "createdAt": "2022-05-04T22:58:28Z",
+      "updatedAt": "2022-05-04T23:23:11Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "br-hale",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Tagging @kkohbrok as we were just discussing this and how the confirmation_tag basically commits to more of the tree structure than just the rolling key derivation. I will take another look at this.",
+          "createdAt": "2022-05-04T23:23:10Z",
+          "updatedAt": "2022-05-04T23:23:10Z"
+        }
+      ]
+    },
+    {
+      "number": 642,
+      "id": "I_kwDOBoyH6c5JE_79",
+      "title": "Remove padding length from CiphertextContent",
+      "url": "https://github.com/mlswg/mls-protocol/issues/642",
+      "state": "OPEN",
+      "author": "bifurcation",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "As discussed [on the mailing list](https://mailarchive.ietf.org/arch/msg/mls/uqXL0UprgE7sf6NGkV5dg1yFRxk/), we should refactor `MLSCiphertextContent` so that the padding is not length-delimited, something like:\r\n\r\n```\r\nstruct {\r\n    select (content_type) { ... }\r\n    MLSMessageAuth auth;\r\n    uint8 zeros[length_of_padding];\r\n} MLSCiphertextContent;\r\n```",
+      "createdAt": "2022-05-04T23:00:32Z",
+      "updatedAt": "2022-05-04T23:00:32Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 643,
+      "id": "I_kwDOBoyH6c5JFAE_",
+      "title": "Explanatory text: MLSMessageCommitContent ",
+      "url": "https://github.com/mlswg/mls-protocol/issues/643",
+      "state": "OPEN",
+      "author": "br-hale",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "TODO at some point: \r\nNarrative text to briefly explain MLSMessageCommitContent would be useful. At the moment this appears as a struct only twice in the spec - its contents in MLSMessageContent are defined and used frequently, but MLSMessageCommitContent is not ever mentioned in discussion text. Something as simple as a narrative comment that MLSMessageCommitContent is used as a combiner for transcript hashes and will not be referred to elsewhere would be useful, giving some scoping for the introduced term. ",
+      "createdAt": "2022-05-04T23:01:36Z",
+      "updatedAt": "2022-05-04T23:01:36Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 644,
+      "id": "I_kwDOBoyH6c5JFAFL",
+      "title": "Illustrations for \u201cfiltered direct path\u201d",
+      "url": "https://github.com/mlswg/mls-protocol/issues/644",
+      "state": "OPEN",
+      "author": "bifurcation",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "In #587, we introduced the idea of a \"filtered direct path\".  It would be helpful to have an illustration of how a filtered direct path differs from a direct path.",
+      "createdAt": "2022-05-04T23:01:38Z",
+      "updatedAt": "2022-05-04T23:01:38Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 645,
+      "id": "I_kwDOBoyH6c5JFBts",
+      "title": "Always operate on a full tree",
+      "url": "https://github.com/mlswg/mls-protocol/issues/645",
+      "state": "OPEN",
+      "author": "bifurcation",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "In order to use tree hashes to represent siblings in parent hashes, we had to compute a different tree hash on the right edge of the tree, pretending that the tree is full, in the sense of having `2^n` leaves.  Thus we actually have two tree hashes in play, one used for group agreement on the tree and one used for parent hash inputs.\r\n\r\nWe should consider specifying that the logical tree used by MLS is always full.  This change to the specification would not change the computations done by the protocol much, if at all.  Thanks to the fact that we no longer generate redundant nodes (#587), there is never anything non-blank to the right of the rightmost non-blank leaf anyway.  So the main impact is to insert some blank nodes between a parent node on the right edge of the tree and its right child -- and all of the algorithms in the specification already skip over such nodes.\r\n\r\nLikewise, implementations' internal represntations of the tree wouldn't have to change much, since the extra nodes could be \"virtual\".  The only time they would be noticed is when computing tree hashes.  We would have to update the description of the `ratchet_tree` extension to say that it only covers the tree up to the rightmost non-blank leaf.\r\n\r\nIt would simplify the specification in a few ways, for example: \r\n* The \"original sibling tree hash\" would just entail blanking unmerged leaves, not structure changes.  \r\n* The description of extending and truncating the tree would be much simpler.\r\n\r\nThe main cost would be extra hashes when joining, or when updating a member close to the right edge of the tree.  If you have a tree with `2^n + 1` leaves, then you have to compute tree hashes over `2^n - 1` blank leaves and their `2^n - 2` blank parents.\r\n",
+      "createdAt": "2022-05-04T23:14:27Z",
+      "updatedAt": "2022-05-04T23:14:27Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
@@ -43930,21 +44034,21 @@
       "id": "PR_kwDOBoyH6c4ybHBE",
       "title": "Add a simple ProofCredential alternative to Certificate.",
       "url": "https://github.com/mlswg/mls-protocol/pull/592",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "Bren2010",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "- Adds an `extra_data` field to BasicCredential to hold application-specific data about a user (examples: link to avatar, information about device)\r\n- Adds a ProofCredential to cover a lot of the cases we're currently missing, particularly:\r\n  - credentials that are just BasicCredential signed with a fixed public key\r\n  - credentials that are authenticated by a system like Key Transparency\r\n  - credentials authenticated by secure hardware",
       "createdAt": "2022-02-10T20:01:06Z",
-      "updatedAt": "2022-04-09T15:16:05Z",
+      "updatedAt": "2022-05-03T17:41:47Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "13955995bc4bb81f8f15f92014fad49494a4acf1",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "brendan/proof-credential",
       "headRefOid": "e165edd5c11f56a5cc8d1dc8839ae0083afea845",
-      "closedAt": null,
+      "closedAt": "2022-05-03T17:41:47Z",
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
@@ -44046,6 +44150,13 @@
           "body": "I agree with @Bren2010 in that (as it was pointed out) it avoids the need for `implementations to add stuff off the bat`. I do see, though, the importance of being careful so we don't end up with the problems of the subject name in X.509. This seems reasonable for the latter point: https://github.com/mlswg/mls-protocol/pull/592#issuecomment-1086219398\r\n\r\n",
           "createdAt": "2022-04-09T15:16:05Z",
           "updatedAt": "2022-04-09T15:16:05Z"
+        },
+        {
+          "author": "seanturner",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I posted this PR to the [mls list](https://mailarchive.ietf.org/arch/msg/mls/SitToPUL1CvPgx0vLnom730Wwes/) to see if we could get more input. I got crickets in response. I am going to close this PR out because it does not appear that we have consensus to merge this at this time.",
+          "createdAt": "2022-05-03T17:41:47Z",
+          "updatedAt": "2022-05-03T17:41:47Z"
         }
       ],
       "reviews": []
@@ -46885,6 +46996,32 @@
           ]
         }
       ]
+    },
+    {
+      "number": 646,
+      "id": "PR_kwDOBoyH6c43UzU9",
+      "title": "Spell check.",
+      "url": "https://github.com/mlswg/mls-protocol/pull/646",
+      "state": "OPEN",
+      "author": "Bren2010",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2022-05-05T00:35:01Z",
+      "updatedAt": "2022-05-05T00:35:01Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "28354251c1ee5a2e8a96304c6604461a834a0063",
+      "headRepository": "mlswg/mls-protocol",
+      "headRefName": "brendan/spell-check",
+      "headRefOid": "f0015055ef7f5c597223a21c60348d33da202de0",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
