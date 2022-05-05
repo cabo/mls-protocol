@@ -23,11 +23,11 @@ protocol that provides efficient asynchronous group key establishment
 with forward secrecy and post-compromise security for groups
 in size ranging from two to thousands. 
     " name="description">
-<meta content="xml2rfc 3.12.4" name="generator">
+<meta content="xml2rfc 3.12.5" name="generator">
 <meta content="Internet-Draft" name="keyword">
 <meta content="draft-ietf-mls-protocol-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.12.4
+  xml2rfc 3.12.5
     Python 3.9.7
     appdirs 1.4.4
     ConfigArgParse 1.3
@@ -1031,7 +1031,7 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Barnes, et al.</td>
-<td class="center">Expires 3 November 2022</td>
+<td class="center">Expires 6 November 2022</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1044,12 +1044,12 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 <dd class="internet-draft">draft-ietf-mls-protocol-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2022-05-02" class="published">2 May 2022</time>
+<time datetime="2022-05-05" class="published">5 May 2022</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2022-11-03">3 November 2022</time></dd>
+<dd class="expires"><time datetime="2022-11-06">6 November 2022</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1119,7 +1119,7 @@ in size ranging from two to thousands.<a href="#section-abstract-1" class="pilcr
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 3 November 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 6 November 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1160,7 +1160,7 @@ in size ranging from two to thousands.<a href="#section-abstract-1" class="pilcr
             <p id="section-toc.1-1.2.1"><a href="#section-2" class="xref">2</a>.  <a href="#name-terminology" class="xref">Terminology</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.1">
-                <p id="section-toc.1-1.2.2.1.1"><a href="#section-2.1" class="xref">2.1</a>.  <a href="#name-presentation-langauge" class="xref">Presentation Langauge</a></p>
+                <p id="section-toc.1-1.2.2.1.1"><a href="#section-2.1" class="xref">2.1</a>.  <a href="#name-presentation-language" class="xref">Presentation Language</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.1.2.1">
                     <p id="section-toc.1-1.2.2.1.2.1.1" class="keepWithNext"><a href="#section-2.1.1" class="xref">2.1.1</a>.  <a href="#name-optional-value" class="xref">Optional Value</a></p>
@@ -1880,7 +1880,7 @@ cryptographic keys it holds.<a href="#section-2-2.2.1" class="pilcrow">¶</a></p
         <dd class="break"></dd>
 <dt id="section-2-2.3">Group:</dt>
         <dd style="margin-left: 1.5em" id="section-2-2.4">
-          <p id="section-2-2.4.1">A group represents a logical collection of clents that share a common
+          <p id="section-2-2.4.1">A group represents a logical collection of clients that share a common
 secret value at any given time.  Its state is represented as a linear
 sequence of epochs in which each epoch depends on its predecessor.<a href="#section-2-2.4.1" class="pilcrow">¶</a></p>
 </dd>
@@ -1926,13 +1926,13 @@ object, as opposed to application data.<a href="#section-2-2.14.1" class="pilcro
 <a href="#ratchet-tree-terminology" class="xref">Section 5.1</a>.<a href="#section-2-3" class="pilcrow">¶</a></p>
 <p id="section-2-4">In general, symmetric values are referred to as "keys" or "secrets"
 interchangeably.  Either term denotes a value that MUST be kept confidential to
-a Client.  When labelling individual values, we typically use "secret" to refer
+a Client.  When labeling individual values, we typically use "secret" to refer
 to a value that is used derive further secret values, and "key" to refer to a
 value that is used with an algorithm such as HMAC or an AEAD algorithm.<a href="#section-2-4" class="pilcrow">¶</a></p>
-<div id="presentation-langauge">
+<div id="presentation-language">
 <section id="section-2.1">
-        <h3 id="name-presentation-langauge">
-<a href="#section-2.1" class="section-number selfRef">2.1. </a><a href="#name-presentation-langauge" class="section-name selfRef">Presentation Langauge</a>
+        <h3 id="name-presentation-language">
+<a href="#section-2.1" class="section-number selfRef">2.1. </a><a href="#name-presentation-language" class="section-name selfRef">Presentation Language</a>
         </h3>
 <p id="section-2.1-1">We use the TLS presentation language <span>[<a href="#RFC8446" class="xref">RFC8446</a>]</span> to describe the structure of
 protocol messages.  In addition to the base syntax, we add two additional
@@ -2067,7 +2067,7 @@ ReadVarint(data):
 <p id="section-2.1.2-11">The use of variable-size integers for vector lengths allows vectors to grow
 very large, up to 2^30 bytes.  Implementations should take care not to allow
 vectors to overflow available storage.  To facilitate debugging of potential
-interoperatbility problems, implementations should provide a clear error when
+interoperability problems, implementations should provide a clear error when
 such an overflow condition occurs.<a href="#section-2.1.2-11" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -3135,7 +3135,7 @@ handshake messages, but MAY transmit handshake messages encoded
 as MLSPlaintext objects in cases where it is necessary for the
 Delivery Service to examine such messages.<a href="#section-7-3" class="pilcrow">¶</a></p>
 <div id="section-7-4">
-<pre class="lang-tls sourcecode">
+<pre class="breakable lang-tls sourcecode">
 enum {
     reserved(0),
     mls10(1),
@@ -3552,7 +3552,7 @@ appearance in the group, signed by that client. It is also used in client
 KeyPackage objects to store the information that will be needed to add a
 client to a group.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
 <div id="section-8.2-2">
-<pre class="lang-tls sourcecode">
+<pre class="breakable lang-tls sourcecode">
 enum {
     reserved(0),
     key_package(1),
@@ -3638,7 +3638,7 @@ struct {
 } LeafNodeTBS;
 </pre><a href="#section-8.2-2" class="pilcrow">¶</a>
 </div>
-<p id="section-8.2-3">The <code>encryption_key</code> field conains an HPKE public key whose private key is held only
+<p id="section-8.2-3">The <code>encryption_key</code> field contains an HPKE public key whose private key is held only
 by the member occupying this leaf (or in the case of a LeafNode in a KeyPackage
 object, the issuer of the KeyPackage).  The <code>credential</code> contains authentication
 information for this member, as described in <a href="#credentials" class="xref">Section 6.3</a>.<a href="#section-8.2-3" class="pilcrow">¶</a></p>
@@ -4235,7 +4235,7 @@ E   _   G   _
 the last time P was updated. This is the case for computing or processing a
 Commit whose UpdatePath traverses P, since the Commit itself resets P. (In
 other words, it is only necessary to recompute the original sibling tree hash
-when validating group's tree on joining.) More generally, if none of the entries
+when validating a group's tree on joining.) More generally, if none of the entries
 in <code>P.unmerged_leaves</code> is in the subtree under S (and thus no nodes were truncated),
 then the original tree hash at S is the tree hash of S in the current tree.<a href="#section-8.8-15" class="pilcrow">¶</a></p>
 <p id="section-8.8-16">If it is necessary to recompute the original tree hash of a node, the efficiency
@@ -4678,7 +4678,7 @@ init_secret = context.export("MLS 1.0 external init secret", KDF.Nh)
 </pre><a href="#section-9.3-3" class="pilcrow">¶</a>
 </div>
 <p id="section-9.3-4">Members of the group receive the <code>kem_output</code> in an ExternalInit proposal and
-preform the corresponding calculation to retrieve the <code>init_secret</code> value.<a href="#section-9.3-4" class="pilcrow">¶</a></p>
+perform the corresponding calculation to retrieve the <code>init_secret</code> value.<a href="#section-9.3-4" class="pilcrow">¶</a></p>
 <div id="section-9.3-5">
 <pre class="lang-pseudocode sourcecode">
 context = SetupBaseR(kem_output, external_priv, "")
@@ -4784,7 +4784,7 @@ psk_secret     = psk_secret_[n]
 <p id="section-9.4-10">Here <code>0</code> represents the all-zero vector of length <code>KDF.Nh</code>. The <code>index</code> field in
 <code>PSKLabel</code> corresponds to the index of the PSK in the <code>psk</code> array, while the
 <code>count</code> field contains the total number of PSKs.  In other words, the PSKs are
-chained together with KDF.Extract invocations (labelled "Extract" for brevity
+chained together with KDF.Extract invocations (labeled "Extract" for brevity
 in the diagram), as follows:<a href="#section-9.4-10" class="pilcrow">¶</a></p>
 <div id="section-9.4-11">
           <div class="alignLeft art-svg artwork" id="section-9.4-11.1">
@@ -5171,7 +5171,7 @@ this client.<a href="#section-11-2.3" class="pilcrow">¶</a>
 </li>
       </ol>
 <p id="section-11-3">KeyPackages are intended to be used only once and SHOULD NOT
-be reused except in case of last resort. (See <a href="#keypackage-reuse" class="xref">Section 17.4</a>).
+be reused except in the case of last resort. (See <a href="#keypackage-reuse" class="xref">Section 17.4</a>).
 Clients MAY generate and publish multiple KeyPackages to
 support multiple ciphersuites.<a href="#section-11-3" class="pilcrow">¶</a></p>
 <p id="section-11-4">The value for <code>init_key</code> MUST be a public key for the asymmetric encryption
@@ -5996,7 +5996,7 @@ populated.  Otherwise, the sender MAY omit the <code>path</code> field at its di
 </li>
             <li class="normal" id="section-13.2.1-4.4">
               <p id="section-13.2.1-4.4.1">If populating the <code>path</code> field: Create an UpdatePath using the provisional
-ratchet tree and GroupContext. Any new member (from an add proposal) MUST be
+ratchet tree and GroupContext. Any new member (from an Add proposal) MUST be
 excluded from the resolution during the computation of the UpdatePath.  The
 <code>leaf_node</code> for this UpdatePath MUST have <code>leaf_node_source</code> set to <code>commit</code>.
 Note that the LeafNode in the <code>UpdatePath</code> effectively updates an existing
@@ -6528,7 +6528,7 @@ optional&lt;Node&gt; ratchet_tree&lt;V&gt;;
 </pre><a href="#section-13.3-3" class="pilcrow">¶</a>
 </div>
 <p id="section-13.3-4">The nodes are listed in the order specified by a left-to-right in-order
-traversal of the rachet tree. Each node is listed between its left subtree and
+traversal of the ratchet tree. Each node is listed between its left subtree and
 its right subtree.  (This is the same ordering as specified for the array-based
 trees outlined in <a href="#array-based-trees" class="xref">Appendix B</a>.)<a href="#section-13.3-4" class="pilcrow">¶</a></p>
 <p id="section-13.3-5">The leaves of the tree are stored in even-numbered entries in
@@ -8086,7 +8086,7 @@ leaf node<a href="#appendix-B-6.1" class="pilcrow">¶</a>
 <p id="appendix-B-7">The following python code demonstrates the tree computations necessary to use an
 array-based tree for MLS.<a href="#appendix-B-7" class="pilcrow">¶</a></p>
 <div id="appendix-B-8">
-<pre class="lang-python sourcecode">
+<pre class="breakable lang-python sourcecode">
 # The exponent of the largest power of 2 less than x. Equivalent to:
 #   int(math.floor(math.log(x, 2)))
 def log2(x):
@@ -8235,11 +8235,11 @@ children.   (As opposed to the array-based representation suggested above, where
 these relationships are computed from relationships between nodes' indices in
 the array.)  Such an implementation needs to update these links to maintain the
 left-balanced structure of the tree as the tree is extended to add new members,
-or truncated when memebers are removed.<a href="#appendix-C-1" class="pilcrow">¶</a></p>
+or truncated when members are removed.<a href="#appendix-C-1" class="pilcrow">¶</a></p>
 <p id="appendix-C-2">The following code snippet shows how these algorithms could be implemented in
 Python.<a href="#appendix-C-2" class="pilcrow">¶</a></p>
 <div id="appendix-C-3">
-<pre class="lang-python sourcecode">
+<pre class="breakable lang-python sourcecode">
 class Node:
     def __init__(self, value, parent=None, left=None, right=None):
         self.value = value    # Value of the node

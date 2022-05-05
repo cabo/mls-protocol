@@ -5,7 +5,7 @@
 Network Working Group                                          R. Barnes
 Internet-Draft                                                     Cisco
 Intended status: Informational                             B. Beurdouche
-Expires: 3 November 2022                                 Inria & Mozilla
+Expires: 6 November 2022                                 Inria & Mozilla
                                                                R. Robert
                                                                         
                                                              J. Millican
@@ -14,7 +14,7 @@ Expires: 3 November 2022                                 Inria & Mozilla
                                                                   Google
                                                           K. Cohn-Gordon
                                                     University of Oxford
-                                                              2 May 2022
+                                                              5 May 2022
 
 
               The Messaging Layer Security (MLS) Protocol
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 3 November 2022.
+   This Internet-Draft will expire on 6 November 2022.
 
 Copyright Notice
 
@@ -77,7 +77,7 @@ Table of Contents
    1.  Introduction
      1.1.  Change Log
    2.  Terminology
-     2.1.  Presentation Langauge
+     2.1.  Presentation Language
        2.1.1.  Optional Value
        2.1.2.  Variable-size Vector Headers
    3.  Operating Context
@@ -529,7 +529,7 @@ Table of Contents
       cryptographic state with other clients.  A client is defined by
       the cryptographic keys it holds.
 
-   Group:  A group represents a logical collection of clents that share
+   Group:  A group represents a logical collection of clients that share
       a common secret value at any given time.  Its state is represented
       as a linear sequence of epochs in which each epoch depends on its
       predecessor.
@@ -560,12 +560,12 @@ Table of Contents
 
    In general, symmetric values are referred to as "keys" or "secrets"
    interchangeably.  Either term denotes a value that MUST be kept
-   confidential to a Client.  When labelling individual values, we
+   confidential to a Client.  When labeling individual values, we
    typically use "secret" to refer to a value that is used derive
    further secret values, and "key" to refer to a value that is used
    with an algorithm such as HMAC or an AEAD algorithm.
 
-2.1.  Presentation Langauge
+2.1.  Presentation Language
 
    We use the TLS presentation language [RFC8446] to describe the
    structure of protocol messages.  In addition to the base syntax, we
@@ -662,7 +662,7 @@ Table of Contents
    The use of variable-size integers for vector lengths allows vectors
    to grow very large, up to 2^30 bytes.  Implementations should take
    care not to allow vectors to overflow available storage.  To
-   facilitate debugging of potential interoperatbility problems,
+   facilitate debugging of potential interoperability problems,
    implementations should provide a clear error when such an overflow
    condition occurs.
 
@@ -1950,11 +1950,11 @@ Table of Contents
        }
    } LeafNodeTBS;
 
-   The encryption_key field conains an HPKE public key whose private key
-   is held only by the member occupying this leaf (or in the case of a
-   LeafNode in a KeyPackage object, the issuer of the KeyPackage).  The
-   credential contains authentication information for this member, as
-   described in Section 6.3.
+   The encryption_key field contains an HPKE public key whose private
+   key is held only by the member occupying this leaf (or in the case of
+   a LeafNode in a KeyPackage object, the issuer of the KeyPackage).
+   The credential contains authentication information for this member,
+   as described in Section 6.3.
 
    The capabilities field indicates what protocol versions,
    ciphersuites, extensions, credential types, and non-default proposal
@@ -2430,8 +2430,8 @@ Table of Contents
    unchanged since the last time P was updated.  This is the case for
    computing or processing a Commit whose UpdatePath traverses P, since
    the Commit itself resets P.  (In other words, it is only necessary to
-   recompute the original sibling tree hash when validating group's tree
-   on joining.)  More generally, if none of the entries in
+   recompute the original sibling tree hash when validating a group's
+   tree on joining.)  More generally, if none of the entries in
    P.unmerged_leaves is in the subtree under S (and thus no nodes were
    truncated), then the original tree hash at S is the tree hash of S in
    the current tree.
@@ -2790,7 +2790,7 @@ psk_secret (or 0) --> KDF.Extract
    init_secret = context.export("MLS 1.0 external init secret", KDF.Nh)
 
    Members of the group receive the kem_output in an ExternalInit
-   proposal and preform the corresponding calculation to retrieve the
+   proposal and perform the corresponding calculation to retrieve the
    init_secret value.
 
    context = SetupBaseR(kem_output, external_priv, "")
@@ -2892,7 +2892,7 @@ psk_secret (or 0) --> KDF.Extract
    field in PSKLabel corresponds to the index of the PSK in the psk
    array, while the count field contains the total number of PSKs.  In
    other words, the PSKs are chained together with KDF.Extract
-   invocations (labelled "Extract" for brevity in the diagram), as
+   invocations (labeled "Extract" for brevity in the diagram), as
    follows:
 
                    0                               0    = psk_secret_[0]
@@ -3141,9 +3141,9 @@ psk_secret (or 0) --> KDF.Extract
        represent this client.
 
    KeyPackages are intended to be used only once and SHOULD NOT be
-   reused except in case of last resort.  (See Section 17.4).  Clients
-   MAY generate and publish multiple KeyPackages to support multiple
-   ciphersuites.
+   reused except in the case of last resort.  (See Section 17.4).
+   Clients MAY generate and publish multiple KeyPackages to support
+   multiple ciphersuites.
 
    The value for init_key MUST be a public key for the asymmetric
    encryption scheme defined by cipher_suite, and it MUST be unique
@@ -3913,7 +3913,7 @@ psk_secret (or 0) --> KDF.Extract
 
    *  If populating the path field: Create an UpdatePath using the
       provisional ratchet tree and GroupContext.  Any new member (from
-      an add proposal) MUST be excluded from the resolution during the
+      an Add proposal) MUST be excluded from the resolution during the
       computation of the UpdatePath.  The leaf_node for this UpdatePath
       MUST have leaf_node_source set to commit.  Note that the LeafNode
       in the UpdatePath effectively updates an existing LeafNode in the
@@ -4407,7 +4407,7 @@ psk_secret (or 0) --> KDF.Extract
    optional<Node> ratchet_tree<V>;
 
    The nodes are listed in the order specified by a left-to-right in-
-   order traversal of the rachet tree.  Each node is listed between its
+   order traversal of the ratchet tree.  Each node is listed between its
    left subtree and its right subtree.  (This is the same ordering as
    specified for the array-based trees outlined in Appendix B.)
 
@@ -5708,7 +5708,7 @@ Appendix C.  Link-Based Trees
    between nodes' indices in the array.)  Such an implementation needs
    to update these links to maintain the left-balanced structure of the
    tree as the tree is extended to add new members, or truncated when
-   memebers are removed.
+   members are removed.
 
    The following code snippet shows how these algorithms could be
    implemented in Python.
