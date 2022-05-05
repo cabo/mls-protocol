@@ -3768,8 +3768,6 @@ psk_secret (or 0) --> KDF.Extract
 
    *  psk
 
-   *  app_ack
-
    *  reinit
 
    New proposal types MUST state whether they require a path.  If any
@@ -5138,9 +5136,7 @@ psk_secret (or 0) --> KDF.Extract
    +------+--------------------------+-------------+--------+----------+
    |0x0006| external_init            | Y           |Y       |RFC XXXX  |
    +------+--------------------------+-------------+--------+----------+
-   |0x0007| app_ack                  | Y           |N       |RFC XXXX  |
-   +------+--------------------------+-------------+--------+----------+
-   |0x0008| group_context_extensions | Y           |Y       |RFC XXXX  |
+   |0x0007| group_context_extensions | Y           |Y       |RFC XXXX  |
    +------+--------------------------+-------------+--------+----------+
    |0xff00| Reserved for Private Use | N/A         |N/A     |RFC XXXX  |
    |-     |                          |             |        |          |
