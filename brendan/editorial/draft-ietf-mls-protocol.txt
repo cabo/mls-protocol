@@ -5,7 +5,7 @@
 Network Working Group                                          R. Barnes
 Internet-Draft                                                     Cisco
 Intended status: Informational                             B. Beurdouche
-Expires: 7 November 2022                                 Inria & Mozilla
+Expires: 8 November 2022                                 Inria & Mozilla
                                                                R. Robert
                                                                         
                                                              J. Millican
@@ -14,7 +14,7 @@ Expires: 7 November 2022                                 Inria & Mozilla
                                                                   Google
                                                           K. Cohn-Gordon
                                                     University of Oxford
-                                                              6 May 2022
+                                                              7 May 2022
 
 
               The Messaging Layer Security (MLS) Protocol
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 7 November 2022.
+   This Internet-Draft will expire on 8 November 2022.
 
 Copyright Notice
 
@@ -682,7 +682,7 @@ Table of Contents
      if length > 1 && v < (1 << ((8*(length-1))-2)):
        raise Exception('minimum encoding was not used')
 
-       return v
+     return v
 
    The use of variable-size integers for vector lengths allows vectors
    to grow very large, up to 2^30 bytes.  Implementations should take
@@ -937,10 +937,13 @@ Table of Contents
    |              |              |              |              |
    |              | Update(B)    |              |              |
    |              +------------------------------------------->|
+   |              |              |              | Update(B)    |
+   |<----------------------------------------------------------+
+   |              |<-------------------------------------------+
+   |              |              |<----------------------------+
+   |              |              |              |              |
    | Commit(Upd)  |              |              |              |
    +---------------------------------------------------------->|
-   |              |              |              |              |
-   |              |              |              | Update(B)    |
    |              |              |              | Commit(Upd)  |
    |<----------------------------------------------------------+
    |              |<-------------------------------------------+
@@ -956,7 +959,7 @@ Table of Contents
    the group can send a Remove proposal followed by a Commit message.
    The Commit message provides new entropy to all members of the group
    except the removed member.  This new entropy is added to the epoch
-   secret for the new epoch, so that it is not known to the removed
+   secret for the new epoch so that it is not known to the removed
    member.  Note that this does not necessarily imply that any member is
    actually allowed to evict other members; groups can enforce access
    control policies on top of these basic mechanism.
@@ -979,7 +982,7 @@ Table of Contents
 4.3.  Relationships Between Epochs
 
    A group has a single linear sequence of epochs.  Groups and epochs
-   are generally independent of one-another.  However, it can sometimes
+   are generally independent of one another.  However, it can sometimes
    be useful to link epochs cryptographically, either within a group or
    across groups.  MLS derives a resumption pre-shared key (PSK) from
    each epoch to allow entropy extracted from one epoch to be injected
