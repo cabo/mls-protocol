@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-05-08T01:52:03.554949+00:00",
+  "timestamp": "2022-05-10T01:25:31.483512+00:00",
   "repo": "mlswg/mls-protocol",
   "labels": [
     {
@@ -6532,7 +6532,7 @@
       "labels": [],
       "body": "On the one hand: It would simplify the transcript hash a fair bit if we omitted the confirmation_tag from the transcript.  We could get rid of the notion of the interim transcript hash.  It doesn\u2019t seem like there\u2019s much security being added by its inclusion, since it\u2019s determined by what came before.  In other words, including the confirmation tag in the transcript only serves to feed it into the next epoch secret, but the confirmation tag just summarizes the previous transcript and epoch secret, which are already fed into the next epoch secret via the init_secret.\r\n\r\nOn the other hand: The analogous value in TLS is the Finished messages, which are included in the transcript.\r\n\r\nWe should obviously only do this if supported by updated proofs.  @TWal ?\r\n",
       "createdAt": "2022-05-04T22:58:28Z",
-      "updatedAt": "2022-05-04T23:23:11Z",
+      "updatedAt": "2022-05-09T09:32:09Z",
       "closedAt": null,
       "comments": [
         {
@@ -6541,6 +6541,20 @@
           "body": "Tagging @kkohbrok as we were just discussing this and how the confirmation_tag basically commits to more of the tree structure than just the rolling key derivation. I will take another look at this.",
           "createdAt": "2022-05-04T23:23:10Z",
           "updatedAt": "2022-05-04T23:23:10Z"
+        },
+        {
+          "author": "kkohbrok",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I can't speak to the proofs, but one nice thing about including the confirmation tag in the transcript is that the transcript is a continuous aggregation of messages. As you point out @bifurcation the key schedule also indirectly includes all past messages, so I'm not overly concerned, but it generally means that the group context does not contain the \"history\" of the group anymore. So to get a value that really includes the group's history, we'd have to use an exporter, where previously, we could have just used the group context. Again, not sure this is a huge concern.\r\n\r\nOn another note: After all the cryptographic analysis that MLS has seen in the past, I find it a bit concerning that in the last minute, we're still tinkering with the cryptographic design. Intuitively, I don't think this proposed change, or the one to the membership tag computation are a problem, but I'd rather have a proof to back up that intuition. The way I understand the IETF release process, the next peer-review cryptographic proof that includes all the changes we make now is in all likelihood going to be released quite some time after the RFC itself.",
+          "createdAt": "2022-05-09T07:07:53Z",
+          "updatedAt": "2022-05-09T07:07:53Z"
+        },
+        {
+          "author": "mulmarta",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Adding my 2 cents, similar @kkohbrok I'm a bit hesitant about changing the cryptographic design at this point. I would feel much more confident leaving it as is.\r\n\r\nThis being said, I think that removing the tag from the transcript should be secure. In fact, our security proof relies on the fact that agreement on the interim hash implies agreement on the confirmed hash. (This holds exactly for the reasons given by @bifurcation.) In other words, the tag is already indirectly included in the interim hash.\r\n\r\nAs a side note, if there could be many acceptable tags for 1 commit, the protocol may behave strangely. For instance, say we have a commit C with 2 possible acceptable confirmation tags T1 and T2. Say Alice accepts C with T1 and Bob accepts C with T2. They agree on the interim hash, so they have the same key schedule and can exchange application messages. However, they disagree on the confirmed hash so they will never accept commits from each other.",
+          "createdAt": "2022-05-09T09:32:09Z",
+          "updatedAt": "2022-05-09T09:32:09Z"
         }
       ]
     },
@@ -6628,9 +6642,17 @@
       "labels": [],
       "body": "Right now, MLSMessageContentTBM includes MLSMessageContentTBS, which includes the GroupContext.  This seems like an unnecessary complication.  MLSMessageContentTBM exists to be the input for the `membership_tag`, and the purpose of the `membership_tag` is to prove that the sender of the message is in the group.  That purpose would be met by MAC'ing the message itself, without additional context.  Before the message is used by the group, its signature will be verified, so the sender's knowledge of the group context will be proven at that stage.\r\n\r\nOn a semi-related note, MLSMessageContentTBM is only used when creating MLSPlaintext, so it would be more properly called MLSPlaintextTBM.\r\n\r\nPutting all that together:\r\n\r\n```\r\nstruct {\r\n  MLSMessageContent content;\r\n  MLSMessageAuth auth;\r\n} MLSPlaintextTBM;\r\n```\r\n\r\n",
       "createdAt": "2022-05-05T03:09:07Z",
-      "updatedAt": "2022-05-05T03:09:07Z",
+      "updatedAt": "2022-05-09T09:36:48Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "mulmarta",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Like with #641 , I'm hesitant about changing the crypto design at this point. Such changes do affect the proofs.\r\n\r\nThis being said, removing the context from the MAC should be secure, but for a reason that has nothing to do with signatures. The purpose of the MAC is to protect against injections in epochs where the key schedule is secret, but some signature keys are compromised. This is achieved without MACing the context, because the context is already mixed into the derivation of the MAC key. In other words, each epoch (with its fixed unique context) uses an independent MAC key.\r\n\r\n@bifurcation I'm not sure I follow your justification. 1) The adversary can sign anything using the compromised signing keys, so I don\u2019t see how you can derive any guarantees from signatures. 2) \"Proving knowledge\" of the context doesn't seem too useful since the context only contains public values (if we send commits in the plaintext mode). I think the membership tag should prove the knowledge of the (secret) key schedule instead.",
+          "createdAt": "2022-05-09T09:36:47Z",
+          "updatedAt": "2022-05-09T09:36:47Z"
+        }
+      ]
     },
     {
       "number": 648,
@@ -47249,7 +47271,7 @@
       "labels": [],
       "body": "I drew this to help explain the relevant patch in MLSpp to someone, and thought it might be helpful to other folks.",
       "createdAt": "2022-05-05T15:59:54Z",
-      "updatedAt": "2022-05-05T16:26:06Z",
+      "updatedAt": "2022-05-09T09:37:14Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "031bf953fb53eaddd0f7575452b3026643202e53",
@@ -47273,6 +47295,19 @@
           "body": "",
           "createdAt": "2022-05-05T16:26:06Z",
           "updatedAt": "2022-05-05T16:26:06Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOBoyH6c45keC1",
+          "commit": {
+            "abbreviatedOid": "179a3be"
+          },
+          "author": "TWal",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "Excellent! This is a very nice addition to explain the design introduced #523 .",
+          "createdAt": "2022-05-09T09:37:14Z",
+          "updatedAt": "2022-05-09T09:37:14Z",
           "comments": []
         }
       ]
@@ -47351,13 +47386,80 @@
       "labels": [],
       "body": "",
       "createdAt": "2022-05-06T15:43:50Z",
-      "updatedAt": "2022-05-07T22:33:33Z",
+      "updatedAt": "2022-05-09T20:41:52Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "f64c3ebb5ad2c5f1621e30fbf581c0e02246b1e5",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "brendan/editorial",
       "headRefOid": "6202b54236bccdf0e5e6c6732274c700fe5198fb",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOBoyH6c45kckU",
+          "commit": {
+            "abbreviatedOid": "6202b54"
+          },
+          "author": "TWal",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-09T09:32:10Z",
+          "updatedAt": "2022-05-09T09:32:11Z",
+          "comments": [
+            {
+              "originalPosition": 19,
+              "body": "The fix is still buggy, here is the correct one:\r\n```suggestion\r\n  if prefix >= 1 && v < (1 << (8*(1 << (prefix-1))-2)):\r\n```",
+              "createdAt": "2022-05-09T09:32:10Z",
+              "updatedAt": "2022-05-09T09:32:11Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c45oFfh",
+          "commit": {
+            "abbreviatedOid": "6202b54"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-09T20:41:52Z",
+          "updatedAt": "2022-05-09T20:41:52Z",
+          "comments": [
+            {
+              "originalPosition": 19,
+              "body": "What's the bug in the current code?",
+              "createdAt": "2022-05-09T20:41:52Z",
+              "updatedAt": "2022-05-09T20:41:52Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 658,
+      "id": "PR_kwDOBoyH6c43eRDJ",
+      "title": "Replace LeafNodeRef with leaf index.",
+      "url": "https://github.com/mlswg/mls-protocol/pull/658",
+      "state": "OPEN",
+      "author": "Bren2010",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This seems to be a layer of indirection that doesn't add any value to implementation.",
+      "createdAt": "2022-05-09T03:53:25Z",
+      "updatedAt": "2022-05-09T03:53:25Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "f64c3ebb5ad2c5f1621e30fbf581c0e02246b1e5",
+      "headRepository": "mlswg/mls-protocol",
+      "headRefName": "brendan/leaf-index",
+      "headRefOid": "f2bf0183f1d7b41c20cfad12d8bd3cf2107e0782",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
