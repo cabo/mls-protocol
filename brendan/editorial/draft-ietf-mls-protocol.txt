@@ -5,7 +5,7 @@
 Network Working Group                                          R. Barnes
 Internet-Draft                                                     Cisco
 Intended status: Informational                             B. Beurdouche
-Expires: 8 November 2022                                 Inria & Mozilla
+Expires: 13 November 2022                                Inria & Mozilla
                                                                R. Robert
                                                                         
                                                              J. Millican
@@ -14,7 +14,7 @@ Expires: 8 November 2022                                 Inria & Mozilla
                                                                   Google
                                                           K. Cohn-Gordon
                                                     University of Oxford
-                                                              7 May 2022
+                                                             12 May 2022
 
 
               The Messaging Layer Security (MLS) Protocol
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 8 November 2022.
+   This Internet-Draft will expire on 13 November 2022.
 
 Copyright Notice
 
@@ -679,7 +679,7 @@ Table of Contents
        v = (v << 8) + data.next_byte()
 
      // Check that the encoder used the minimum bits required
-     if length > 1 && v < (1 << ((8*(length-1))-2)):
+     if prefix >= 1 && v < (1 << (8*(1 << (prefix-1))-2)):
        raise Exception('minimum encoding was not used')
 
      return v
