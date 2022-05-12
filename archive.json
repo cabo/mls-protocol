@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-05-10T01:25:31.483512+00:00",
+  "timestamp": "2022-05-12T01:56:25.035396+00:00",
   "repo": "mlswg/mls-protocol",
   "labels": [
     {
@@ -6750,9 +6750,17 @@
       "labels": [],
       "body": "It's not clear to me from reading the spec what should happen when a Commit includes a Remove proposal for the committer.",
       "createdAt": "2022-05-06T20:30:21Z",
-      "updatedAt": "2022-05-06T20:30:21Z",
+      "updatedAt": "2022-05-10T22:21:24Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "rohan-wire",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I think that sending a Commit with a Remove Proposal for yourself (the sender of the Commit) doesn't make sense and should be invalid. If you want to remove yourself, it would be better to send a separate Remove Proposal. Then another member is obliged to Commit your Proposal. Of course if a all the members try to send a Proposal nearly simultaneously, the last member should probably Commit all the proposals before closing the group.",
+          "createdAt": "2022-05-10T22:21:23Z",
+          "updatedAt": "2022-05-10T22:21:23Z"
+        }
+      ]
     }
   ],
   "pulls": [
@@ -47386,7 +47394,7 @@
       "labels": [],
       "body": "",
       "createdAt": "2022-05-06T15:43:50Z",
-      "updatedAt": "2022-05-09T20:41:52Z",
+      "updatedAt": "2022-05-10T22:29:18Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "f64c3ebb5ad2c5f1621e30fbf581c0e02246b1e5",
@@ -47397,7 +47405,22 @@
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "rohan-wire",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Some of these editorial comments I find less clear than the original. The code changes and varint are fine. Could you please split this into two more atomic PRs so we can discuss separately?",
+          "createdAt": "2022-05-10T22:27:50Z",
+          "updatedAt": "2022-05-10T22:27:50Z"
+        },
+        {
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Feel free to leave comments on the editorial portion of this PR to keep things moving",
+          "createdAt": "2022-05-10T22:29:18Z",
+          "updatedAt": "2022-05-10T22:29:18Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOBoyH6c45kckU",
@@ -47436,6 +47459,26 @@
               "body": "What's the bug in the current code?",
               "createdAt": "2022-05-09T20:41:52Z",
               "updatedAt": "2022-05-09T20:41:52Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c45rTEX",
+          "commit": {
+            "abbreviatedOid": "6202b54"
+          },
+          "author": "TWal",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-10T12:10:02Z",
+          "updatedAt": "2022-05-10T12:10:02Z",
+          "comments": [
+            {
+              "originalPosition": 19,
+              "body": "In your code, all numbers between `2^14` and `2^22` will be rejected: they are represented with `prefix = 2` (hence `length = 4`). In this case, the buggy check is `v < (1 << (8*3-2))`, the fixed check is `v < (1 << (8*2-2))`.",
+              "createdAt": "2022-05-10T12:10:02Z",
+              "updatedAt": "2022-05-10T12:10:02Z"
             }
           ]
         }
