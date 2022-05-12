@@ -5,7 +5,7 @@
 Network Working Group                                          R. Barnes
 Internet-Draft                                                     Cisco
 Intended status: Informational                             B. Beurdouche
-Expires: 14 October 2022                                 Inria & Mozilla
+Expires: 13 November 2022                                Inria & Mozilla
                                                                R. Robert
                                                                         
                                                              J. Millican
@@ -14,7 +14,7 @@ Expires: 14 October 2022                                 Inria & Mozilla
                                                                   Google
                                                           K. Cohn-Gordon
                                                     University of Oxford
-                                                           12 April 2022
+                                                             12 May 2022
 
 
               The Messaging Layer Security (MLS) Protocol
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 14 October 2022.
+   This Internet-Draft will expire on 13 November 2022.
 
 Copyright Notice
 
@@ -77,7 +77,7 @@ Table of Contents
    1.  Introduction
      1.1.  Change Log
    2.  Terminology
-     2.1.  Presentation Langauge
+     2.1.  Presentation Language
        2.1.1.  Optional Value
        2.1.2.  Variable-size Vector Headers
    3.  Operating Context
@@ -118,8 +118,8 @@ Table of Contents
      9.3.  External Initialization
      9.4.  Pre-Shared Keys
      9.5.  Exporters
-     9.6.  Resumption Secret
-     9.7.  State Authentication Keys
+     9.6.  Resumption PSK
+     9.7.  Epoch Authenticators
    10. Secret Tree
      10.1.  Encryption Keys
      10.2.  Deletion Schedule
@@ -149,7 +149,7 @@ Table of Contents
    14. Extensibility
      14.1.  Ciphersuites
      14.2.  Proposals
-     14.3.  Extensions
+     14.3.  Credential Extensibility
    15. Sequencing of State Changes
      15.1.  Server-Enforced Ordering
      15.2.  Client-Enforced Ordering
@@ -225,6 +225,27 @@ Table of Contents
 1.1.  Change Log
 
    RFC EDITOR PLEASE DELETE THIS SECTION.
+
+   draft-14
+
+   *  Ensure that a signature public key is always intelligible (*)
+
+   *  Clean up terminology of derived secrets/keys
+
+   *  Fix parent hash (*)
+
+   *  Specify compatibility behavior around new credentials
+
+   *  Add Path Required to Proposal Type template
+
+   *  Sub-group branching requires fresh key packages for each member
+
+   *  Use aasvg and typed code blocks
+
+   *  Require init key and leaf key to be different
+
+   *  Preconfigured senders extension and removal of signature key
+      indirection
 
    draft-13
 
@@ -529,7 +550,7 @@ Table of Contents
       cryptographic state with other clients.  A client is defined by
       the cryptographic keys it holds.
 
-   Group:  A group represents a logical collection of clents that share
+   Group:  A group represents a logical collection of clients that share
       a common secret value at any given time.  Its state is represented
       as a linear sequence of epochs in which each epoch depends on its
       predecessor.
@@ -558,7 +579,14 @@ Table of Contents
    Terminology specific to tree computations is described in
    Section 5.1.
 
-2.1.  Presentation Langauge
+   In general, symmetric values are referred to as "keys" or "secrets"
+   interchangeably.  Either term denotes a value that MUST be kept
+   confidential to a Client.  When labeling individual values, we
+   typically use "secret" to refer to a value that is used derive
+   further secret values, and "key" to refer to a value that is used
+   with an algorithm such as HMAC or an AEAD algorithm.
+
+2.1.  Presentation Language
 
    We use the TLS presentation language [RFC8446] to describe the
    structure of protocol messages.  In addition to the base syntax, we
@@ -655,7 +683,7 @@ Table of Contents
    The use of variable-size integers for vector lengths allows vectors
    to grow very large, up to 2^30 bytes.  Implementations should take
    care not to allow vectors to overflow available storage.  To
-   facilitate debugging of potential interoperatbility problems,
+   facilitate debugging of potential interoperability problems,
    implementations should provide a clear error when such an overflow
    condition occurs.
 
@@ -1310,6 +1338,18 @@ Table of Contents
    in the credentials in the leaves of the tree (including the leaf node
    information in KeyPackages used to add new members).
 
+   Like HPKE public keys, signature public keys are represented as
+   opaque values in a format defined by the cipher suite's signature
+   scheme.
+
+   opaque SignaturePublicKey<V>;
+
+   For ciphersuites using Ed25519 or Ed448 signature schemes, the public
+   key is in the format specified in [RFC8032].  For ciphersuites using
+   ECDSA with the NIST curves (P-256, P-384, or P-521), the public key
+   is the output of the uncompressed Elliptic-Curve-Point-to-Octet-
+   String conversion according to [SECG].
+
    To disambiguate different signatures used in MLS, each signed value
    is prefixed by a label as shown below:
 
@@ -1362,24 +1402,16 @@ Table of Contents
 
 6.3.  Credentials
 
-   A member of a group authenticates the identities of other
-   participants by means of credentials issued by some authentication
-   system, like a PKI.  Each type of credential MUST express the
-   following data in the context of the group it is used with:
+   Each member of a group presents a credential that associates an
+   identity with the member's key material.  This information is
+   verified according to the Authentication Service in use for a group.
 
-   *  The public key of a signature key pair matching the
-      SignatureScheme specified by the CipherSuite of the group
-
-   *  One or more identifiers of the holder of the private key
-
-   Note that a Credential can provide multiple identifiers for the
-   client.  If an application wishes to decided whether a credential
-   represents the correct identifier for a participant in a given
-   context, it is up to the application to decide what the correct value
-   is and compare it to the credential.  For example, a certificate in
-   an X509Credential may attest to several domain names or email
-   addresses in its subjectAltName extension.  An application may decide
-   to present all of these to a user, or if it knows a "desired" domain
+   A Credential can provide multiple identifiers for the client.  It is
+   up to the application to decide which identifier or identifiers to
+   use at the application level.  For example, a certificate in an
+   X509Credential may attest to several domain names or email addresses
+   in its subjectAltName extension.  An application may decide to
+   present all of these to a user, or if it knows a "desired" domain
    name or email address, it can check that the desired identifier is
    among those attested.  Using the terminology from [RFC6125], a
    Credential provides "presented identifiers", and it is up to the
@@ -1387,22 +1419,11 @@ Table of Contents
    client, if any.
 
    Credentials MAY also include information that allows a relying party
-   to verify the identity / signing key binding.
-
-   Additionally, Credentials SHOULD specify the signature scheme
-   corresponding to each contained public key.
-
-   // See RFC 8446 and the IANA TLS SignatureScheme registry
-   uint16 SignatureScheme;
+   to verify the identity / signing key binding, such as a signature
+   from a trusted authority.
 
    // See IANA registry for registered values
    uint16 CredentialType;
-
-   struct {
-       opaque identity<V>;
-       SignatureScheme signature_scheme;
-       opaque signature_key<V>;
-   } BasicCredential;
 
    struct {
        opaque cert_data<V>;
@@ -1410,32 +1431,26 @@ Table of Contents
 
    struct {
        CredentialType credential_type;
-       select (Credential.credential_type) {
+       select (credential_type) {
            case basic:
-               BasicCredential;
+               opaque identity<V>;
 
            case x509:
                Certificate chain<V>;
        };
    } Credential;
 
-   A BasicCredential is a raw, unauthenticated assertion of an identity/
-   key binding.  The format of the key in the public_key field is
-   defined by the relevant ciphersuite: the group ciphersuite for a
-   credential in a leaf node of a ratchet tree or the KeyPackage
-   ciphersuite for a credential in a KeyPackage object.  For
-   ciphersuites using Ed25519 or Ed448 signature schemes, the public key
-   is in the format specified in [RFC8032].  For ciphersuites using
-   ECDSA with the NIST curves (P-256, P-384, or P-521), the public key
-   is the output of the uncompressed Elliptic-Curve-Point-to-Octet-
-   String conversion according to [SECG].
+   A BasicCredential is a bare assertion of an identity, without any
+   additional information.  The format of the encoded identity is
+   defined by the application.
 
    For an X.509 credential, each entry in the chain represents a single
    DER-encoded X.509 certificate.  The chain is ordered such that the
    first entry (chain[0]) is the end-entity certificate and each
    subsequent certificate in the chain MUST be the issuer of the
-   previous certificate.  The algorithm for the public_key in the end-
-   entity certificate MUST match the relevant ciphersuite.
+   previous certificate.  The public key encoded in the
+   subjectPublicKeyInfo of the end-entity certificate MUST be identical
+   to the signature_key in the LeafNode containing this credential.
 
    The signatures used in this document are encoded as specified in
    [RFC8446].  In particular, ECDSA signatures are DER-encoded and EdDSA
@@ -1601,8 +1616,19 @@ Table of Contents
    structure.
 
    struct {
-       opaque mac_value<V>;
-   } MAC;
+       ProtocolVersion version = mls10;
+       WireFormat wire_format;
+       MLSMessageContent content;
+       select (MLSMessageContentTBS.content.sender.sender_type) {
+           case member:
+               GroupContext context;
+           case new_member:
+           case external:
+               struct{};
+       }
+   } MLSMessageContentTBS;
+
+   opaque MAC<V>;
 
    struct {
        // SignWithLabel(., "MLSMessageContentTBS", MLSMessageContentTBS)
@@ -1621,9 +1647,9 @@ Table of Contents
    The signature is computed using SignWithLabel with label
    "MLSMessageContentTBS" and with a content that covers the message
    content and the wire format that will be used for this message.  If
-   the sender's sender_type is Member, the content also covers the
-   GroupContext for the current epoch, so that signatures are specific
-   to a given group and epoch.
+   the sender's sender_type is member, the content also covers the
+   GroupContext for the current epoch so that signatures are specific to
+   a given group and epoch.
 
    The sender MUST use the private key corresponding to the following
    signature key depending on the sender's sender_type:
@@ -1645,28 +1671,13 @@ Table of Contents
       -  commit: The signature key in the credential contained in the
          KeyPackage in the Commit's path (see Section Section 9.3).
 
-   struct {
-       ProtocolVersion version = mls10;
-       WireFormat wire_format;
-       MLSMessageContent content;
-       select (MLSMessageContentTBS.content.sender.sender_type) {
-           case member:
-           case new_member:
-               GroupContext context;
-
-           case external:
-               struct{};
-       }
-   } MLSMessageContentTBS;
-
    Recipients of an MLSMessage MUST verify the signature with the key
    depending on the sender_type of the sender as described above.
 
    The confirmation tag value confirms that the members of the group
-   have arrived at the same state of the group.
-
-   A MLSMessageAuth is said to be valid when both the signature and
-   confirmation_tag fields are valid.
+   have arrived at the same state of the group.  An MLSMessageAuth is
+   said to be valid when both the signature and confirmation_tag fields
+   are valid.
 
 7.2.  Encoding and Decoding a Plaintext
 
@@ -1853,14 +1864,14 @@ Table of Contents
    simpler:
 
    struct {
-       HPKEPublicKey public_key;
+       HPKEPublicKey encryption_key;
        opaque parent_hash<V>;
        uint32 unmerged_leaves<V>;
    } ParentNode;
 
-   The public_key field contains an HPKE public key whose private key is
-   held only by the members at the leaves among its descendants.  The
-   parent_hash field contains a hash of this node's parent node, as
+   The encryption_key field contains an HPKE public key whose private
+   key is held only by the members at the leaves among its descendants.
+   The parent_hash field contains a hash of this node's parent node, as
    described in Section 8.8.  The unmerged_leaves field lists the leaves
    under this parent node that are unmerged, according to their indices
    among all the leaves in the tree.
@@ -1885,6 +1896,7 @@ Table of Contents
        CipherSuite ciphersuites<V>;
        ExtensionType extensions<V>;
        ProposalType proposals<V>;
+       CredentialType credentials<V>;
    } Capabilities;
 
    struct {
@@ -1901,7 +1913,8 @@ Table of Contents
    } Extension;
 
    struct {
-       HPKEPublicKey public_key;
+       HPKEPublicKey encryption_key;
+       SignaturePublicKey signature_key;
        Credential credential;
        Capabilities capabilities;
 
@@ -1923,7 +1936,8 @@ Table of Contents
    } LeafNode;
 
    struct {
-       HPKEPublicKey public_key;
+       HPKEPublicKey encryption_key;
+       SignaturePublicKey signature_key;
        Credential credential;
        Capabilities capabilities;
 
@@ -1953,18 +1967,21 @@ Table of Contents
        }
    } LeafNodeTBS;
 
-   The public_key field conains an HPKE public key whose private key is
-   held only by the member occupying this leaf (or in the case of a
-   LeafNode in a KeyPackage object, the issuer of the KeyPackage).  The
-   credential contains authentication information for this member, as
-   described in Section 6.3.
+   The encryption_key field contains an HPKE public key whose private
+   key is held only by the member occupying this leaf (or in the case of
+   a LeafNode in a KeyPackage object, the issuer of the KeyPackage).
+   The credential contains authentication information for this member,
+   as described in Section 6.3.
 
    The capabilities field indicates what protocol versions,
-   ciphersuites, protocol extensions, and non-default proposal types are
-   supported by a client.  Proposal types defined in this document are
-   considered "default" and thus need not be listed.  Extensions that
-   appear in the extensions field of a LeafNode MUST be included in the
-   extensions field of the capabilities field.
+   ciphersuites, extensions, credential types, and non-default proposal
+   types are supported by a client.  Proposal and extension types
+   defined in this document are considered "default" and thus need not
+   be listed, while any credential types the application wishes to use
+   MUST be listed.  Extensions that appear in the extensions field of a
+   LeafNode MUST be included in the extensions field of the capabilities
+   field, and the credential type used in the LeafNode MUST be included
+   in the credentials field of the capabilities field.
 
    The leaf_node_source field indicates how this LeafNode came to be
    added to the tree.  This signal tells other members of the group
@@ -2029,8 +2046,14 @@ Table of Contents
 
    *  Verify that the LeafNode is compatible with the group's
       parameters.  If the GroupContext has a required_capabilities
-      extension, then the required extensions and proposals MUST be
-      listed in the LeafNode's capabilities field.
+      extension, then the required extensions, proposals, and credential
+      types MUST be listed in the LeafNode's capabilities field.
+
+   *  Verify that the credential type is supported by all members of the
+      group, as specified by the capabilities field of each member's
+      LeafNode, and that the capabilities field of this LeafNode
+      indicates support for all the credential types currently in use by
+      other members.
 
    *  Verify the lifetime field:
 
@@ -2054,9 +2077,9 @@ Table of Contents
       the members of the group (including any other members added in the
       same Commit):
 
-      -  public_key
+      -  encryption_key
 
-      -  credential.signature_key
+      -  signature_key
 
    *  Verify that the extensions in the leaf node are supported.  The ID
       for each extension in the extensions field MUST be listed in the
@@ -2365,13 +2388,13 @@ Table of Contents
    obtained by hashing P's ParentHashInput struct.
 
    struct {
-       HPKEPublicKey public_key;
+       HPKEPublicKey encryption_key;
        opaque parent_hash<V>;
        opaque original_sibling_tree_hash<V>;
    } ParentHashInput;
 
-   The field public_key contains the HPKE public key of P.  If P is the
-   root, then the parent_hash field is set to a zero-length octet
+   The field encryption_key contains the HPKE public key of P.  If P is
+   the root, then the parent_hash field is set to a zero-length octet
    string.  Otherwise, parent_hash is the Parent Hash of the next node
    after P on the filtered direct path of U.  This way, P's Parent Hash
    fixes the new HPKE public key of each node V on the path from P to
@@ -2379,65 +2402,53 @@ Table of Contents
    blank nodes that are not fixed by P's Parent Hash.  However, for each
    node that has an HPKE key, this key is fixed by P's Parent Hash.
 
-   Finally, original_sibling_tree_hash is the original tree hash of S.
-   The original tree hash corresponds to the tree hash of S the last
-   time P was updated.  It can be computed as the tree hash of S in the
-   ratchet tree modified the following way:
+   Finally, original_sibling_tree_hash is the tree hash of S in the
+   ratchet tree modified as follows:
 
-   *  reset the leaves in P.unmerged_leaves to blanks
+   *  Extend the subtree of S by adding blank leaves until it is full,
+      i.e., until its number of leaves is a power of 2 (see
+      Section 8.5).
 
-   *  remove P.unmerged_leaves from all unmerged_leaves lists
+   *  For each leaf L in P.unmerged_leaves, blank L and remove it from
+      the unmerged_leaves sets of all parent nodes.
 
-   *  truncate the ratchet tree as described in Section 13.1.3
+   Observe that original_sibling_tree_hash does not change between
+   updates of P.  This property is crucial for the correctness of the
+   protocol.
 
    For example, in the following tree:
 
-                 W [D, H]
+                 W [F]
            ______|_____
           /             \
-         U [D]           Y [F, H]
+         U               Y [F]
        __|__           __|__
       /     \         /     \
-     T       _       X [F]   _
-    / \     / \     / \     / \
-   A   B   C   D   E   F   G   H
+     T       _       _      |
+    / \     / \     / \     |
+   A   B   C   D   E   F    G
 
-       Figure 12: A full tree unmerged leaves that illustrate parent
-                             hash computations
+          Figure 12: A tree illustrating parent hash computations.
 
    With P = W and S = Y, original_sibling_tree_hash is the tree hash of
    the following tree:
 
-         Y [F]
+         Y
        __|__
       /     \
-     X [F]  |
-    / \     |
-   E   F    G
-
-   Because W.unmerged_leaves = [H], H is removed from Y.unmerged_leaves,
-   then H is replaced with a blank leaf, then the tree is truncated
-   removing the last two nodes.
-
-   With P = W and S = U, original_sibling_tree_hash is the tree hash of
-   the following tree:
-
-         U
-       __|__
-      /     \
-     T       _
+     _       _
     / \     / \
-   A   B   C   _
+   E   _   G   _
 
-   This time we have 4 leaf nodes because the truncation of the ratchet
-   tree didn't remove the last leaf.
+   Because W.unmerged_leaves includes F, F is blanked and removed from
+   Y.unmerged_leaves.
 
    Note that no recomputation is needed if the tree hash of S is
    unchanged since the last time P was updated.  This is the case for
    computing or processing a Commit whose UpdatePath traverses P, since
    the Commit itself resets P.  (In other words, it is only necessary to
-   recompute the original sibling tree hash when validating group's tree
-   on joining.)  More generally, if none of the entries in
+   recompute the original sibling tree hash when validating a group's
+   tree on joining.)  More generally, if none of the entries in
    P.unmerged_leaves is in the subtree under S (and thus no nodes were
    truncated), then the original tree hash at S is the tree hash of S in
    the current tree.
@@ -2448,15 +2459,6 @@ Table of Contents
    is included in multiple parent hashes.  A subtree hash can be reused
    as long as the intersection of the parent's unmerged leaves with the
    subtree is the same as in the earlier computation.
-
-   Observe that original_child_resolution is equal to the resolution of
-   S at the time the UpdatePath was generated, since at that point P's
-   set of unmerged leaves was emptied.  (Observe also that
-   original_child_resolution contains all unmerged leaves of S.)
-   Therefore, P's Parent Hash fixes, for each node V on the path from P
-   to the root, not only the HPKE public key of V, but also the set of
-   HPKE public keys to which the corresponding HPKE secret key of V was
-   encrypted by the generator of the UpdatePath.
 
 8.8.1.  Using Parent Hashes
 
@@ -2532,7 +2534,7 @@ Table of Contents
    } HPKECiphertext;
 
    struct {
-       HPKEPublicKey public_key;
+       HPKEPublicKey encryption_key;
        HPKECiphertext encrypted_path_secret<V>;
    } UpdatePathNode;
 
@@ -2643,33 +2645,46 @@ psk_secret (or 0) --> KDF.Extract
                           V
                     init_secret_[n]
 
-   A number of secrets are derived from the epoch secret for different
+   A number of values are derived from the epoch secret for different
    purposes:
 
-               +=======================+==================+
-               | Secret                | Label            |
-               +=======================+==================+
-               | sender_data_secret    | "sender data"    |
-               +-----------------------+------------------+
-               | encryption_secret     | "encryption"     |
-               +-----------------------+------------------+
-               | exporter_secret       | "exporter"       |
-               +-----------------------+------------------+
-               | authentication_secret | "authentication" |
-               +-----------------------+------------------+
-               | external_secret       | "external"       |
-               +-----------------------+------------------+
-               | confirmation_key      | "confirm"        |
-               +-----------------------+------------------+
-               | membership_key        | "membership"     |
-               +-----------------------+------------------+
-               | resumption_secret     | "resumption"     |
-               +-----------------------+------------------+
+    +==================+=====================+=======================+
+    | Label            | Secret              | Purpose               |
+    +==================+=====================+=======================+
+    | "sender data"    | sender_data_secret  | Deriving keys to      |
+    |                  |                     | encrypt sender data   |
+    +------------------+---------------------+-----------------------+
+    | "encryption"     | encryption_secret   | Deriving message      |
+    |                  |                     | encryption keys (via  |
+    |                  |                     | the secret tree)      |
+    +------------------+---------------------+-----------------------+
+    | "exporter"       | exporter_secret     | Deriving exported     |
+    |                  |                     | secrets               |
+    +------------------+---------------------+-----------------------+
+    | "external"       | external_secret     | Deriving the external |
+    |                  |                     | init key              |
+    +------------------+---------------------+-----------------------+
+    | "confirm"        | confirmation_key    | Computing the         |
+    |                  |                     | confirmation MAC for  |
+    |                  |                     | an epoch              |
+    +------------------+---------------------+-----------------------+
+    | "membership"     | membership_key      | Computing the         |
+    |                  |                     | membership MAC for an |
+    |                  |                     | MLSPlaintext          |
+    +------------------+---------------------+-----------------------+
+    | "resumption"     | resumption_psk      | Proving membership in |
+    |                  |                     | this epoch (via a PSK |
+    |                  |                     | injected later)       |
+    +------------------+---------------------+-----------------------+
+    | "authentication" | epoch_authenticator | Confirming that two   |
+    |                  |                     | clients have the same |
+    |                  |                     | view of the group     |
+    +------------------+---------------------+-----------------------+
 
                       Table 3: Epoch-derived secrets
 
-   The "external secret" is used to derive an HPKE key pair whose
-   private key is held by the entire group:
+   The external_secret is used to derive an HPKE key pair whose private
+   key is held by the entire group:
 
    external_priv, external_pub = KEM.DeriveKeyPair(external_secret)
 
@@ -2792,7 +2807,7 @@ psk_secret (or 0) --> KDF.Extract
    init_secret = context.export("MLS 1.0 external init secret", KDF.Nh)
 
    Members of the group receive the kem_output in an ExternalInit
-   proposal and preform the corresponding calculation to retrieve the
+   proposal and perform the corresponding calculation to retrieve the
    init_secret value.
 
    context = SetupBaseR(kem_output, external_priv, "")
@@ -2873,9 +2888,8 @@ psk_secret (or 0) --> KDF.Extract
    object with the psks field set, the receiving Client includes them in
    the key schedule in the order listed in the Commit, or in the psks
    field respectively.  For resumption PSKs, the PSK is defined as the
-   resumption_secret of the group and epoch specified in the
-   PreSharedKeyID object.  Specifically, psk_secret is computed as
-   follows:
+   resumption_psk of the group and epoch specified in the PreSharedKeyID
+   object.  Specifically, psk_secret is computed as follows:
 
    struct {
        PreSharedKeyID id;
@@ -2895,7 +2909,7 @@ psk_secret (or 0) --> KDF.Extract
    field in PSKLabel corresponds to the index of the PSK in the psk
    array, while the count field contains the total number of PSKs.  In
    other words, the PSKs are chained together with KDF.Extract
-   invocations (labelled "Extract" for brevity in the diagram), as
+   invocations (labeled "Extract" for brevity in the diagram), as
    follows:
 
                    0                               0    = psk_secret_[0]
@@ -2939,27 +2953,42 @@ psk_secret (or 0) --> KDF.Extract
    It is RECOMMENDED for the application generating exported values to
    refresh those values after a Commit is processed.
 
-9.6.  Resumption Secret
+9.6.  Resumption PSK
 
-   The main MLS key schedule provides a resumption_secret that is used
-   as a PSK to inject entropy from one epoch into another.  This
+   The main MLS key schedule provides a resumption_psk that is used as a
+   PSK to inject entropy from one epoch into another.  This
    functionality is used in the reinitialization and branching processes
    described in Section 12.2 and Section 12.3, but may be used by
    applications for other purposes.
 
    Some uses of resumption PSKs might call for the use of PSKs from
    historical epochs.  The application SHOULD specify an upper limit on
-   the number of past epochs for which the resumption_secret may be
-   stored.
+   the number of past epochs for which the resumption_psk may be stored.
 
-9.7.  State Authentication Keys
+9.7.  Epoch Authenticators
 
-   The main MLS key schedule provides a per-epoch authentication_secret.
-   If one of the parties is being actively impersonated by an attacker,
-   their authentication_secret will differ from that of the other group
-   members.  Thus, members of a group MAY use their
-   authentication_secrets within an out-of-band authentication protocol
-   to ensure that they share the same view of the group.
+   The main MLS key schedule provides a per-epoch epoch_authenticator.
+   If one member of the group is being impersonated by an active
+   attacker, the epoch_authenticator computed by their client will
+   differ from those computed by the other group members.
+
+   This property can be used to construct defenses against impersonation
+   attacks that are effective even if members' signature keys are
+   compromised.  As a trivial example, if the users of the clients in an
+   MLS group were to meet in person and reliably confirm that their
+   epoch authenticator values were equal (using some suitable user
+   interface), then each user would be assured that the others were not
+   being impersonated in the current epoch.  As soon as the epoch
+   changed, though, they would need to re-do this confirmation.  The
+   state of the group would have changed, possibly introducing an
+   attacker.
+
+   More generally, in order for the members of an MLS group to obtain
+   concrete authentication protections using the epoch_authenticator,
+   they will need to use it in some secondary protocol (such as the
+   face-to-face protocol above).  The details of that protocol will then
+   determine the specific authentication protections provided to the MLS
+   group.
 
 10.  Secret Tree
 
@@ -3129,16 +3158,16 @@ psk_secret (or 0) --> KDF.Extract
        represent this client.
 
    KeyPackages are intended to be used only once and SHOULD NOT be
-   reused except in case of last resort.  (See Section 17.4).  Clients
-   MAY generate and publish multiple KeyPackages to support multiple
-   ciphersuites.
+   reused except in the case of last resort.  (See Section 17.4).
+   Clients MAY generate and publish multiple KeyPackages to support
+   multiple ciphersuites.
 
    The value for init_key MUST be a public key for the asymmetric
    encryption scheme defined by cipher_suite, and it MUST be unique
    among the set of KeyPackages created by this client.  Likewise, the
    leaf_node field MUST be valid for the ciphersuite, including both the
-   public_key and credential fields.  The whole structure is signed
-   using the client's signature key.  A KeyPackage object with an
+   encryption_key and signature_key fields.  The whole structure is
+   signed using the client's signature key.  A KeyPackage object with an
    invalid signature field MUST be considered malformed.
 
    The signature is computed by the function SignWithLabel with a label
@@ -3171,12 +3200,13 @@ psk_secret (or 0) --> KDF.Extract
    KeyPackage in an Add proposal.
 
    The field leaf_node.capabilities indicates what protocol versions,
-   ciphersuites, protocol extensions, and non-default proposal types are
-   supported by the client.  (Proposal types defined in this document
-   are considered "default" and not listed.)  This information allows
-   MLS session establishment to be safe from downgrade attacks on the
-   parameters described (as discussed in Section 12), while still only
-   advertising one version / ciphersuite per KeyPackage.
+   ciphersuites, credential types, and non-default proposal/extension
+   types are supported by the client.  (Proposal and extension types
+   defined in this document are considered "default" and not listed.)
+   This information allows MLS session establishment to be safe from
+   downgrade attacks on the parameters described (as discussed in
+   Section 12), while still only advertising one version / ciphersuite
+   per KeyPackage.
 
    The field leaf_node.leaf_node_source of the LeafNode in a KeyPackage
    MUST be set to key_package.
@@ -3205,8 +3235,8 @@ psk_secret (or 0) --> KDF.Extract
    *  Verify that the signature on the KeyPackage is valid using the
       public key in leaf_node.credential.
 
-   *  Verify that the value of leaf_node.public_key is different from
-      the value of the init_key field.
+   *  Verify that the value of leaf_node.encryption_key is different
+      from the value of the init_key field.
 
 11.2.  KeyPackage Identifiers
 
@@ -3288,12 +3318,13 @@ psk_secret (or 0) --> KDF.Extract
    struct {
        ExtensionType extension_types<V>;
        ProposalType proposal_types<V>;
+       CredentialType credential_types<V>;
    } RequiredCapabilities;
 
-   This extension lists the extensions and proposal types that must be
-   supported by all members of the group.  The "default" proposal and
-   extension types defined in this document are assumed to be
-   implemented by all clients, and need not be listed in
+   This extension lists the extensions, proposals, and credential types
+   that must be supported by all members of the group.  The "default"
+   proposal and extension types defined in this document are assumed to
+   be implemented by all clients, and need not be listed in
    RequiredCapabilities in order to be safely used.
 
    For new members, support for required capabilities is enforced by
@@ -3484,8 +3515,8 @@ psk_secret (or 0) --> KDF.Extract
    *  Validate the LeafNode as specified in Section 8.3.  The
       leaf_node_source field MUST be set to update.
 
-   *  Verify that the public_key value in the LeafNode is different from
-      the corresponding field in the LeafNode being replaced.
+   *  Verify that the encryption_key value in the LeafNode is different
+      from the corresponding field in the LeafNode being replaced.
 
    *  Replace the sender's LeafNode with the one contained in the Update
       proposal
@@ -3763,7 +3794,7 @@ psk_secret (or 0) --> KDF.Extract
    the rest invalid.  The committer MUST consider invalid any Add or
    Update proposal if the Credential in the contained KeyPackage shares
    the same signature key with a Credential in any leaf of the group, or
-   if the LeafNode in the KeyPackage shares the same public_key with
+   if the LeafNode in the KeyPackage shares the same encryption_key with
    another LeafNode in the group.
 
    The Commit MUST NOT combine proposals sent within different epochs.
@@ -3899,7 +3930,7 @@ psk_secret (or 0) --> KDF.Extract
 
    *  If populating the path field: Create an UpdatePath using the
       provisional ratchet tree and GroupContext.  Any new member (from
-      an add proposal) MUST be excluded from the resolution during the
+      an Add proposal) MUST be excluded from the resolution during the
       computation of the UpdatePath.  The leaf_node for this UpdatePath
       MUST have leaf_node_source set to commit.  Note that the LeafNode
       in the UpdatePath effectively updates an existing LeafNode in the
@@ -4030,8 +4061,8 @@ psk_secret (or 0) --> KDF.Extract
       -  Validate the LeafNode as specified in Section 8.3.  The
          leaf_node_source field MUST be set to commit.
 
-      -  Verify that the public_key value in the LeafNode is different
-         from the committer's current leaf node.
+      -  Verify that the encryption_key value in the LeafNode is
+         different from the committer's current leaf node.
 
       -  Apply the UpdatePath to the tree, as described in Section 8.6,
          and store leaf_node at the committer's leaf.
@@ -4393,7 +4424,7 @@ psk_secret (or 0) --> KDF.Extract
    optional<Node> ratchet_tree<V>;
 
    The nodes are listed in the order specified by a left-to-right in-
-   order traversal of the rachet tree.  Each node is listed between its
+   order traversal of the ratchet tree.  Each node is listed between its
    left subtree and its right subtree.  (This is the same ordering as
    specified for the array-based trees outlined in Appendix B.)
 
@@ -4515,7 +4546,37 @@ psk_secret (or 0) --> KDF.Extract
    unless the proposal type is supported by all the members of the group
    that will process the Commit.
 
-14.3.  Extensions
+14.3.  Credential Extensibility
+
+   In order to ensure that MLS provides meaningful authentication it is
+   important that each member is able to authenticate some identity
+   information for each other member.  Identity information is encoded
+   in Credentials, so this property is assured by ensuring that members
+   use compatible credential types.
+
+   The types of credential that may be used in a group is restricted to
+   what all members of the group support, as specified by the
+   capabilities field of each LeafNode in the RatchetTree.  An
+   application can introduce new credential types by choosing an
+   unallocated identifier from the registry in Section 18.4 and
+   indicating support for the credential type in published LeafNodes,
+   whether in Update proposals to existing groups or KeyPackages that
+   are added to new groups.  Once all members in a group indicate
+   support for the credential type, members can start using LeafNodes
+   with the new credential.  Application may enforce that certain
+   credential types always remain supported by adding a
+   required_capabilities extension to the group's GroupContext, which
+   would prevent any member from being added to the group that doesn't
+   support them.
+
+   In future extensions to MLS, it may be useful to allow a member to
+   present more than one credential.  For example, such credentials
+   might present different attributes attested by different authorities.
+   To be consistent with the general principle stated at the beginning
+   of this section, such an extension would need to ensure that each
+   member can authenticate some identity for each other member.  For
+   each pair of members (Alice, Bob), Alice would need to present at
+   least one credential of a type that Bob supports. ## Extensions
 
    This protocol includes a mechanism for negotiating extension
    parameters similar to the one in TLS [RFC8446].  In TLS, extension
@@ -5464,23 +5525,14 @@ Appendix A.  Protocol Origins of Example Trees
 
    To construct the tree in Figure 12:
 
-   *  A creates a group with B, ... G
+   *  A creates a group with B, ..., G
 
    *  A removes F in a full Commit, setting T, U, and W
 
-   *  E sends an empty Commit, setting X, Y, and W
+   *  E sends an empty Commit, setting Y and W
 
    *  A adds a new member at F in a partial Commit, adding F as unmerged
-      at X, Y, and W
-
-   *  A removes D, resetting T, U, and W (in particular, F is no longer
-      unmerged at W)
-
-   *  A adds new memebers at D and H in a partial commit
-
-      -  D is added as unmerged at U, W
-
-      -  H is added as unmerged at Y, W
+      at Y and W
 
 Appendix B.  Array-Based Trees
 
@@ -5673,7 +5725,7 @@ Appendix C.  Link-Based Trees
    between nodes' indices in the array.)  Such an implementation needs
    to update these links to maintain the left-balanced structure of the
    tree as the tree is extended to add new members, or truncated when
-   memebers are removed.
+   members are removed.
 
    The following code snippet shows how these algorithms could be
    implemented in Python.
