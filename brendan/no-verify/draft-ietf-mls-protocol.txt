@@ -5,7 +5,7 @@
 Network Working Group                                          R. Barnes
 Internet-Draft                                                     Cisco
 Intended status: Informational                             B. Beurdouche
-Expires: 13 November 2022                                Inria & Mozilla
+Expires: 14 November 2022                                Inria & Mozilla
                                                                R. Robert
                                                                         
                                                              J. Millican
@@ -14,7 +14,7 @@ Expires: 13 November 2022                                Inria & Mozilla
                                                                   Google
                                                           K. Cohn-Gordon
                                                     University of Oxford
-                                                             12 May 2022
+                                                             13 May 2022
 
 
               The Messaging Layer Security (MLS) Protocol
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 13 November 2022.
+   This Internet-Draft will expire on 14 November 2022.
 
 Copyright Notice
 
@@ -2034,11 +2034,10 @@ Table of Contents
    *  Verify that the credential in the LeafNode is valid according to
       the authentication service and the client's local policy.  These
       actions MUST be the same regardless of at what point in the
-      protocol the LeafNode is being verified with the following
-      exception: If the LeafNode is an update to another LeafNode, the
-      authentication service MUST additionally validate that the set of
-      identities attested by the credential in the new LeafNode is
-      acceptable relative to the identities attested by the old
+      protocol the LeafNode is being verified.  If the LeafNode is an
+      update to another LeafNode, the Authentication Service SHOULD
+      additionally validate that the set of identities attested by the
+      credential in the new LeafNode are the same as in the old
       credential.
 
    *  Verify that the signature on the LeafNode is valid using the
