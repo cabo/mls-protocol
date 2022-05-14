@@ -1660,12 +1660,12 @@ Table of Contents
 
    *  external: The signature key at the index indicated by sender_index
       in the external_senders group context extension (see
-      Section Section 13.1.9.1).  In this case, the content_type of the
-      message MUST NOT be commit, since only members of the group or new
-      joiners can send Commit messages.
+      Section Section 13.1.9.1).  The content_type of the message MUST
+      be proposal.
 
    *  new_member: The signature key in the credential contained in the
-      KeyPackage in the Commit's path (see Section Section 9.3).
+      KeyPackage in the Commit's path (see Section Section 9.3).  The
+      content_type of the message MUST be commit.
 
    Recipients of an MLSMessage MUST verify the signature with the key
    depending on the sender_type of the sender as described above.
