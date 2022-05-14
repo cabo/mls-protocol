@@ -5,7 +5,7 @@
 Network Working Group                                          R. Barnes
 Internet-Draft                                                     Cisco
 Intended status: Informational                             B. Beurdouche
-Expires: 13 November 2022                                Inria & Mozilla
+Expires: 15 November 2022                                Inria & Mozilla
                                                                R. Robert
                                                                         
                                                              J. Millican
@@ -14,7 +14,7 @@ Expires: 13 November 2022                                Inria & Mozilla
                                                                   Google
                                                           K. Cohn-Gordon
                                                     University of Oxford
-                                                             12 May 2022
+                                                             14 May 2022
 
 
               The Messaging Layer Security (MLS) Protocol
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 13 November 2022.
+   This Internet-Draft will expire on 15 November 2022.
 
 Copyright Notice
 
@@ -1621,8 +1621,9 @@ Table of Contents
        MLSMessageContent content;
        select (MLSMessageContentTBS.content.sender.sender_type) {
            case member:
-               GroupContext context;
            case new_member:
+               GroupContext context;
+
            case external:
                struct{};
        }
@@ -1654,22 +1655,17 @@ Table of Contents
    The sender MUST use the private key corresponding to the following
    signature key depending on the sender's sender_type:
 
-   *  member: The signature key contained in the Credential at the leaf
-      with the sender's LeafNodeRef
+   *  member: The signature key contained in the LeafNode corresponding
+      to the sender's LeafNodeRef
 
-   *  external: The signature key contained in the Credential at the
-      index indicated by the sender_index in the external_senders group
-      context extension (see Section Section 13.1.9.1).  In this case,
-      the content_type of the message MUST NOT be commit, since only
-      members of the group or new joiners can send Commit messages.
+   *  external: The signature key at the index indicated by sender_index
+      in the external_senders group context extension (see
+      Section Section 13.1.9.1).  In this case, the content_type of the
+      message MUST NOT be commit, since only members of the group or new
+      joiners can send Commit messages.
 
-   *  new_member: The signature key depends on the content_type:
-
-      -  proposal: The signature key in the credential contained in
-         KeyPackage in the Add proposal (see Section Section 13.1.9).
-
-      -  commit: The signature key in the credential contained in the
-         KeyPackage in the Commit's path (see Section Section 9.3).
+   *  new_member: The signature key in the credential contained in the
+      KeyPackage in the Commit's path (see Section Section 9.3).
 
    Recipients of an MLSMessage MUST verify the signature with the key
    depending on the sender_type of the sender as described above.
@@ -3693,28 +3689,19 @@ psk_secret (or 0) --> KDF.Extract
 13.1.9.  External Proposals
 
    Add and Remove proposals can be constructed and sent to the group by
-   a party that is outside the group.  For example, a Delivery Service
-   might propose to remove a member of a group who has been inactive for
-   a long time, or propose adding a newly-hired staff member to a group
-   representing a real-world team.  Proposals originating outside the
-   group are identified by a external or new_member SenderType in
-   MLSPlaintext.
+   a party that is outside the group, indicated by an external
+   SenderType.  This is useful in cases where, for example, an automated
+   service might propose to remove a member of a group who has been
+   inactive for a long time, or propose adding a newly-hired staff
+   member to a group representing a real-world team.
 
    ReInit proposals can also be sent to the group by a external sender,
    for example to enforce a changed policy regarding MLS version or
    ciphersuite.
 
-   The new_member SenderType is used for clients proposing that they
-   themselves be added.  For this ID type the sender value MUST be zero
-   and the Proposal type MUST be Add. The MLSPlaintext MUST be signed
-   with the private key corresponding to the KeyPackage in the Add
-   message.  Recipients MUST verify that the MLSPlaintext carrying the
-   Proposal message is validly signed with this key.
-
-   The external SenderType is reserved for signers that are pre-
-   provisioned to the clients within a group.  It can only be used if
-   the external_senders extension is present in the group's group
-   context extensions.
+   The external SenderType requires that signers are pre-provisioned to
+   the clients within a group and can only be used if the
+   external_senders extension is present in the group's GroupContext.
 
    An external proposal MUST be sent as an MLSPlaintext object, since
    the sender will not have the keys necessary to construct an
@@ -3723,10 +3710,10 @@ psk_secret (or 0) --> KDF.Extract
 13.1.9.1.  External Senders Extension
 
    The external_senders extension is a group context extension that
-   contains credentials of senders that are permitted to send external
-   proposals to the group.
+   contains the signature keys of senders that are permitted to send
+   external proposals to the group.
 
-   Credential external_senders<V>;
+   SignaturePublicKey external_senders<V>;
 
 13.2.  Commit
 

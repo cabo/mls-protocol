@@ -1031,7 +1031,7 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Barnes, et al.</td>
-<td class="center">Expires 13 November 2022</td>
+<td class="center">Expires 15 November 2022</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1044,12 +1044,12 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 <dd class="internet-draft">draft-ietf-mls-protocol-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2022-05-12" class="published">12 May 2022</time>
+<time datetime="2022-05-14" class="published">14 May 2022</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2022-11-13">13 November 2022</time></dd>
+<dd class="expires"><time datetime="2022-11-15">15 November 2022</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1119,7 +1119,7 @@ in size ranging from two to thousands.<a href="#section-abstract-1" class="pilcr
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 13 November 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 15 November 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -3263,8 +3263,9 @@ struct {
     MLSMessageContent content;
     select (MLSMessageContentTBS.content.sender.sender_type) {
         case member:
-            GroupContext context;
         case new_member:
+            GroupContext context;
+
         case external:
             struct{};
     }
@@ -3296,28 +3297,19 @@ current epoch so that signatures are specific to a given group and epoch.<a href
 depending on the sender's <code>sender_type</code>:<a href="#section-7.1-4" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-7.1-5.1">
-            <code>member</code>: The signature key contained in the Credential at the leaf with the
+            <code>member</code>: The signature key contained in the LeafNode corresponding to the
 sender's <code>LeafNodeRef</code><a href="#section-7.1-5.1" class="pilcrow">¶</a>
 </li>
           <li class="normal" id="section-7.1-5.2">
-            <code>external</code>: The signature key contained in the Credential at the index
-indicated by the <code>sender_index</code> in the <code>external_senders</code> group context
+            <code>external</code>: The signature key at the index
+indicated by <code>sender_index</code> in the <code>external_senders</code> group context
 extension (see Section <a href="#external-senders-extension" class="xref">Section 13.1.9.1</a>).  In this case, the
 <code>content_type</code> of the message MUST NOT be <code>commit</code>, since only members
 of the group or new joiners can send Commit messages.<a href="#section-7.1-5.2" class="pilcrow">¶</a>
 </li>
           <li class="normal" id="section-7.1-5.3">
-            <p id="section-7.1-5.3.1"><code>new_member</code>: The signature key depends on the <code>content_type</code>:<a href="#section-7.1-5.3.1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-7.1-5.3.2.1">
-                <code>proposal</code>: The signature key in the credential contained in KeyPackage in
-the Add proposal (see Section <a href="#external-proposals" class="xref">Section 13.1.9</a>).<a href="#section-7.1-5.3.2.1" class="pilcrow">¶</a>
-</li>
-              <li class="normal" id="section-7.1-5.3.2.2">
-                <code>commit</code>: The signature key in the credential contained in the KeyPackage in
-the Commit's path (see Section <a href="#external-initialization" class="xref">Section 9.3</a>).<a href="#section-7.1-5.3.2.2" class="pilcrow">¶</a>
-</li>
-            </ul>
+            <code>new_member</code>: The signature key in the credential contained in the KeyPackage in
+  the Commit's path (see Section <a href="#external-initialization" class="xref">Section 9.3</a>).<a href="#section-7.1-5.3" class="pilcrow">¶</a>
 </li>
         </ul>
 <p id="section-7.1-6">Recipients of an MLSMessage MUST verify the signature with the key depending on
@@ -5775,35 +5767,28 @@ group agree on the extensions in use.<a href="#section-13.1.8-5" class="pilcrow"
 <a href="#section-13.1.9" class="section-number selfRef">13.1.9. </a><a href="#name-external-proposals" class="section-name selfRef">External Proposals</a>
           </h4>
 <p id="section-13.1.9-1">Add and Remove proposals can be constructed and sent to the group by a party
-that is outside the group.  For example, a Delivery Service might propose to
+that is outside the group, indicated by an <code>external</code> SenderType.
+This is useful in cases where, for example, an automated service might propose to
 remove a member of a group who has been inactive for a long time, or propose adding
-a newly-hired staff member to a group representing a real-world team.  Proposals
-originating outside the group are identified by a <code>external</code> or
-<code>new_member</code> SenderType in MLSPlaintext.<a href="#section-13.1.9-1" class="pilcrow">¶</a></p>
+a newly-hired staff member to a group representing a real-world team.<a href="#section-13.1.9-1" class="pilcrow">¶</a></p>
 <p id="section-13.1.9-2">ReInit proposals can also be sent to the group by a <code>external</code> sender, for
 example to enforce a changed policy regarding MLS version or ciphersuite.<a href="#section-13.1.9-2" class="pilcrow">¶</a></p>
-<p id="section-13.1.9-3">The <code>new_member</code> SenderType is used for clients proposing that they themselves
-be added.  For this ID type the sender value MUST be zero and the Proposal type
-MUST be Add. The MLSPlaintext MUST be signed with the private key corresponding
-to the KeyPackage in the Add message.  Recipients MUST verify that the
-MLSPlaintext carrying the Proposal message is validly signed with this key.<a href="#section-13.1.9-3" class="pilcrow">¶</a></p>
-<p id="section-13.1.9-4">The <code>external</code> SenderType is reserved for signers that are pre-provisioned
-to the clients within a group. It can only be used if the
-<code>external_senders</code> extension is present in the group's group context
-extensions.<a href="#section-13.1.9-4" class="pilcrow">¶</a></p>
-<p id="section-13.1.9-5">An external proposal MUST be sent as an MLSPlaintext object, since the sender
-will not have the keys necessary to construct an MLSCiphertext object.<a href="#section-13.1.9-5" class="pilcrow">¶</a></p>
+<p id="section-13.1.9-3">The <code>external</code> SenderType requires that signers are pre-provisioned
+to the clients within a group and can only be used if the
+<code>external_senders</code> extension is present in the group's GroupContext.<a href="#section-13.1.9-3" class="pilcrow">¶</a></p>
+<p id="section-13.1.9-4">An external proposal MUST be sent as an MLSPlaintext object, since the sender
+will not have the keys necessary to construct an MLSCiphertext object.<a href="#section-13.1.9-4" class="pilcrow">¶</a></p>
 <div id="external-senders-extension">
 <section id="section-13.1.9.1">
             <h5 id="name-external-senders-extension">
 <a href="#section-13.1.9.1" class="section-number selfRef">13.1.9.1. </a><a href="#name-external-senders-extension" class="section-name selfRef">External Senders Extension</a>
             </h5>
 <p id="section-13.1.9.1-1">The <code>external_senders</code> extension is a group context extension that contains
-credentials of senders that are permitted to send external proposals to the
+the signature keys of senders that are permitted to send external proposals to the
 group.<a href="#section-13.1.9.1-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-13.1.9.1-2">
 <pre>
-Credential external_senders&lt;V&gt;;
+SignaturePublicKey external_senders&lt;V&gt;;
 </pre><a href="#section-13.1.9.1-2" class="pilcrow">¶</a>
 </div>
 </section>
