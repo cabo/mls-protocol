@@ -1663,9 +1663,9 @@ Table of Contents
       Section Section 13.1.9.1).  The content_type of the message MUST
       be proposal.
 
-   *  new_member: The signature key in the credential contained in the
-      KeyPackage in the Commit's path (see Section Section 9.3).  The
-      content_type of the message MUST be commit.
+   *  new_member: The signature key in the LeafNode in the Commit's path
+      (see Section Section 9.3).  The content_type of the message MUST
+      be commit.
 
    Recipients of an MLSMessage MUST verify the signature with the key
    depending on the sender_type of the sender as described above.
