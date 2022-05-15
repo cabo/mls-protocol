@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-05-12T01:56:25.035396+00:00",
+  "timestamp": "2022-05-15T02:00:23.846966+00:00",
   "repo": "mlswg/mls-protocol",
   "labels": [
     {
@@ -6761,6 +6761,22 @@
           "updatedAt": "2022-05-10T22:21:23Z"
         }
       ]
+    },
+    {
+      "number": 661,
+      "id": "I_kwDOBoyH6c5Jo4xz",
+      "title": "Specify that clients MUST ensure the group id is unique and fixed for each group.",
+      "url": "https://github.com/mlswg/mls-protocol/issues/661",
+      "state": "OPEN",
+      "author": "Bren2010",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Group ids are signed to bind certain information to specific groups. But I can imagine a case where a user mis-uses the group id to be something like a \"room title\" which lets an adversary control the group id and introduces potential problems.\r\n\r\n- If we can prove that it's fine for a group id to be reused, then should we get rid of group ids?\r\n- If not (as I expect), then group ids need to be guaranteed to be unique [globally | per client | per signing key] and we need to specify that.",
+      "createdAt": "2022-05-13T16:31:40Z",
+      "updatedAt": "2022-05-13T16:31:40Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
@@ -47205,7 +47221,7 @@
       "labels": [],
       "body": "Fixes #642 \r\n\r\nAlso requires that padding be all-zero.  Before, the sender was allowed to put arbitrary octets in there.",
       "createdAt": "2022-05-05T13:51:25Z",
-      "updatedAt": "2022-05-06T02:18:57Z",
+      "updatedAt": "2022-05-12T23:48:21Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "031bf953fb53eaddd0f7575452b3026643202e53",
@@ -47238,6 +47254,26 @@
           "createdAt": "2022-05-05T16:24:32Z",
           "updatedAt": "2022-05-05T16:24:32Z",
           "comments": []
+        },
+        {
+          "id": "PRR_kwDOBoyH6c456QQ9",
+          "commit": {
+            "abbreviatedOid": "c800347"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-12T23:48:20Z",
+          "updatedAt": "2022-05-12T23:48:21Z",
+          "comments": [
+            {
+              "originalPosition": 42,
+              "body": "```suggestion\r\nto reduce the ability of attackers outside the group to infer the size of the\r\n```",
+              "createdAt": "2022-05-12T23:48:20Z",
+              "updatedAt": "2022-05-12T23:48:21Z"
+            }
+          ]
         }
       ]
     },
@@ -47253,7 +47289,7 @@
       "labels": [],
       "body": "Fixes #647 ",
       "createdAt": "2022-05-05T15:36:51Z",
-      "updatedAt": "2022-05-05T15:36:51Z",
+      "updatedAt": "2022-05-12T23:52:02Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "031bf953fb53eaddd0f7575452b3026643202e53",
@@ -47265,7 +47301,21 @@
       "mergedBy": null,
       "mergeCommit": null,
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOBoyH6c456Qo-",
+          "commit": {
+            "abbreviatedOid": "9c902ee"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2022-05-12T23:52:02Z",
+          "updatedAt": "2022-05-12T23:52:02Z",
+          "comments": []
+        }
+      ]
     },
     {
       "number": 652,
@@ -47394,13 +47444,13 @@
       "labels": [],
       "body": "",
       "createdAt": "2022-05-06T15:43:50Z",
-      "updatedAt": "2022-05-10T22:29:18Z",
+      "updatedAt": "2022-05-12T16:18:48Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "f64c3ebb5ad2c5f1621e30fbf581c0e02246b1e5",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "brendan/editorial",
-      "headRefOid": "6202b54236bccdf0e5e6c6732274c700fe5198fb",
+      "headRefOid": "9de99af90fdc0372720f1e11c6d81529fa62fa3e",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -47481,6 +47531,26 @@
               "updatedAt": "2022-05-10T12:10:02Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c454l1B",
+          "commit": {
+            "abbreviatedOid": "6202b54"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-12T16:18:47Z",
+          "updatedAt": "2022-05-12T16:18:48Z",
+          "comments": [
+            {
+              "originalPosition": 19,
+              "body": "Ah, thank you!",
+              "createdAt": "2022-05-12T16:18:48Z",
+              "updatedAt": "2022-05-12T16:18:48Z"
+            }
+          ]
         }
       ]
     },
@@ -47503,6 +47573,92 @@
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "brendan/leaf-index",
       "headRefOid": "f2bf0183f1d7b41c20cfad12d8bd3cf2107e0782",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 659,
+      "id": "PR_kwDOBoyH6c43wCU_",
+      "title": "Remove new_member Add proposals.",
+      "url": "https://github.com/mlswg/mls-protocol/pull/659",
+      "state": "OPEN",
+      "author": "Bren2010",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Sending an Add proposal from outside the group is how we let people do \"external add\" functionality without needing to publish the group state. But you can't talk right away like you can with an external Commit. In that case, applications seem more inclined to build this functionality themselves so let's just remove it from the spec.",
+      "createdAt": "2022-05-12T23:03:35Z",
+      "updatedAt": "2022-05-14T00:33:15Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "f64c3ebb5ad2c5f1621e30fbf581c0e02246b1e5",
+      "headRepository": "mlswg/mls-protocol",
+      "headRefName": "brendan/tbs-bug",
+      "headRefOid": "5dea9d29bd6c54453005e5b9d088715cad97f431",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 660,
+      "id": "PR_kwDOBoyH6c43wEcG",
+      "title": "Remove clause about verifying identity changes.",
+      "url": "https://github.com/mlswg/mls-protocol/pull/660",
+      "state": "OPEN",
+      "author": "Bren2010",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "I don't think the \"MUST\" clause here is really weight-bearing, especially given that we don't provide any specific way to do the verification. We already say that applications \"SHOULD require that a client present the same identifiers\" and going against the \"SHOULD\" means the implementer is taking responsibility for any problems.",
+      "createdAt": "2022-05-12T23:11:41Z",
+      "updatedAt": "2022-05-13T16:44:50Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "f64c3ebb5ad2c5f1621e30fbf581c0e02246b1e5",
+      "headRepository": "mlswg/mls-protocol",
+      "headRefName": "brendan/no-verify",
+      "headRefOid": "2eb6a831b6e11068638f64a087e99efd9e8d0794",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "kkohbrok",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "This is again in the gray area of how much authentication do we want to deal with in MLS. I'm not attached to the MUST, but I think we should give people some guidance on what to look out for when deciding on this SHOULD. Maybe this should go in the architecture doc?",
+          "createdAt": "2022-05-13T05:58:45Z",
+          "updatedAt": "2022-05-13T05:58:45Z"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "number": 662,
+      "id": "PR_kwDOBoyH6c430E05",
+      "title": "More wording improvements, updating sections that got out of date.",
+      "url": "https://github.com/mlswg/mls-protocol/pull/662",
+      "state": "OPEN",
+      "author": "Bren2010",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2022-05-14T00:04:33Z",
+      "updatedAt": "2022-05-14T00:04:33Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "f64c3ebb5ad2c5f1621e30fbf581c0e02246b1e5",
+      "headRepository": "mlswg/mls-protocol",
+      "headRefName": "brendan/editorial2",
+      "headRefOid": "3b8a680ee219001af96339a6ad9a24b206f8bf63",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
