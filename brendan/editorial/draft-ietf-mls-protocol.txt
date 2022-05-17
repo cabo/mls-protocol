@@ -5,7 +5,7 @@
 Network Working Group                                          R. Barnes
 Internet-Draft                                                     Cisco
 Intended status: Informational                             B. Beurdouche
-Expires: 13 November 2022                                Inria & Mozilla
+Expires: 18 November 2022                                Inria & Mozilla
                                                                R. Robert
                                                                         
                                                              J. Millican
@@ -14,7 +14,7 @@ Expires: 13 November 2022                                Inria & Mozilla
                                                                   Google
                                                           K. Cohn-Gordon
                                                     University of Oxford
-                                                             12 May 2022
+                                                             17 May 2022
 
 
               The Messaging Layer Security (MLS) Protocol
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 13 November 2022.
+   This Internet-Draft will expire on 18 November 2022.
 
 Copyright Notice
 
@@ -801,9 +801,9 @@ Table of Contents
 
    *  A _key schedule_ that describes the chain of key derivations used
       to progress from epoch to epoch (mainly using the _init_secret_
-      and _epoch_secret_) and which derives a variety of other secrets
-      (see Table 3) used during the current epoch.  One of these (the
-      _encryption_secret_) is the root of the secret tree.
+      and _epoch_secret_), as well as the derivation of a variety of
+      other secrets (see Table 3) used during the current epoch.  One of
+      these (the _encryption_secret_) is the root of the secret tree.
 
    *  A _secret tree_ derived from the key schedule that represents
       shared secrets used by the members of the group for encrypting and
@@ -818,9 +818,9 @@ Table of Contents
    ratchet tree by applying a set of Proposals, and uses the updated
    ratchet tree to distribute fresh entropy to the group.  This fresh
    entropy is provided only to members in the new epoch and not to
-   members who have been removed, which maintains the confidentiality of
-   the epoch secret (in other words, the protocol provides post-
-   compromise security with respect to those members).
+   members who have been removed.  Commits thus maintain the property
+   that the the epoch secret is confidential to the members in the
+   current epoch.
 
    For each Commit that adds one or more members to the group, there is
    a single corresponding Welcome message.  The Welcome message provides
