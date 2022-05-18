@@ -3860,10 +3860,10 @@ extension in the <code>extensions</code> field MUST be listed in the field
         <h3 id="name-ratchet-tree-evolution">
 <a href="#section-8.4" class="section-number selfRef">8.4. </a><a href="#name-ratchet-tree-evolution" class="section-name selfRef">Ratchet Tree Evolution</a>
         </h3>
-<p id="section-8.4-1">In order to provide forward secrecy and post-compromise security, whenever a
-member initiates an epoch change (i.e., commits; see <a href="#commit" class="xref">Section 13.2</a>), they refresh
-the key pairs of their leaf and of all nodes on their leaf's direct path (all
-nodes for which they know the secret key).<a href="#section-8.4-1" class="pilcrow">¶</a></p>
+<p id="section-8.4-1">Whenever a member initiates an epoch change (i.e., commits; see <a href="#commit" class="xref">Section 13.2</a>),
+they may need to refresh the key pairs of their leaf and of the nodes on their
+leaf's direct path in order to maintain forward secrecy and post-compromise
+security.<a href="#section-8.4-1" class="pilcrow">¶</a></p>
 <p id="section-8.4-2">The member initiating the epoch change generates the fresh key pairs using the
 following procedure. The procedure is designed in a way that allows group members to
 efficiently communicate the fresh secret keys to other group members, as
@@ -5864,7 +5864,7 @@ remove a member of a group who has been inactive for a long time, or propose add
 a newly-hired staff member to a group representing a real-world team.  Proposals
 originating outside the group are identified by a <code>external</code> or
 <code>new_member</code> SenderType in MLSPlaintext.<a href="#section-13.1.9-1" class="pilcrow">¶</a></p>
-<p id="section-13.1.9-2">ReInit proposals can also be sent to the group by a <code>external</code> sender, for
+<p id="section-13.1.9-2">ReInit proposals can also be sent to the group by an <code>external</code> sender, for
 example to enforce a changed policy regarding MLS version or ciphersuite.<a href="#section-13.1.9-2" class="pilcrow">¶</a></p>
 <p id="section-13.1.9-3">The <code>new_member</code> SenderType is used for clients proposing that they themselves
 be added.  For this ID type the sender value MUST be zero and the Proposal type

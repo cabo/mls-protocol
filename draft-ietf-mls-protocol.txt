@@ -2125,11 +2125,10 @@ Welcome  KeyPackage  GroupInfo   MLSPlaintext      MLSCiphertext -'
 
 8.4.  Ratchet Tree Evolution
 
-   In order to provide forward secrecy and post-compromise security,
-   whenever a member initiates an epoch change (i.e., commits; see
-   Section 13.2), they refresh the key pairs of their leaf and of all
-   nodes on their leaf's direct path (all nodes for which they know the
-   secret key).
+   Whenever a member initiates an epoch change (i.e., commits; see
+   Section 13.2), they may need to refresh the key pairs of their leaf
+   and of the nodes on their leaf's direct path in order to maintain
+   forward secrecy and post-compromise security.
 
    The member initiating the epoch change generates the fresh key pairs
    using the following procedure.  The procedure is designed in a way
@@ -3738,7 +3737,7 @@ psk_secret (or 0) --> KDF.Extract
    group are identified by a external or new_member SenderType in
    MLSPlaintext.
 
-   ReInit proposals can also be sent to the group by a external sender,
+   ReInit proposals can also be sent to the group by an external sender,
    for example to enforce a changed policy regarding MLS version or
    ciphersuite.
 
