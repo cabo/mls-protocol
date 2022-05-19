@@ -5,7 +5,7 @@
 Network Working Group                                          R. Barnes
 Internet-Draft                                                     Cisco
 Intended status: Informational                             B. Beurdouche
-Expires: 15 November 2022                                Inria & Mozilla
+Expires: 20 November 2022                                Inria & Mozilla
                                                                R. Robert
                                                                         
                                                              J. Millican
@@ -14,7 +14,7 @@ Expires: 15 November 2022                                Inria & Mozilla
                                                                   Google
                                                           K. Cohn-Gordon
                                                     University of Oxford
-                                                             14 May 2022
+                                                             19 May 2022
 
 
               The Messaging Layer Security (MLS) Protocol
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 15 November 2022.
+   This Internet-Draft will expire on 20 November 2022.
 
 Copyright Notice
 
@@ -1664,8 +1664,8 @@ Table of Contents
       be proposal.
 
    *  new_member: The signature key in the LeafNode in the Commit's path
-      (see Section Section 9.3).  The content_type of the message MUST
-      be commit.
+      (see Section Section 13.2.3.1).  The content_type of the message
+      MUST be commit.
 
    Recipients of an MLSMessage MUST verify the signature with the key
    depending on the sender_type of the sender as described above.
