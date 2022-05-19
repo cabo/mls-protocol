@@ -3023,7 +3023,6 @@ to Proposals they cover.  These identifiers are computed as follows:<a href="#se
 opaque HashReference[16];
 
 HashReference KeyPackageRef;
-HashReference LeafNodeRef;
 HashReference ProposalRef;
 </pre><a href="#section-6.2-2" class="pilcrow">¶</a>
 </div>
@@ -3032,17 +3031,13 @@ HashReference ProposalRef;
 MakeKeyPackageRef(value) = KDF.expand(
   KDF.extract("", value), "MLS 1.0 KeyPackage Reference", 16)
 
-MakeLeafNodeRef(value) = KDF.expand(
-  KDF.extract("", value), "MLS 1.0 Leaf Node Reference", 16)
-
 MakeProposalRef(value) = KDF.expand(
   KDF.extract("", value), "MLS 1.0 Proposal Reference", 16)
 </pre><a href="#section-6.2-3" class="pilcrow">¶</a>
 </div>
 <p id="section-6.2-4">For a KeyPackageRef, the <code>value</code> input is the encoded KeyPackage, and the
 ciphersuite specified in the KeyPackage determines the KDF used.  For a
-LeafNodeRef, the <code>value</code> input is the LeafNode object for the leaf node in
-question.  For a ProposalRef, the <code>value</code> input is the MLSMessageContentAuth carrying the
+ProposalRef, the <code>value</code> input is the MLSMessageContentAuth carrying the
 proposal.  In the latter two cases, the KDF is determined by the group's
 ciphersuite.<a href="#section-6.2-4" class="pilcrow">¶</a></p>
 </section>
@@ -3117,24 +3112,17 @@ client.<a href="#section-6.3-8" class="pilcrow">¶</a></p>
 protocol operations with regard to other clients (e.g., removing clients).  Such
 functions will need to refer to the other clients using some identifier.  MLS
 clients have a few types of identifiers, with different operational properties.<a href="#section-6.3.1-1" class="pilcrow">¶</a></p>
-<p id="section-6.3.1-2">The Credentials presented by the clients in a group authenticate
-application-level identifiers for the clients.  These identifiers may not
+<p id="section-6.3.1-2">Internally to the protocol, group members are uniquely identified by their leaf
+index. However, a leaf index is only valid for referring to members in a given
+epoch. The same leaf index may represent a different member, or no member at
+all, in a subsequent epoch.<a href="#section-6.3.1-2" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-3">The Credentials presented by the clients in a group authenticate
+application-level identifiers for the clients.  However, these identifiers may not
 uniquely identify clients.  For example, if a user has multiple devices that are
 all present in an MLS group, then those devices' clients could all present the
-user's application-layer identifiers.<a href="#section-6.3.1-2" class="pilcrow">¶</a></p>
-<p id="section-6.3.1-3">Internally to the protocol, group members are uniquely identified by their
-leaves, expressed as LeafNodeRef objects.  These identifiers are unstable:
-They change whenever the member sends a Commit, or whenever an Update
-proposal from the member is committed.<a href="#section-6.3.1-3" class="pilcrow">¶</a></p>
-<p id="section-6.3.1-4">MLS provides two unique client identifiers that are stable across epochs:<a href="#section-6.3.1-4" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-6.3.1-5.1">The index of a client among the leaves of the tree<a href="#section-6.3.1-5.1" class="pilcrow">¶</a>
-</li>
-            <li class="normal" id="section-6.3.1-5.2">The <code>epoch_id</code> field in the key package<a href="#section-6.3.1-5.2" class="pilcrow">¶</a>
-</li>
-          </ul>
-<p id="section-6.3.1-6">The application may also provide application-specific unique identifiers in the
-<code>extensions</code> field of KeyPackage or LeafNode objects.<a href="#section-6.3.1-6" class="pilcrow">¶</a></p>
+user's application-layer identifiers.<a href="#section-6.3.1-3" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-4">If needed, applications may add application-specific unique identifiers to the
+<code>extensions</code> field of KeyPackage or LeafNode objects.<a href="#section-6.3.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -3191,7 +3179,7 @@ struct {
     SenderType sender_type;
     switch (sender_type) {
         case member:
-            LeafNodeRef member_ref;
+            uint32 leaf_index;
         case external:
             uint32 sender_index;
         case new_member:
@@ -3362,12 +3350,12 @@ current epoch, so that signatures are specific to a given group and epoch.<a hre
 depending on the sender's <code>sender_type</code>:<a href="#section-7.1-4" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-7.1-5.1">
-            <code>member</code>: The signature key contained in the Credential at the leaf with the
-sender's <code>LeafNodeRef</code><a href="#section-7.1-5.1" class="pilcrow">¶</a>
+            <code>member</code>: The signature key contained in the Credential at the index
+indicated by <code>leaf_index</code> in the ratchet tree.<a href="#section-7.1-5.1" class="pilcrow">¶</a>
 </li>
           <li class="normal" id="section-7.1-5.2">
             <code>external</code>: The signature key contained in the Credential at the index
-indicated by the <code>sender_index</code> in the <code>external_senders</code> group context
+indicated by <code>sender_index</code> in the <code>external_senders</code> group context
 extension (see Section <a href="#external-senders-extension" class="xref">Section 13.1.9.1</a>).  In this case, the
 <code>content_type</code> of the message MUST NOT be <code>commit</code>, since only members
 of the group or new joiners can send Commit messages.<a href="#section-7.1-5.2" class="pilcrow">¶</a>
@@ -3568,15 +3556,15 @@ encrypted, the sender data is encoded as an object of the following form:<a href
 <div id="section-7.3.2-2">
 <pre class="lang-tls sourcecode">
 struct {
-    LeafNodeRef sender;
+    uint32 leaf_index;
     uint32 generation;
     opaque reuse_guard[4];
 } MLSSenderData;
 </pre><a href="#section-7.3.2-2" class="pilcrow">¶</a>
 </div>
-<p id="section-7.3.2-3">MLSSenderData.sender is assumed to be a <code>member</code> sender type.  When constructing
-an MLSSenderData from a Sender object, the sender MUST verify Sender.sender_type
-is <code>member</code> and use Sender.sender for MLSSenderData.sender.<a href="#section-7.3.2-3" class="pilcrow">¶</a></p>
+<p id="section-7.3.2-3">When constructing an MLSSenderData from a Sender object, the sender MUST verify
+Sender.sender_type is <code>member</code> and use Sender.leaf_index for
+MLSSenderData.leaf_index.<a href="#section-7.3.2-3" class="pilcrow">¶</a></p>
 <p id="section-7.3.2-4">The <code>reuse_guard</code> field contains a fresh random value used to avoid nonce reuse
 in the case of state loss or corruption, as described in <a href="#content-encryption" class="xref">Section 7.3.1</a>.<a href="#section-7.3.2-4" class="pilcrow">¶</a></p>
 <p id="section-7.3.2-5">The key and nonce provided to the AEAD are computed as the KDF of the first
@@ -3605,8 +3593,8 @@ struct {
 </pre><a href="#section-7.3.2-8" class="pilcrow">¶</a>
 </div>
 <p id="section-7.3.2-9">When parsing a SenderData struct as part of message decryption, the recipient
-MUST verify that the LeafNodeRef indicated in the <code>sender</code> field identifies a
-member of the group.<a href="#section-7.3.2-9" class="pilcrow">¶</a></p>
+MUST verify that the leaf index indicated in the <code>leaf_index</code> field identifies a
+non-blank node.<a href="#section-7.3.2-9" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -5677,12 +5665,12 @@ corresponding field in the LeafNode being replaced.<a href="#section-13.1.2-4.2"
           <h4 id="name-remove">
 <a href="#section-13.1.3" class="section-number selfRef">13.1.3. </a><a href="#name-remove" class="section-name selfRef">Remove</a>
           </h4>
-<p id="section-13.1.3-1">A Remove proposal requests that the member with LeafNodeRef <code>removed</code> be removed
+<p id="section-13.1.3-1">A Remove proposal requests that the member with the leaf index <code>removed</code> be removed
 from the group.<a href="#section-13.1.3-1" class="pilcrow">¶</a></p>
 <div id="section-13.1.3-2">
 <pre class="lang-tls sourcecode">
 struct {
-    LeafNodeRef removed;
+    uint32 removed;
 } Remove;
 </pre><a href="#section-13.1.3-2" class="pilcrow">¶</a>
 </div>
@@ -5784,7 +5772,7 @@ included in Commit messages.<a href="#section-13.1.7-1" class="pilcrow">¶</a></
 <div id="section-13.1.7-2">
 <pre class="lang-tls sourcecode">
 struct {
-    LeafNodeRef sender;
+    uint32 sender;
     uint32 first_generation;
     uint32 last_generation;
 } MessageRange;
@@ -6316,14 +6304,14 @@ struct {
     Extension group_context_extensions&lt;V&gt;;
     Extension other_extensions&lt;V&gt;;
     MAC confirmation_tag;
-    LeafNodeRef signer;
+    uint32 signer;
     // SignWithLabel(., "GroupInfoTBS", GroupInfoTBS)
     opaque signature&lt;V&gt;;
 } GroupInfo;
 </pre><a href="#section-13.2.3-2" class="pilcrow">¶</a>
 </div>
 <p id="section-13.2.3-3">New members MUST verify the <code>signature</code> using the public key taken from the
-credential in the leaf node of the member with LeafNodeRef <code>signer</code>. The
+credential in the leaf node of the ratchet tree with leaf index <code>signer</code>. The
 signature covers the following structure, comprising all the fields in the
 GroupInfo above <code>signature</code>:<a href="#section-13.2.3-3" class="pilcrow">¶</a></p>
 <div id="section-13.2.3-4">
@@ -6337,7 +6325,7 @@ struct {
     Extension group_context_extensions&lt;V&gt;;
     Extension other_extensions&lt;V&gt;;
     MAC confirmation_tag;
-    LeafNodeRef signer;
+    uint32 signer;
 } GroupInfoTBS;
 </pre><a href="#section-13.2.3-4" class="pilcrow">¶</a>
 </div>
@@ -6529,7 +6517,7 @@ welcome_key = KDF.Expand(welcome_secret, "key", AEAD.Nk)
 <li class="normal" id="section-13.2.3.2-9.1">Verify the signature on the GroupInfo object. The signature input comprises
 all of the fields in the GroupInfo object except the signature field. The
 public key and algorithm are taken from the credential in the leaf node of the
-member with LeafNodeRef <code>signer</code>. If there is no matching leaf node, or if
+ratchet tree with leaf index <code>signer</code>. If the node is blank or if
 signature verification fails, return an error.<a href="#section-13.2.3.2-9.1" class="pilcrow">¶</a>
 </li>
               <li class="normal" id="section-13.2.3.2-9.2">
@@ -6570,7 +6558,7 @@ public key in the node.<a href="#section-13.2.3.2-9.4.2.3" class="pilcrow">¶</a
 </li>
                   <li class="normal" id="section-13.2.3.2-9.4.2.4">If the <code>path_secret</code> value is set in the GroupSecrets object: Identify the
 lowest common ancestor of the leaf node <code>my_leaf</code> and of the node of
-the member with LeafNodeRef <code>GroupInfo.signer</code>. Set the private key for
+the member with leaf index <code>GroupInfo.signer</code>. Set the private key for
 this node to the private key derived from the <code>path_secret</code>.<a href="#section-13.2.3.2-9.4.2.4" class="pilcrow">¶</a>
 </li>
                   <li class="normal" id="section-13.2.3.2-9.4.2.5">For each parent of the common ancestor, up to the root of the tree, derive
