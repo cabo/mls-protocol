@@ -5,7 +5,7 @@
 Network Working Group                                          R. Barnes
 Internet-Draft                                                     Cisco
 Intended status: Informational                             B. Beurdouche
-Expires: 15 November 2022                                Inria & Mozilla
+Expires: 20 November 2022                                Inria & Mozilla
                                                                R. Robert
                                                                         
                                                              J. Millican
@@ -14,7 +14,7 @@ Expires: 15 November 2022                                Inria & Mozilla
                                                                   Google
                                                           K. Cohn-Gordon
                                                     University of Oxford
-                                                             14 May 2022
+                                                             19 May 2022
 
 
               The Messaging Layer Security (MLS) Protocol
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 15 November 2022.
+   This Internet-Draft will expire on 20 November 2022.
 
 Copyright Notice
 
@@ -1763,7 +1763,7 @@ Table of Contents
    already been used, causing reuse of a key/nonce pair.
 
    To avoid this situation, the sender of a message MUST generate a
-   fresh random four byte "reuse guard" value and XOR it with the first
+   fresh random four-byte "reuse guard" value and XOR it with the first
    four bytes of the nonce from the key schedule before using the nonce
    for encryption.  The sender MUST include the reuse guard in the
    reuse_guard field of the sender data object, so that the recipient of
@@ -2074,9 +2074,6 @@ Table of Contents
          proposed for addition, even if it is expired at these later
          points in the protocol.
 
-   *  If applicable, verify the parent_hash as specified in
-      Section 8.8.2.
-
    *  Verify that the following fields in the LeafNode are unique among
       the members of the group (including any other members added in the
       same Commit):
@@ -2264,7 +2261,7 @@ Table of Contents
       the node
 
    The path secret value for a given node is encrypted to the subtree
-   rooted at the parent's non-updated child.  That is, the child on the
+   rooted at the parent's non-updated child, i.e., the child on the
    copath of the sender's leaf node.  There is one encryption of the
    path secret to each public key in the resolution of the non-updated
    child.
@@ -2307,8 +2304,8 @@ Table of Contents
              length hash for this value.
 
        *  For nodes where a path secret was recovered in step 1
-          ("Compute the updated path secrets"), store the node's updated
-          private key.
+          ("Compute the updated path secrets"), compute and store the
+          node's updated private key.
 
    For example, in order to communicate the example update described in
    Section 8.4, the sender would transmit the following values:
