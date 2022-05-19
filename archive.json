@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-05-17T01:50:12.722149+00:00",
+  "timestamp": "2022-05-19T01:59:44.123255+00:00",
   "repo": "mlswg/mls-protocol",
   "labels": [
     {
@@ -6750,7 +6750,7 @@
       "labels": [],
       "body": "It's not clear to me from reading the spec what should happen when a Commit includes a Remove proposal for the committer.",
       "createdAt": "2022-05-06T20:30:21Z",
-      "updatedAt": "2022-05-16T21:06:59Z",
+      "updatedAt": "2022-05-17T06:13:27Z",
       "closedAt": null,
       "comments": [
         {
@@ -6766,6 +6766,13 @@
           "body": "Yeah, I always thought it was illegal for a Commit to include a Remove for the Committer.  Flagging for @mulmarta as she's working on a proposal validation PR.",
           "createdAt": "2022-05-16T21:06:59Z",
           "updatedAt": "2022-05-16T21:06:59Z"
+        },
+        {
+          "author": "kkohbrok",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Since the committer learns the secrets of the next epoch, committing a self-remove really should be illegal.",
+          "createdAt": "2022-05-17T06:13:27Z",
+          "updatedAt": "2022-05-17T06:13:27Z"
         }
       ]
     },
@@ -6861,9 +6868,59 @@
       "labels": [],
       "body": "Right now, the deletion schedule requires a key to be consumed if it is used to \"encrypt or (successfully) decrypt a message\".  This means that a client can't decrypt its own messages, because the key has already been deleted.  On the one hand, this isn't a tragedy, since in principle the client could just hold on to the plaintext.  On the other hand, it requires some lightly painful special-casing for things like proposals and application data, where the message is broadcast.  (On the third hand, receiving Commits from yourself already requires special processing.)\r\n\r\nIt seems like this could be fixed by just changing the deletion requirement to trigger only on decrypt instead of on encrypt or decrypt.  In scenarios where a sender gets her messages back, the effect would be the same, modulo an RTT.  You would have reduced FS in scenarios where the DS does not echo a message back to a sender.",
       "createdAt": "2022-05-16T22:04:44Z",
-      "updatedAt": "2022-05-16T22:04:44Z",
+      "updatedAt": "2022-05-17T23:18:40Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "kkohbrok",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "If I understand correctly, the result of this change would be that there is no FS for the sender of any message until the end of the epoch or until the secret tree of that epoch is deleted. So you would always have reduced FS. Just in cases there is no echo, you wouldn't have needed the reduction in the first place.\r\n\r\nIn any case, I'd prefer keeping the strict deletion schedule at the cost of some slight inconvenience in the implementation. Although as you say, own commits need to be treated differently anyway.",
+          "createdAt": "2022-05-17T06:25:27Z",
+          "updatedAt": "2022-05-17T06:25:27Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "There wouldn't be FS with regard to the sender of a message until the sender receives the message back.  In the echo case, that is quick; in the no-echo case, it is the end of the epoch + any out-of-order delivery window, as you say.\r\n\r\nIt depends some on what the application wants as well.  If the application never needs to receive from itself and forgets what it sends after sending it, then the current situation is fine.  If the application remembers what it sends (as with current messengers), then the sender will be holding on to the plaintext anyway, so the notion of FS with regard to the sender is kind of moot.\r\n\r\nFor completeness, an intermediate position here would be to say:\r\n\r\n* MUST delete on successful decrypt\r\n* SHOULD delete on encrypt, unless required by application context (with explanatory text about decrypt-from-self).\r\n\r\nThat seems worse than the alternatives, though, because it's a hard-to-understand knob for the application to set.",
+          "createdAt": "2022-05-17T14:38:56Z",
+          "updatedAt": "2022-05-17T14:38:56Z"
+        },
+        {
+          "author": "kkohbrok",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "An example of note here is the self-deleting messages feature that exist in quite a few messaging apps. Here, you want to send the message and forget it and you explicitly _don't_ want to keep the key material. I think that should be a feature that can be enabled by MLS, either by default or by letting the application choose, i.e. the intermediate position that you describe.",
+          "createdAt": "2022-05-17T14:50:31Z",
+          "updatedAt": "2022-05-17T14:50:31Z"
+        },
+        {
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "body": "This would also seem to have a higher likelihood of encryption keys accidentally being reused.",
+          "createdAt": "2022-05-17T18:35:27Z",
+          "updatedAt": "2022-05-17T18:35:27Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@Bren2010 - I'm not sure I follow.  Do you mean that because the key would still exist, there's a risk of key management bugs using an old key?",
+          "createdAt": "2022-05-17T19:42:06Z",
+          "updatedAt": "2022-05-17T19:42:06Z"
+        },
+        {
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Yes, I think there's a higher risk of bugs because the key is still around and you're doing additional accounting to separate which ratchet the implementation is using for the next encryption and which is for the next decryption. Being able to delete the key after it was used, regardless of why, is a nice simplification.\r\n\r\nThe cost of that simplification is that if you want to decrypt-from-self then you need to implement an additional layer that, for example, maps hashes of sent messages to their decrypted/authenticated version. But like people have said, if you're interested in doing decrypt-from-self then you're likely already keeping records of sent messages anyway. So this shouldn't be a big additional burden.",
+          "createdAt": "2022-05-17T20:48:49Z",
+          "updatedAt": "2022-05-17T20:48:49Z"
+        },
+        {
+          "author": "tomleavy",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "> An example of note here is the self-deleting messages feature that exist in quite a few messaging apps. Here, you want to send the message and forget it and you explicitly _don't_ want to keep the key material. I think that should be a feature that can be enabled by MLS, either by default or by letting the application choose, i.e. the intermediate position that you describe.\n\nAgreed. I also didn't find the current situation too difficult to implement in practice when I wrote a demo of a websocket relay. It's easy enough to just have to relay filter out the sender from the broadcast or send an ack in place of the message to the sender. ",
+          "createdAt": "2022-05-17T23:18:40Z",
+          "updatedAt": "2022-05-17T23:18:40Z"
+        }
+      ]
     },
     {
       "number": 668,
@@ -6976,6 +7033,88 @@
       "updatedAt": "2022-05-16T22:13:53Z",
       "closedAt": null,
       "comments": []
+    },
+    {
+      "number": 676,
+      "id": "I_kwDOBoyH6c5J1k2z",
+      "title": "remove mention of `epoch_id` in section on Credentials",
+      "url": "https://github.com/mlswg/mls-protocol/issues/676",
+      "state": "OPEN",
+      "author": "kkohbrok",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The Credentials section claims there is an epoch id field in key packages. I don't think that actually exists. My apologies if this is a duplicate issue.",
+      "createdAt": "2022-05-17T15:03:11Z",
+      "updatedAt": "2022-05-17T18:16:07Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Addressed in #658 but may need to be pulled out depending on the fate of that PR",
+          "createdAt": "2022-05-17T18:16:07Z",
+          "updatedAt": "2022-05-17T18:16:07Z"
+        }
+      ]
+    },
+    {
+      "number": 677,
+      "id": "I_kwDOBoyH6c5J1nSK",
+      "title": "Remove claim about PCS with Epoch change",
+      "url": "https://github.com/mlswg/mls-protocol/issues/677",
+      "state": "OPEN",
+      "author": "kkohbrok",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [
+        "Bren2010"
+      ],
+      "labels": [],
+      "body": "In first paragraph, the \"Ratchet Tree Evolution\" Section states that whenever a member initiates an epoch change, they refresh the key pair in their leaves, etc. This is not the case for partial commits, where the epoch is advanced without a key update and without achieving PCS.",
+      "createdAt": "2022-05-17T15:10:41Z",
+      "updatedAt": "2022-05-17T18:14:30Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 678,
+      "id": "I_kwDOBoyH6c5J2Lok",
+      "title": "Be more specific about Credential verification",
+      "url": "https://github.com/mlswg/mls-protocol/issues/678",
+      "state": "OPEN",
+      "author": "raphaelrobert",
+      "authorAssociation": "MEMBER",
+      "assignees": [],
+      "labels": [],
+      "body": "While this is spread out throughout the document, it would be beneficial to spell out in which scenarios a Credential MUST be verified (with the AS):\r\n\r\n - When fetching a KeyPackage to add a new member\r\n - When discovering a KeyPackage in an AddProposal from another member\r\n - When joining a new group (verify all other members' Credentials), both when receiving a Welcome message and when joining through an External Commit\r\n - When a member updates its leaf\r\n - ... anywhere else?",
+      "createdAt": "2022-05-17T17:16:58Z",
+      "updatedAt": "2022-05-17T17:16:58Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 679,
+      "id": "I_kwDOBoyH6c5J2NYF",
+      "title": "Content encryption: Clarify generation sequence",
+      "url": "https://github.com/mlswg/mls-protocol/issues/679",
+      "state": "OPEN",
+      "author": "raphaelrobert",
+      "authorAssociation": "MEMBER",
+      "assignees": [],
+      "labels": [],
+      "body": "The generation numbers should be increased sequentially, gaps should be avoided to avoid unnecessary expensive operations on clients. Clients might also abort if the gap is too large to prevent attacks from malicious insiders.",
+      "createdAt": "2022-05-17T17:24:17Z",
+      "updatedAt": "2022-05-17T18:02:43Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "body": "This is stated in 10.1:\r\n\r\n> The sender uses the j-th key/nonce pair in the sequence to encrypt (using the AEAD) the j-th message they send during that epoch.",
+          "createdAt": "2022-05-17T18:02:42Z",
+          "updatedAt": "2022-05-17T18:02:42Z"
+        }
+      ]
     }
   ],
   "pulls": [
@@ -47521,24 +47660,28 @@
       "id": "PR_kwDOBoyH6c43XWQN",
       "title": "Add a diagram showing how the message types relate",
       "url": "https://github.com/mlswg/mls-protocol/pull/652",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "bifurcation",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
-      "labels": [],
+      "labels": [
+        "editorial"
+      ],
       "body": "I drew this to help explain the relevant patch in MLSpp to someone, and thought it might be helpful to other folks.",
       "createdAt": "2022-05-05T15:59:54Z",
-      "updatedAt": "2022-05-09T09:37:14Z",
+      "updatedAt": "2022-05-18T19:40:18Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "031bf953fb53eaddd0f7575452b3026643202e53",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "message-diagram",
       "headRefOid": "179a3be6a73ef9d1c519c5d3aa654f90b4deae53",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2022-05-18T19:40:18Z",
+      "mergedAt": "2022-05-18T19:40:18Z",
+      "mergedBy": "bifurcation",
+      "mergeCommit": {
+        "oid": "234b22940369d04fb46cbe2e01878201113c6ac3"
+      },
       "comments": [],
       "reviews": [
         {
@@ -47636,24 +47779,28 @@
       "id": "PR_kwDOBoyH6c43bF5K",
       "title": "Editorial",
       "url": "https://github.com/mlswg/mls-protocol/pull/656",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "Bren2010",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
-      "labels": [],
+      "labels": [
+        "editorial"
+      ],
       "body": "",
       "createdAt": "2022-05-06T15:43:50Z",
-      "updatedAt": "2022-05-12T16:18:48Z",
+      "updatedAt": "2022-05-18T19:41:22Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "f64c3ebb5ad2c5f1621e30fbf581c0e02246b1e5",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "brendan/editorial",
-      "headRefOid": "9de99af90fdc0372720f1e11c6d81529fa62fa3e",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "22b322bf8b7cd5e177887517f3752bd7a50b1e42",
+      "closedAt": "2022-05-18T19:41:21Z",
+      "mergedAt": "2022-05-18T19:41:21Z",
+      "mergedBy": "bifurcation",
+      "mergeCommit": {
+        "oid": "80f9137ee8a16cac7614aab1b938be81b5ae7811"
+      },
       "comments": [
         {
           "author": "rohan-wire",
@@ -47750,6 +47897,78 @@
               "updatedAt": "2022-05-12T16:18:48Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c46J2Ya",
+          "commit": {
+            "abbreviatedOid": "9de99af"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "Couple of suggestions, generally looks good.",
+          "createdAt": "2022-05-17T15:11:12Z",
+          "updatedAt": "2022-05-17T15:27:22Z",
+          "comments": [
+            {
+              "originalPosition": 40,
+              "body": "```suggestion\r\n  epoch to epoch (mainly using the _init_secret_ and _epoch_secret_), as well as the derivation of\r\n```",
+              "createdAt": "2022-05-17T15:11:12Z",
+              "updatedAt": "2022-05-17T15:27:22Z"
+            },
+            {
+              "originalPosition": 63,
+              "body": "```suggestion\r\nepoch and not to members who have been removed. Commits thus maintain the property that the\r\nthe epoch secret is confidential to the members in the current epoch.\r\n```",
+              "createdAt": "2022-05-17T15:14:09Z",
+              "updatedAt": "2022-05-17T16:05:02Z"
+            },
+            {
+              "originalPosition": 87,
+              "body": "These seem like useful examples?  Since they show how the key schedule actually gets put to use.  Might drop `init_secret` and replace `confirmation_key` with `exporter_secret` to make it more functional.",
+              "createdAt": "2022-05-17T15:15:29Z",
+              "updatedAt": "2022-05-17T15:27:22Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c46KNuN",
+          "commit": {
+            "abbreviatedOid": "9de99af"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-17T16:11:54Z",
+          "updatedAt": "2022-05-17T16:11:54Z",
+          "comments": [
+            {
+              "originalPosition": 87,
+              "body": "Sure, but it doesn't seem to fit in this section. The rest of the text is talking about messages and how they evolve the group state.",
+              "createdAt": "2022-05-17T16:11:54Z",
+              "updatedAt": "2022-05-17T16:11:54Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c46KjUE",
+          "commit": {
+            "abbreviatedOid": "f7a1146"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-17T17:22:56Z",
+          "updatedAt": "2022-05-17T17:25:54Z",
+          "comments": [
+            {
+              "originalPosition": 87,
+              "body": "Maybe move them up under the `_key schedule_` bullet above?  \"... derive a variety of secrets, for example: <sub-bullets>\"",
+              "createdAt": "2022-05-17T17:22:56Z",
+              "updatedAt": "2022-05-17T17:25:54Z"
+            }
+          ]
         }
       ]
     },
@@ -47765,7 +47984,7 @@
       "labels": [],
       "body": "This seems to be a layer of indirection that doesn't add any value to implementation.",
       "createdAt": "2022-05-09T03:53:25Z",
-      "updatedAt": "2022-05-09T03:53:25Z",
+      "updatedAt": "2022-05-19T01:09:15Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "f64c3ebb5ad2c5f1621e30fbf581c0e02246b1e5",
@@ -47777,7 +47996,28 @@
       "mergedBy": null,
       "mergeCommit": null,
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOBoyH6c46RMA0",
+          "commit": {
+            "abbreviatedOid": "f2bf018"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "I don't have a strong opinion on this question, but this change seems sensible to me.  The use of LeafNodeRef requires either (a) a linear scan through the tree, which is time-expensive in large trees, or (b) keeping an index that maps LeafNodeRef values to indices, which is storage-intensive in large trees.\r\n\r\nIIRC, the change to LeafNodeRef was made in the context of @TWal's work to make the tree description less tied to the array representation.  In general, that is the right thing to do, and it's good that we did it.  But we still have leaf indices anyway, for `unmerged_leaves`.  Since we still have the concept, we might as well use it where it makes sense.  And it certainly seems to me like `Sender.sender` and `removed` make sense, since they are internal to the protocol.\r\n\r\nIn case folks are worried about the application-facing API -- MLS stacks can certainly be more intelligent, e.g., exposing `remove(LeafNodeRef)` or `remove(ApplicationIDFromExtension)` or `remove(SignaturePublicKey)`.  But they can do that regardless of this PR.\r\n",
+          "createdAt": "2022-05-18T20:18:59Z",
+          "updatedAt": "2022-05-19T01:09:15Z",
+          "comments": [
+            {
+              "originalPosition": 34,
+              "body": "This could be a little more concrete: A member's leaf index is stable while that member is part of the group, but before that member joins or after they leave, a different member may occupy that leaf.",
+              "createdAt": "2022-05-18T20:18:59Z",
+              "updatedAt": "2022-05-19T01:09:15Z"
+            }
+          ]
+        }
+      ]
     },
     {
       "number": 659,
@@ -47791,7 +48031,7 @@
       "labels": [],
       "body": "Sending an Add proposal from outside the group is how we let people do \"external add\" functionality without needing to publish the group state. But you can't talk right away like you can with an external Commit. In that case, applications seem more inclined to build this functionality themselves so let's just remove it from the spec.",
       "createdAt": "2022-05-12T23:03:35Z",
-      "updatedAt": "2022-05-14T00:33:15Z",
+      "updatedAt": "2022-05-18T20:14:30Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "f64c3ebb5ad2c5f1621e30fbf581c0e02246b1e5",
@@ -47803,7 +48043,28 @@
       "mergedBy": null,
       "mergeCommit": null,
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOBoyH6c46RKmC",
+          "commit": {
+            "abbreviatedOid": "5dea9d2"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "Looks good, thanks for putting this together!",
+          "createdAt": "2022-05-18T20:13:45Z",
+          "updatedAt": "2022-05-18T20:14:30Z",
+          "comments": [
+            {
+              "originalPosition": 69,
+              "body": "```suggestion\r\n    the Commit's path (see Section {{joining-via-external-commits}}). The\r\n```",
+              "createdAt": "2022-05-18T20:13:45Z",
+              "updatedAt": "2022-05-18T20:14:30Z"
+            }
+          ]
+        }
+      ]
     },
     {
       "number": 660,
@@ -47848,10 +48109,12 @@
       "author": "Bren2010",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
-      "labels": [],
+      "labels": [
+        "editorial"
+      ],
       "body": "",
       "createdAt": "2022-05-14T00:04:33Z",
-      "updatedAt": "2022-05-14T00:04:33Z",
+      "updatedAt": "2022-05-18T19:52:27Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "f64c3ebb5ad2c5f1621e30fbf581c0e02246b1e5",
@@ -47863,7 +48126,122 @@
       "mergedBy": null,
       "mergeCommit": null,
       "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOBoyH6c46RA-d",
+          "commit": {
+            "abbreviatedOid": "3b8a680"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-18T19:43:53Z",
+          "updatedAt": "2022-05-18T19:52:27Z",
+          "comments": [
+            {
+              "originalPosition": 93,
+              "body": "```suggestion\r\nfour-byte \"reuse guard\" value and XOR it with the first four bytes of the nonce\r\n```",
+              "createdAt": "2022-05-18T19:43:53Z",
+              "updatedAt": "2022-05-18T19:52:27Z"
+            },
+            {
+              "originalPosition": 189,
+              "body": "This doesn't make sense.  It's not meaningful to just verify the parent hash in a leaf.  For example, a leaf's parent hash might be invalid just because its sibling updated more recently.  Parent hashes should really only be validated (a) on validating a newly received tree, and (b) when validating a Commit UpdatePath.",
+              "createdAt": "2022-05-18T19:47:16Z",
+              "updatedAt": "2022-05-18T19:52:27Z"
+            },
+            {
+              "originalPosition": 234,
+              "body": "```suggestion\r\nrooted at the parent's non-updated child, that is, the child\r\n```\r\n\r\nIf there's a full stop here, the \"That is...\" part isn't a full sentence.  It might read more smoothly as \"i.e.\"?",
+              "createdAt": "2022-05-18T19:49:45Z",
+              "updatedAt": "2022-05-18T19:52:27Z"
+            },
+            {
+              "originalPosition": 243,
+              "body": "The private key needs to computed from the path secret at some point.  Do you just mean for that to be implicit?",
+              "createdAt": "2022-05-18T19:50:39Z",
+              "updatedAt": "2022-05-18T19:52:27Z"
+            },
+            {
+              "originalPosition": 266,
+              "body": "```suggestion\r\nis the next non-blank ancestor of its predecessor in the filtered direct path.\r\n```",
+              "createdAt": "2022-05-18T19:52:00Z",
+              "updatedAt": "2022-05-18T19:52:27Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 675,
+      "id": "PR_kwDOBoyH6c438mN5",
+      "title": "More clarity around validating proposals",
+      "url": "https://github.com/mlswg/mls-protocol/pull/675",
+      "state": "OPEN",
+      "author": "mulmarta",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "The text in the RFC around validating proposals, choosing which proposals go into a commit and how to validate a received commit could do with a bit more work.\r\n\r\nThe root issue is that Section 13.2 states \u201cThe sender of a Commit MUST include all valid proposals that it has received during the current epoch. Invalid proposals include, for example, proposals with an invalid signature or proposals that are semantically invalid, such as an Add when the sender does not have the application-level permission to add new users.\u201d There are two intertwined issues with this text:\r\n1. The qualifier \u201cMUST\u201d\r\n2. The text is too vague about what a \u201cvalid Proposal\u201d is. E.g. it could be interpreted to mean a Proposal is \u201cvalid\u201d relative to the current group state: Can it be applied to the group as it stands now? Then it\u2019s \u201cvalid\u201d.\r\n\r\nPut simply, it doesn\u2019t make sense to only validate proposals individually. Instead one should validate if the full list of proposals can be committed. Indeed, other parts of the RFC enforce validation steps that apply to the full list. E.g.\r\n* A ReInit proposal MUST be the only one in the commit, and other existing proposals SHOULD be preferred (13.2.1).\r\n* Out of multiple proposals affecting the same leaf, the committer MUST choose an arbitrary one (13.2, \u201cIf there are multiple (\u2026)\u201d).\r\n* Out of multiple PSK proposals with the same ID, the committer MUST choose an arbitrary one (13.2).\r\n\r\nIn fact, once extensions come into play there are likely many more similar situations, even ones affecting lists of otherwise benign proposals (e.g. Add/Remove). Suppose a chat app is built on MLS with a custom room moderator roles extension. The app wants MLS to enforce two rules: Only mods can Add/Remove. Rooms should always have at least 1 Mod. Here\u2019s how the RFC\u2019s current text can become a problem: A and B are the only mods in a room. A makes proposal P1 that removes B. Meanwhile, B makes prop P2 that removes A. C gets both proposals. What should C do?\r\n* Option 1: validate & cache both proposals. \u2192 Problem: C can no longer issue a commit as it \u201cMUST include all valid proposals\u201d. (Alternatively, it does commit to both as instructed by the RFC which leaves the room without a mod.)\r\n* Option 2: validate & cache the first prop received (say, P1), but reject P2 as validating both means C can\u2019t commit. \u2192 Problem: If someone else commits to P2 by ref. C can\u2019t process the commit as it doesn\u2019t \u201cknow\u201d P2.\r\n\r\nSo, to clean all this up a bit more, this PR proposes the following main changes:\r\n1. Add a section \"Validating Proposals\" that defines a procedure for validating a *list* of proposals. The procedure starts with checking that each individual proposal is valid, as described in the \"Proposals\" section. It also has a note that applications may add more rules.\r\n2. Clean up a bit the validation rules in the \"Proposals\" section and remove redundancies. Now for each proposal, we precisely define when it is valid.\r\n3. In the \"Commit\" section, add a requirement that both a committer and a receiver of a commit MUST verify that the committed proposal list is valid according to section \"Validating Proposals\".\r\n4. Downgrade the requirement that \u201cThe sender of a Commit MUST include all valid proposals that it has received\u201c to \"The sender of a Commit SHOULD include all valid proposals that it has received, as long as this does not make the proposal list invalid.\"\r\n\r\nNote that the validation in section \"Proposals\" can be done when a commit is received. The final check in \"Validating Proposals\" is done when a commit is created and when it is received.\r\n\r\nThis also fixes #657.",
+      "createdAt": "2022-05-17T10:35:46Z",
+      "updatedAt": "2022-05-17T11:16:40Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "f64c3ebb5ad2c5f1621e30fbf581c0e02246b1e5",
+      "headRepository": "mulmarta/mls-protocol",
+      "headRefName": "mulmarta/proposal-validation",
+      "headRefOid": "783c1522b25663608e7dabc1ecf03b42b3d7fb10",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
       "reviews": []
+    },
+    {
+      "number": 680,
+      "id": "PR_kwDOBoyH6c44C3If",
+      "title": "#677: Update PCS claim.",
+      "url": "https://github.com/mlswg/mls-protocol/pull/680",
+      "state": "MERGED",
+      "author": "Bren2010",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [
+        "editorial"
+      ],
+      "body": "",
+      "createdAt": "2022-05-18T17:57:13Z",
+      "updatedAt": "2022-05-18T19:42:16Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "f64c3ebb5ad2c5f1621e30fbf581c0e02246b1e5",
+      "headRepository": "mlswg/mls-protocol",
+      "headRefName": "brendan/pcs-claim",
+      "headRefOid": "ec0bb9b1f556b7ccc9a6067f430f480501949ce3",
+      "closedAt": "2022-05-18T19:42:15Z",
+      "mergedAt": "2022-05-18T19:42:15Z",
+      "mergedBy": "bifurcation",
+      "mergeCommit": {
+        "oid": "c75ea81796f8a6274850027db30c927acd2b787a"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOBoyH6c46Q_pV",
+          "commit": {
+            "abbreviatedOid": "ec0bb9b"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2022-05-18T19:42:08Z",
+          "updatedAt": "2022-05-18T19:42:08Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
