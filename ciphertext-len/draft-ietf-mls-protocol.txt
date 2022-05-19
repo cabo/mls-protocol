@@ -5,7 +5,7 @@
 Network Working Group                                          R. Barnes
 Internet-Draft                                                     Cisco
 Intended status: Informational                             B. Beurdouche
-Expires: 6 November 2022                                 Inria & Mozilla
+Expires: 20 November 2022                                Inria & Mozilla
                                                                R. Robert
                                                                         
                                                              J. Millican
@@ -14,7 +14,7 @@ Expires: 6 November 2022                                 Inria & Mozilla
                                                                   Google
                                                           K. Cohn-Gordon
                                                     University of Oxford
-                                                              5 May 2022
+                                                             19 May 2022
 
 
               The Messaging Layer Security (MLS) Protocol
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 6 November 2022.
+   This Internet-Draft will expire on 20 November 2022.
 
 Copyright Notice
 
@@ -4767,8 +4767,8 @@ psk_secret (or 0) --> KDF.Extract
 
    The length of the padding field in MLSCiphertextContent can be chosen
    at the time of message encryption by the sender.  Senders may use
-   padding to reduce the ability of attackers out side the group to
-   infer the size of the encrypted content.
+   padding to reduce the ability of attackers outside the group to infer
+   the size of the encrypted content.
 
 16.2.  Restrictions
 
