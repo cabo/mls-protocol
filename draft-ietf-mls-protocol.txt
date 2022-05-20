@@ -4811,7 +4811,8 @@ psk_secret (or 0) --> KDF.Extract
 16.2.  Restrictions
 
    During each epoch senders MUST NOT encrypt more data than permitted
-   by the security bounds of the AEAD scheme used.
+   by the security bounds of the AEAD scheme used
+   [I-D.irtf-cfrg-aead-limits].
 
    Note that each change to the Group through a Handshake message will
    also set a new encryption_secret.  Hence this change MUST be applied
@@ -5472,6 +5473,13 @@ psk_secret (or 0) --> KDF.Extract
               Progress, Internet-Draft, draft-ietf-trans-rfc6962-bis-42,
               31 August 2021, <https://datatracker.ietf.org/doc/html/
               draft-ietf-trans-rfc6962-bis-42>.
+
+   [I-D.irtf-cfrg-aead-limits]
+              Günther, F., Thomson, M., and C. A. Wood, "Usage Limits on
+              AEAD Algorithms", Work in Progress, Internet-Draft, draft-
+              irtf-cfrg-aead-limits-04, 7 March 2022,
+              <https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-
+              aead-limits-04>.
 
    [RFC5116]  McGrew, D., "An Interface and Algorithms for Authenticated
               Encryption", RFC 5116, DOI 10.17487/RFC5116, January 2008,
