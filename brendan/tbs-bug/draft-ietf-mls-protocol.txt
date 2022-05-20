@@ -1683,12 +1683,12 @@ Welcome  KeyPackage  GroupInfo   MLSPlaintext      MLSCiphertext -'
 
    *  external: The signature key at the index indicated by sender_index
       in the external_senders group context extension (see
-      Section Section 13.1.9.1).  The content_type of the message MUST
-      be proposal.
+      Section 13.1.9.1).  The content_type of the message MUST be
+      proposal.
 
    *  new_member: The signature key in the LeafNode in the Commit's path
-      (see Section Section 13.2.3.1).  The content_type of the message
-      MUST be commit.
+      (see Section 13.2.3.1).  The content_type of the message MUST be
+      commit.
 
    Recipients of an MLSMessage MUST verify the signature with the key
    depending on the sender_type of the sender as described above.
