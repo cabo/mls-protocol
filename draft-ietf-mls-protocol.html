@@ -1031,7 +1031,7 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Barnes, et al.</td>
-<td class="center">Expires 20 November 2022</td>
+<td class="center">Expires 21 November 2022</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1044,12 +1044,12 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 <dd class="internet-draft">draft-ietf-mls-protocol-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2022-05-19" class="published">19 May 2022</time>
+<time datetime="2022-05-20" class="published">20 May 2022</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2022-11-20">20 November 2022</time></dd>
+<dd class="expires"><time datetime="2022-11-21">21 November 2022</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1119,7 +1119,7 @@ in size ranging from two to thousands.<a href="#section-abstract-1" class="pilcr
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 20 November 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 21 November 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -2976,7 +2976,7 @@ the same as the signature algorithm specified in the credentials in the leaves
 of the tree (including the leaf node information in KeyPackages used to add new
 members).<a href="#section-6.1-6" class="pilcrow">¶</a></p>
 <p id="section-6.1-7">Like HPKE public keys, signature public keys are represented as opaque values in
-a format defined by the cipher suite's signature scheme.<a href="#section-6.1-7" class="pilcrow">¶</a></p>
+a format defined by the ciphersuite's signature scheme.<a href="#section-6.1-7" class="pilcrow">¶</a></p>
 <div id="section-6.1-8">
 <pre class="lang-tls sourcecode">
 opaque SignaturePublicKey&lt;V&gt;;
@@ -3047,12 +3047,12 @@ ciphersuite.<a href="#section-6.2-4" class="pilcrow">¶</a></p>
         <h3 id="name-credentials">
 <a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-credentials" class="section-name selfRef">Credentials</a>
         </h3>
-<p id="section-6.3-1">Each member of a group presents a credential that associates an identity with
-the member's key material.  This information is verified according to the
-Authentication Service in use for a group.<a href="#section-6.3-1" class="pilcrow">¶</a></p>
-<p id="section-6.3-2">A Credential can provide multiple identifiers for the client.  It is up to the
-application to decide which identifier or identifiers to use at the application
-level.  For example,
+<p id="section-6.3-1">Each member of a group presents a credential that provides one or more
+identities for the member, and associates them with the member's signing key.
+The identities and signing key are verified by the Authentication Service in use
+for a group.<a href="#section-6.3-1" class="pilcrow">¶</a></p>
+<p id="section-6.3-2">It is up to the application to decide which identifier or identifiers to use at
+the application level.  For example,
 a certificate in an X509Credential may attest to several domain names or email
 addresses in its subjectAltName extension.  An application may decide to
 present all of these to a user, or if it knows a "desired" domain name or email
@@ -3060,10 +3060,7 @@ address, it can check that the desired identifier is among those attested.
 Using the terminology from <span>[<a href="#RFC6125" class="xref">RFC6125</a>]</span>, a Credential provides "presented
 identifiers", and it is up to the application to supply a "reference identifier"
 for the authenticated client, if any.<a href="#section-6.3-2" class="pilcrow">¶</a></p>
-<p id="section-6.3-3">Credentials MAY also include information that allows a relying party
-to verify the identity / signing key binding, such as a signature from a trusted
-authority.<a href="#section-6.3-3" class="pilcrow">¶</a></p>
-<div id="section-6.3-4">
+<div id="section-6.3-3">
 <pre class="lang-tls sourcecode">
 // See IANA registry for registered values
 uint16 CredentialType;
@@ -3074,7 +3071,7 @@ struct {
 
 struct {
     CredentialType credential_type;
-    select (credential_type) {
+    select (Credential.credential_type) {
         case basic:
             opaque identity&lt;V&gt;;
 
@@ -3082,27 +3079,27 @@ struct {
             Certificate chain&lt;V&gt;;
     };
 } Credential;
-</pre><a href="#section-6.3-4" class="pilcrow">¶</a>
+</pre><a href="#section-6.3-3" class="pilcrow">¶</a>
 </div>
-<p id="section-6.3-5">A BasicCredential is a bare assertion of an identity, without any additional
-information.  The format of the encoded identity is defined by the application.<a href="#section-6.3-5" class="pilcrow">¶</a></p>
-<p id="section-6.3-6">For an X.509 credential, each entry in the chain represents a single DER-encoded
+<p id="section-6.3-4">A BasicCredential is a bare assertion of an identity, without any additional
+information.  The format of the encoded identity is defined by the application.<a href="#section-6.3-4" class="pilcrow">¶</a></p>
+<p id="section-6.3-5">For an X.509 credential, each entry in the chain represents a single DER-encoded
 X.509 certificate. The chain is ordered such that the first entry (chain[0]) is
 the end-entity certificate and each subsequent certificate in the chain MUST be
 the issuer of the previous certificate.  The public key encoded in the
 <code>subjectPublicKeyInfo</code> of the end-entity certificate MUST be identical to the
-<code>signature_key</code> in the LeafNode containing this credential.<a href="#section-6.3-6" class="pilcrow">¶</a></p>
-<p id="section-6.3-7">The signatures used in this document are encoded as specified in <span>[<a href="#RFC8446" class="xref">RFC8446</a>]</span>.
+<code>signature_key</code> in the LeafNode containing this credential.<a href="#section-6.3-5" class="pilcrow">¶</a></p>
+<p id="section-6.3-6">The signatures used in this document are encoded as specified in <span>[<a href="#RFC8446" class="xref">RFC8446</a>]</span>.
 In particular, ECDSA signatures are DER-encoded and EdDSA signatures are defined
-as the concatenation of <code>r</code> and <code>s</code> as specified in <span>[<a href="#RFC8032" class="xref">RFC8032</a>]</span>.<a href="#section-6.3-7" class="pilcrow">¶</a></p>
-<p id="section-6.3-8">Each new credential that has not already been validated by the application MUST
+as the concatenation of <code>r</code> and <code>s</code> as specified in <span>[<a href="#RFC8032" class="xref">RFC8032</a>]</span>.<a href="#section-6.3-6" class="pilcrow">¶</a></p>
+<p id="section-6.3-7">Each new credential that has not already been validated by the application MUST
 be validated against the Authentication Service.  Applications SHOULD require
 that a client present the same set of identifiers throughout its presence in
 the group, even if its Credential is changed in a Commit or Update.  If an
 application allows clients to change identifiers over time, then each time the
 client presents a new credential, the application MUST verify that the set
 of identifiers in the credential is acceptable to the application for this
-client.<a href="#section-6.3-8" class="pilcrow">¶</a></p>
+client.<a href="#section-6.3-7" class="pilcrow">¶</a></p>
 <div id="uniquely-identifying-clients">
 <section id="section-6.3.1">
           <h4 id="name-uniquely-identifying-client">
@@ -3136,7 +3133,7 @@ user's application-layer identifiers.<a href="#section-6.3.1-3" class="pilcrow">
       </h2>
 <p id="section-7-1">Handshake and application messages use a common framing structure.
 This framing provides encryption to ensure confidentiality within the
-group, as well as signing to authenticate the sender within the group.<a href="#section-7-1" class="pilcrow">¶</a></p>
+group, as well as signing to authenticate the sender.<a href="#section-7-1" class="pilcrow">¶</a></p>
 <p id="section-7-2">The main structure is MLSMessageContent, which contains the content of
 the message.  This structure is authenticated using MLSMessageAuth
 (see <a href="#content-authentication" class="xref">Section 7.1</a>).
@@ -3177,7 +3174,7 @@ enum {
 
 struct {
     SenderType sender_type;
-    switch (sender_type) {
+    select (Sender.sender_type) {
         case member:
             uint32 leaf_index;
         case external:
@@ -3410,7 +3407,7 @@ at the same state of the group.<a href="#section-7.1-8" class="pilcrow">¶</a></
 struct {
     MLSMessageContent content;
     MLSMessageAuth auth;
-    select(MLSPlaintext.content.sender.sender_type) {
+    select (MLSPlaintext.content.sender.sender_type) {
         case member:
             MAC membership_tag;
         case external:
@@ -3436,8 +3433,8 @@ struct {
 membership_tag = MAC(membership_key, MLSMessageContentTBM)
 </pre><a href="#section-7.2-5" class="pilcrow">¶</a>
 </div>
-<p id="section-7.2-6">When decoding a MLSPlaintext into a MLSMessageContentAuth,
-the application MUST check <code>membership_tag</code>, and MUST check that the
+<p id="section-7.2-6">When decoding an MLSPlaintext into an MLSMessageContentAuth,
+the application MUST check <code>membership_tag</code> and MUST check that the
 MLSMessageAuth is valid.<a href="#section-7.2-6" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -3507,7 +3504,7 @@ deterministically, a client must keep persistent state as to where in the key
 schedule it is; if this persistent state is lost or corrupted, a client might
 reuse a generation that has already been used, causing reuse of a key/nonce pair.<a href="#section-7.3.1-5" class="pilcrow">¶</a></p>
 <p id="section-7.3.1-6">To avoid this situation, the sender of a message MUST generate a fresh random
-4-byte "reuse guard" value and XOR it with the first four bytes of the nonce
+four-byte "reuse guard" value and XOR it with the first four bytes of the nonce
 from the key schedule before using the nonce for encryption.  The sender MUST
 include the reuse guard in the <code>reuse_guard</code> field of the sender data object, so
 that the recipient of the message can use it to compute the nonce to be used for
@@ -3540,7 +3537,7 @@ struct {
 } MLSCiphertextContentAAD;
 </pre><a href="#section-7.3.1-9" class="pilcrow">¶</a>
 </div>
-<p id="section-7.3.1-10">When decoding a MLSCiphertextContent, the application MUST check that the
+<p id="section-7.3.1-10">When decoding an MLSCiphertextContent, the application MUST check that the
 MLSMessageAuth is valid.<a href="#section-7.3.1-10" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -3549,7 +3546,7 @@ MLSMessageAuth is valid.<a href="#section-7.3.1-10" class="pilcrow">¶</a></p>
           <h4 id="name-sender-data-encryption">
 <a href="#section-7.3.2" class="section-number selfRef">7.3.2. </a><a href="#name-sender-data-encryption" class="section-name selfRef">Sender Data Encryption</a>
           </h4>
-<p id="section-7.3.2-1">The "sender data" used to look up the key for the content encryption is
+<p id="section-7.3.2-1">The "sender data" used to look up the key for content encryption is
 encrypted with the ciphersuite's AEAD with a key and nonce derived from both the
 <code>sender_data_secret</code> and a sample of the encrypted content. Before being
 encrypted, the sender data is encoded as an object of the following form:<a href="#section-7.3.2-1" class="pilcrow">¶</a></p>
@@ -3683,12 +3680,12 @@ struct {
     Capabilities capabilities;
 
     LeafNodeSource leaf_node_source;
-    select (leaf_node_source) {
+    select (LeafNode.leaf_node_source) {
         case key_package:
             Lifetime lifetime;
 
         case update:
-            struct {}
+            struct{};
 
         case commit:
             opaque parent_hash&lt;V&gt;;
@@ -3706,7 +3703,7 @@ struct {
     Capabilities capabilities;
 
     LeafNodeSource leaf_node_source;
-    select (leaf_node_source) {
+    select (LeafNodeTBS.leaf_node_source) {
         case key_package:
             Lifetime lifetime;
 
@@ -3719,7 +3716,7 @@ struct {
 
     Extension extensions&lt;V&gt;;
 
-    select (leaf_node_source) {
+    select (LeafNodeTBS.leaf_node_source) {
         case key_package:
             struct{};
 
@@ -3734,8 +3731,10 @@ struct {
 </div>
 <p id="section-8.2-3">The <code>encryption_key</code> field contains an HPKE public key whose private key is held only
 by the member occupying this leaf (or in the case of a LeafNode in a KeyPackage
-object, the issuer of the KeyPackage).  The <code>credential</code> contains authentication
-information for this member, as described in <a href="#credentials" class="xref">Section 6.3</a>.<a href="#section-8.2-3" class="pilcrow">¶</a></p>
+object, the issuer of the KeyPackage). The <code>signature_key</code> field contains the
+member's public signing key. The <code>credential</code> field contains information
+authenticating both the member's identity and the provided signing key, as
+described in <a href="#credentials" class="xref">Section 6.3</a>.<a href="#section-8.2-3" class="pilcrow">¶</a></p>
 <p id="section-8.2-4">The <code>capabilities</code> field indicates what protocol versions, ciphersuites,
 extensions, credential types, and non-default proposal types are supported by a client.
 Proposal and extension types defined in this document are considered "default" and thus need
@@ -3798,8 +3797,7 @@ another LeafNode, the authentication service MUST additionally validate that
 the set of identities attested by the credential in the new LeafNode is
 acceptable relative to the identities attested by the old credential.<a href="#section-8.3-4.1" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-8.3-4.2">Verify that the signature on the LeafNode is valid using the public key
-in the LeafNode's credential<a href="#section-8.3-4.2" class="pilcrow">¶</a>
+          <li class="normal" id="section-8.3-4.2">Verify that the signature on the LeafNode is valid using <code>signature_key</code>.<a href="#section-8.3-4.2" class="pilcrow">¶</a>
 </li>
           <li class="normal" id="section-8.3-4.3">Verify that the LeafNode is compatible with the group's parameters.  If the
 GroupContext has a <code>required_capabilities</code> extension, then the required
@@ -3811,25 +3809,25 @@ specified by the <code>capabilities</code> field of each member's LeafNode, and 
 <code>capabilities</code> field of this LeafNode indicates support for all the credential
 types currently in use by other members.<a href="#section-8.3-4.4" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-8.3-4.5">
-            <p id="section-8.3-4.5.1">Verify the <code>lifetime</code> field:<a href="#section-8.3-4.5.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-8.3-4.5">Verify that the <code>leaf_node_source</code> field has the appropriate value for the
+context in which the LeafNode is being validated (as defined in
+<a href="#leaf-node-contents" class="xref">Section 8.2</a>).<a href="#section-8.3-4.5" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-8.3-4.6">
+            <p id="section-8.3-4.6.1">If applicable, verify the <code>lifetime</code> field:<a href="#section-8.3-4.6.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-8.3-4.5.2.1">When validating a LeafNode in a KeyPackage before sending an Add proposal,
+<li class="normal" id="section-8.3-4.6.2.1">When validating a LeafNode in a KeyPackage before sending an Add proposal,
 the current time MUST be within the <code>lifetime</code> range.  A KeyPackage
 containing a LeafNode that is expired or not yet valid MUST NOT be sent in
-an Add proposal.<a href="#section-8.3-4.5.2.1" class="pilcrow">¶</a>
+an Add proposal.<a href="#section-8.3-4.6.2.1" class="pilcrow">¶</a>
 </li>
-              <li class="normal" id="section-8.3-4.5.2.2">When receiving an Add or validating a tree, checking the <code>lifetime</code> is
+              <li class="normal" id="section-8.3-4.6.2.2">When receiving an Add or validating a tree, checking the <code>lifetime</code> is
 RECOMMENDED, if it is feasible in a given application context.  Because of
 the asynchronous nature of MLS, the <code>lifetime</code> may have been valid when the
 leaf node was proposed for addition, even if it is expired at these later
-points in the protocol.<a href="#section-8.3-4.5.2.2" class="pilcrow">¶</a>
+points in the protocol.<a href="#section-8.3-4.6.2.2" class="pilcrow">¶</a>
 </li>
             </ul>
-</li>
-          <li class="normal" id="section-8.3-4.6">Verify that the <code>leaf_node_source</code> field has the appropriate value for the
-context in which the LeafNode is being validated (as defined in
-<a href="#leaf-node-contents" class="xref">Section 8.2</a>).<a href="#section-8.3-4.6" class="pilcrow">¶</a>
 </li>
           <li class="normal" id="section-8.3-4.7">
             <p id="section-8.3-4.7.1">Verify that the following fields in the LeafNode are unique among the
@@ -3844,9 +3842,9 @@ Commit):<a href="#section-8.3-4.7.1" class="pilcrow">¶</a></p>
 </li>
             </ul>
 </li>
-          <li class="normal" id="section-8.3-4.8">Verify that the extensions in the leaf node are supported.  The ID for each
-extension in the <code>extensions</code> field MUST be listed in the field
-<code>capabilities.extensions</code> of the LeafNode.<a href="#section-8.3-4.8" class="pilcrow">¶</a>
+          <li class="normal" id="section-8.3-4.8">Verify that the extensions in the LeafNode are supported by checking that the
+ID for each extension in the <code>extensions</code> field is listed in the
+<code>capabilities.extensions</code> field of the LeafNode.<a href="#section-8.3-4.8" class="pilcrow">¶</a>
 </li>
         </ul>
 </section>
@@ -3868,11 +3866,11 @@ described in <a href="#update-paths" class="xref">Section 8.9</a>.<a href="#sect
 To begin with, the generator of the UpdatePath updates its leaf and its leaf's
 <em>filtered direct path</em> with new key pairs. The filtered direct path of a node
 is obtained from the node's direct path by removing all nodes whose child on
-the nodes's copath has an empty resolution (any unmerged leaves of the copath
-child count towards its resolution). Such a removed node does not need a key
-pair, since after blanking it, its resolution consists of a single node on the
-filtered direct path. Using the key pair of the node in the resolution is
-equivalent to using the key pair of the removed node.<a href="#section-8.4-3" class="pilcrow">¶</a></p>
+the nodes' copath has an empty resolution (keeping in mind that any unmerged leaves of the copath
+child count towards its resolution). Such a removed node does not need its own key
+pair since, if the copath child's resolution is blank, then encrypting any data
+to the node's key pair would be equivalent to encrypting only to the
+non-copath child.<a href="#section-8.4-3" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-8.4-4.1">Blank all the nodes on the direct path from the leaf to the root.<a href="#section-8.4-4.1" class="pilcrow">¶</a>
 </li>
@@ -4106,12 +4104,12 @@ sender's leaf, including the root:<a href="#section-8.6-2" class="pilcrow">¶</a
 <ul class="normal">
 <li class="normal" id="section-8.6-3.1">The public key for the node<a href="#section-8.6-3.1" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-8.6-3.2">Zero or more encrypted copies of the path secret corresponding to
+          <li class="normal" id="section-8.6-3.2">One or more encrypted copies of the path secret corresponding to
 the node<a href="#section-8.6-3.2" class="pilcrow">¶</a>
 </li>
         </ul>
-<p id="section-8.6-4">The path secret value for a given node is encrypted for the subtree
-corresponding to the parent's non-updated child, that is, the child
+<p id="section-8.6-4">The path secret value for a given node is encrypted to the subtree
+rooted at the parent's non-updated child, i.e., the child
 on the copath of the sender's leaf node.
 There is one encryption of the path secret to each public key in the resolution
 of the non-updated child.<a href="#section-8.6-4" class="pilcrow">¶</a></p>
@@ -4163,7 +4161,7 @@ updated path secrets"), compute and store the node's updated private key.<a href
 </li>
         </ol>
 <p id="section-8.6-7">For example, in order to communicate the example update described in
-the previous section, the sender would transmit the following
+<a href="#ratchet-tree-evolution" class="xref">Section 8.4</a>, the sender would transmit the following
 values:<a href="#section-8.6-7" class="pilcrow">¶</a></p>
 <table class="center" id="table-2">
           <caption><a href="#table-2" class="selfRef">Table 2</a></caption>
@@ -4403,13 +4401,11 @@ chain from the committer's leaf to the root.<a href="#section-8.8.2-6" class="pi
         <h3 id="name-update-paths">
 <a href="#section-8.9" class="section-number selfRef">8.9. </a><a href="#name-update-paths" class="section-name selfRef">Update Paths</a>
         </h3>
-<p id="section-8.9-1">As described in <a href="#commit" class="xref">Section 13.2</a>, each MLS Commit message may optionally
-transmit a LeafNode and parent node values along its direct path.
-The path contains a public key and encrypted secret value for all
-intermediate nodes in the filtered direct path from the leaf to the
-root. The path is ordered
-from the closest node to the leaf to the root; each node MUST be the
-parent of its predecessor.<a href="#section-8.9-1" class="pilcrow">¶</a></p>
+<p id="section-8.9-1">As described in <a href="#commit" class="xref">Section 13.2</a>, each Commit message may optionally contain an
+UpdatePath, with a new LeafNode and set of parent nodes for the sender's
+filtered direct path. For each parent node, the UpdatePath contains a new
+public key and encrypted path secret. The parent nodes are kept in the same
+order as the filtered direct path.<a href="#section-8.9-1" class="pilcrow">¶</a></p>
 <div id="section-8.9-2">
 <pre class="lang-tls sourcecode">
 struct {
@@ -4429,9 +4425,9 @@ struct {
 </pre><a href="#section-8.9-2" class="pilcrow">¶</a>
 </div>
 <p id="section-8.9-3">For each <code>UpdatePathNode</code>, the resolution of the corresponding copath node MUST
-be filtered by removing all new leaf nodes added as part of this MLS Commit
-message. The number of ciphertexts in the <code>encrypted_path_secret</code> vector MUST be
-equal to the length of the filtered resolution, with each ciphertext being the
+exclude all new leaf nodes added as part of the current Commit. The length of
+the <code>encrypted_path_secret</code> vector MUST be equal to the length of the resolution
+of the copath node (excluding new leaf nodes), with each ciphertext being the
 encryption to the respective resolution node.<a href="#section-8.9-3" class="pilcrow">¶</a></p>
 <p id="section-8.9-4">The HPKECiphertext values are computed as<a href="#section-8.9-4" class="pilcrow">¶</a></p>
 <div id="section-8.9-5">
