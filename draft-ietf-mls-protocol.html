@@ -1923,20 +1923,27 @@ can be used to encrypt to that client, and which other clients can use to
 introduce the client to a new group.<a href="#section-2-2.10.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-2.11">Signature Key:</dt>
+<dt id="section-2-2.11">Group Context:</dt>
         <dd style="margin-left: 1.5em" id="section-2-2.12">
-          <p id="section-2-2.12.1">A signing key pair used to authenticate the sender of a message.<a href="#section-2-2.12.1" class="pilcrow">¶</a></p>
+          <p id="section-2-2.12.1">An object that summarizes the state of the group. The group context is signed
+to bind a message to a particular group, and also provided to new members to
+help them join a group.<a href="#section-2-2.12.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-2.13">Handshake Message:</dt>
+<dt id="section-2-2.13">Signature Key:</dt>
         <dd style="margin-left: 1.5em" id="section-2-2.14">
-          <p id="section-2-2.14.1">An MLSPlaintext or MLSCiphertext message carrying an MLS Proposal or Commit
-object, as opposed to application data.<a href="#section-2-2.14.1" class="pilcrow">¶</a></p>
+          <p id="section-2-2.14.1">A signing key pair used to authenticate the sender of a message.<a href="#section-2-2.14.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-2.15">Application Message:</dt>
+<dt id="section-2-2.15">Handshake Message:</dt>
         <dd style="margin-left: 1.5em" id="section-2-2.16">
-          <p id="section-2-2.16.1">An MLSCiphertext message carrying application data.<a href="#section-2-2.16.1" class="pilcrow">¶</a></p>
+          <p id="section-2-2.16.1">An MLSPlaintext or MLSCiphertext message carrying an MLS Proposal or Commit
+object, as opposed to application data.<a href="#section-2-2.16.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-2.17">Application Message:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-2.18">
+          <p id="section-2-2.18.1">An MLSCiphertext message carrying application data.<a href="#section-2-2.18.1" class="pilcrow">¶</a></p>
 </dd>
       <dd class="break"></dd>
 </dl>
