@@ -5,7 +5,7 @@
 Network Working Group                                          R. Barnes
 Internet-Draft                                                     Cisco
 Intended status: Informational                             B. Beurdouche
-Expires: 20 November 2022                                Inria & Mozilla
+Expires: 21 November 2022                                Inria & Mozilla
                                                                R. Robert
                                                                         
                                                              J. Millican
@@ -14,7 +14,7 @@ Expires: 20 November 2022                                Inria & Mozilla
                                                                   Google
                                                           K. Cohn-Gordon
                                                     University of Oxford
-                                                             19 May 2022
+                                                             20 May 2022
 
 
               The Messaging Layer Security (MLS) Protocol
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 20 November 2022.
+   This Internet-Draft will expire on 21 November 2022.
 
 Copyright Notice
 
@@ -2524,10 +2524,9 @@ Table of Contents
 
    As described in Section 13.2, each Commit message may optionally
    contain an UpdatePath, with a new LeafNode and set of parent nodes
-   for the sender's filtered direct path.  For each intermediate node,
-   the UpdatePath contains a new public key and encrypted path secret.
-   The nodes are ordered such that each node is the ancestor of its
-   predecessor.
+   for the sender's filtered direct path.  For each parent node, the
+   UpdatePath contains a new public key and encrypted path secret.  The
+   parent nodes are kept in the same order as the filtered direct path.
 
    struct {
        opaque kem_output<V>;
