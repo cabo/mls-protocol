@@ -5156,25 +5156,75 @@ encrypted with an AEAD where the key and nonce are derived from both
 <p id="section-10.1-4">For handshake and application messages, a sequence of keys is derived via a
 "sender ratchet".  Each sender has their own sender ratchet, and each step along
 the ratchet is called a "generation".<a href="#section-10.1-4" class="pilcrow">¶</a></p>
-<p id="section-10.1-5">A sender ratchet starts from a per-sender base secret derived from a Secret
+<p id="section-10.1-5">The following figure shows a secret tree for a four-member group, with the
+handshake and application ratchets that member D will use for sending and the
+first two application keys and nonces.<a href="#section-10.1-5" class="pilcrow">¶</a></p>
+<span id="name-secret-tree-for-a-four-memb"></span><div id="secret-tree-example">
+<figure id="figure-13">
+          <div id="section-10.1-6.1">
+            <div class="alignLeft art-svg artwork" id="section-10.1-6.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="320" width="200" viewBox="0 0 200 320" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
+                <path d="M 56,48 L 56,64" fill="none" stroke="black"></path>
+                <path d="M 128,176 L 128,208" fill="none" stroke="black"></path>
+                <path d="M 128,240 L 128,272" fill="none" stroke="black"></path>
+                <path d="M 160,160 L 160,192" fill="none" stroke="black"></path>
+                <path d="M 160,224 L 160,256" fill="none" stroke="black"></path>
+                <path d="M 40,64 L 72,64" fill="none" stroke="black"></path>
+                <path d="M 144,160 L 176,160" fill="none" stroke="black"></path>
+                <path d="M 160,192 L 176,192" fill="none" stroke="black"></path>
+                <path d="M 144,224 L 176,224" fill="none" stroke="black"></path>
+                <path d="M 160,256 L 176,256" fill="none" stroke="black"></path>
+                <path d="M 72,64 L 80,80" fill="none" stroke="black"></path>
+                <path d="M 32,80 L 40,64" fill="none" stroke="black"></path>
+                <g class="text">
+                  <text x="56" y="36">G</text>
+                  <text x="24" y="100">E</text>
+                  <text x="88" y="100">F</text>
+                  <text x="16" y="116">/</text>
+                  <text x="32" y="116">\</text>
+                  <text x="80" y="116">/</text>
+                  <text x="96" y="116">\</text>
+                  <text x="8" y="132">A</text>
+                  <text x="40" y="132">B</text>
+                  <text x="72" y="132">C</text>
+                  <text x="104" y="132">D</text>
+                  <text x="96" y="148">/</text>
+                  <text x="112" y="148">\</text>
+                  <text x="88" y="164">HR0</text>
+                  <text x="128" y="164">AR0</text>
+                  <text x="188" y="164">K0</text>
+                  <text x="188" y="196">N0</text>
+                  <text x="128" y="228">AR1</text>
+                  <text x="188" y="228">K1</text>
+                  <text x="188" y="260">N1</text>
+                  <text x="128" y="292">AR2</text>
+                </g>
+              </svg><a href="#section-10.1-6.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-13" class="selfRef">Figure 13</a>:
+<a href="#name-secret-tree-for-a-four-memb" class="selfRef">Secret tree for a four-member group</a>
+          </figcaption></figure>
+</div>
+<p id="section-10.1-7">A sender ratchet starts from a per-sender base secret derived from a Secret
 Tree, as described in <a href="#secret-tree" class="xref">Section 10</a>. The base secret initiates a symmetric
 hash ratchet which generates a sequence of keys and nonces. The sender uses the
 j-th key/nonce pair in the sequence to encrypt (using the AEAD) the j-th message
 they send during that epoch. Each key/nonce pair MUST NOT be used to encrypt
-more than one message.<a href="#section-10.1-5" class="pilcrow">¶</a></p>
-<p id="section-10.1-6">Keys, nonces, and the secrets in ratchets are derived using
+more than one message.<a href="#section-10.1-7" class="pilcrow">¶</a></p>
+<p id="section-10.1-8">Keys, nonces, and the secrets in ratchets are derived using
 DeriveTreeSecret. The context in a given call consists of the current position
-in the ratchet.<a href="#section-10.1-6" class="pilcrow">¶</a></p>
-<div id="section-10.1-7">
+in the ratchet.<a href="#section-10.1-8" class="pilcrow">¶</a></p>
+<div id="section-10.1-9">
 <pre class="lang-pseudocode sourcecode">
 DeriveTreeSecret(Secret, Label, Generation, Length) =
     ExpandWithLabel(Secret, Label, Generation, Length)
 
 Where Generation is encoded as a uint32.
-</pre><a href="#section-10.1-7" class="pilcrow">¶</a>
+</pre><a href="#section-10.1-9" class="pilcrow">¶</a>
 </div>
-<div id="section-10.1-8">
-          <div class="alignLeft art-svg artwork" id="section-10.1-8.1">
+<div id="section-10.1-10">
+          <div class="alignLeft art-svg artwork" id="section-10.1-10.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="208" width="416" viewBox="0 0 416 208" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
               <path d="M 56,40 L 56,160" fill="none" stroke="black"></path>
               <path d="M 56,64 L 80,64" fill="none" stroke="black"></path>
@@ -5203,12 +5253,12 @@ Where Generation is encoded as a uint32.
                 <text x="8" y="196">=</text>
                 <text x="116" y="196">ratchet_secret_[N]_[j+1]</text>
               </g>
-            </svg><a href="#section-10.1-8.1" class="pilcrow">¶</a>
+            </svg><a href="#section-10.1-10.1" class="pilcrow">¶</a>
 </div>
 </div>
-<p id="section-10.1-9">Here, AEAD.Nn and AEAD.Nk denote the lengths
+<p id="section-10.1-11">Here, AEAD.Nn and AEAD.Nk denote the lengths
 in bytes of the nonce and key for the AEAD scheme defined by
-the ciphersuite.<a href="#section-10.1-9" class="pilcrow">¶</a></p>
+the ciphersuite.<a href="#section-10.1-11" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="deletion-schedule">
@@ -5249,55 +5299,34 @@ node L,<a href="#section-10.2-6.2" class="pilcrow">¶</a>
             <code>application_ratchet_nonce_[L]_[j]</code> and <code>application_ratchet_key_[L]_[j]</code>.<a href="#section-10.2-6.4" class="pilcrow">¶</a>
 </li>
         </ul>
-<p id="section-10.2-7">Concretely, suppose we have the following Secret Tree and ratchet for
-participant D:<a href="#section-10.2-7" class="pilcrow">¶</a></p>
-<div id="section-10.2-8">
-          <div class="alignLeft art-svg artwork" id="section-10.2-8.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="320" width="200" viewBox="0 0 200 320" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
-              <path d="M 56,48 L 56,64" fill="none" stroke="black"></path>
-              <path d="M 128,176 L 128,208" fill="none" stroke="black"></path>
-              <path d="M 128,240 L 128,272" fill="none" stroke="black"></path>
-              <path d="M 160,160 L 160,192" fill="none" stroke="black"></path>
-              <path d="M 160,224 L 160,256" fill="none" stroke="black"></path>
-              <path d="M 40,64 L 72,64" fill="none" stroke="black"></path>
-              <path d="M 144,160 L 176,160" fill="none" stroke="black"></path>
-              <path d="M 160,192 L 176,192" fill="none" stroke="black"></path>
-              <path d="M 144,224 L 176,224" fill="none" stroke="black"></path>
-              <path d="M 160,256 L 176,256" fill="none" stroke="black"></path>
-              <path d="M 72,64 L 80,80" fill="none" stroke="black"></path>
-              <path d="M 32,80 L 40,64" fill="none" stroke="black"></path>
-              <g class="text">
-                <text x="56" y="36">G</text>
-                <text x="24" y="100">E</text>
-                <text x="88" y="100">F</text>
-                <text x="16" y="116">/</text>
-                <text x="32" y="116">\</text>
-                <text x="80" y="116">/</text>
-                <text x="96" y="116">\</text>
-                <text x="8" y="132">A</text>
-                <text x="40" y="132">B</text>
-                <text x="72" y="132">C</text>
-                <text x="104" y="132">D</text>
-                <text x="96" y="148">/</text>
-                <text x="112" y="148">\</text>
-                <text x="88" y="164">HR0</text>
-                <text x="128" y="164">AR0</text>
-                <text x="188" y="164">K0</text>
-                <text x="188" y="196">N0</text>
-                <text x="128" y="228">AR1</text>
-                <text x="188" y="228">K1</text>
-                <text x="188" y="260">N1</text>
-                <text x="128" y="292">AR2</text>
-              </g>
-            </svg><a href="#section-10.2-8.1" class="pilcrow">¶</a>
-</div>
-</div>
-<p id="section-10.2-9">Then if a client uses key K1 and nonce N1 during epoch n then it must consume
-(at least) values G, F, D, AR0, AR1, K1, N1 as well as the key schedule secrets
-used to derive G (the <code>encryption_secret</code>), namely <code>init_secret</code> of epoch n-1
-and <code>commit_secret</code>, <code>joiner_secret</code>, <code>epoch_secret</code> of epoch n. The client MAY
-retain (not consume) the values K0 and N0 to allow for out-of-order delivery,
-and SHOULD retain AR2 for processing future messages.<a href="#section-10.2-9" class="pilcrow">¶</a></p>
+<p id="section-10.2-7">Concretely, consider the Secret Tree shown in <a href="#secret-tree-example" class="xref">Figure 13</a>.  Client
+A, B, or C would generate the illustrated values on receiving a message from D
+with generation equal to 1, having not received a message with generation 0
+(e.g., due to out-of-order delivery).  In such a case, the following values
+would be consumed:<a href="#section-10.2-7" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-10.2-8.1">The key K1 and nonce N1 used to decrypt the message<a href="#section-10.2-8.1" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-10.2-8.2">The application ratchet secrets AR1 and AR0<a href="#section-10.2-8.2" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-10.2-8.3">The tree secrets D, F, G (recall that G is the <code>encryption_secret</code> for the
+epoch)<a href="#section-10.2-8.3" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-10.2-8.4">The <code>epoch_secret</code>, <code>commit_secret</code>, <code>psk_secret</code>, and <code>joiner_secret</code> for the
+current epoch<a href="#section-10.2-8.4" class="pilcrow">¶</a>
+</li>
+        </ul>
+<p id="section-10.2-9">Other values may be retained (not consumed):<a href="#section-10.2-9" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-10.2-10.1">K0 and N0 for decryption of an out-of-order message with generation 0<a href="#section-10.2-10.1" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-10.2-10.2">AR2 for derivation of further message decryption keys and nonces<a href="#section-10.2-10.2" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-10.2-10.3">HR0 for protection of handshake messages from D<a href="#section-10.2-10.3" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-10.2-10.4">E and C for deriving secrets used by senders A, B, and C<a href="#section-10.2-10.4" class="pilcrow">¶</a>
+</li>
+        </ul>
 </section>
 </div>
 </section>
