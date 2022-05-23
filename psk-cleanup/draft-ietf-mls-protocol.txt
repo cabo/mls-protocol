@@ -5,7 +5,7 @@
 Network Working Group                                          R. Barnes
 Internet-Draft                                                     Cisco
 Intended status: Informational                             B. Beurdouche
-Expires: 23 November 2022                                Inria & Mozilla
+Expires: 24 November 2022                                Inria & Mozilla
                                                                R. Robert
                                                                         
                                                              J. Millican
@@ -14,7 +14,7 @@ Expires: 23 November 2022                                Inria & Mozilla
                                                                   Google
                                                           K. Cohn-Gordon
                                                     University of Oxford
-                                                             22 May 2022
+                                                             23 May 2022
 
 
               The Messaging Layer Security (MLS) Protocol
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 23 November 2022.
+   This Internet-Draft will expire on 24 November 2022.
 
 Copyright Notice
 
@@ -3581,11 +3581,12 @@ psk_secret (or 0) --> KDF.Extract
        PreSharedKeyID psk;
    } PreSharedKey;
 
-   A PreSharedKey proposal MUST NOT contain a PSK of type resumption and
-   usage reinit or branch.  When processing a Commit message that
-   includes one or more PreSharedKey proposals, group members derive
-   psk_secret as described in Section 9.4, where the order of the PSKs
-   corresponds to the order of the PreSharedKey proposals in the Commit.
+   A PreSharedKey proposal MUST NOT contain a PSK of type resumption
+   that has usage reinit or branch.  When processing a Commit message
+   that includes one or more PreSharedKey proposals, group members
+   derive psk_secret as described in Section 9.4, where the order of the
+   PSKs corresponds to the order of the PreSharedKey proposals in the
+   Commit.
 
 13.1.5.  ReInit
 
