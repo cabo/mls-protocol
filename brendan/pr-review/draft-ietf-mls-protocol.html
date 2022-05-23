@@ -1031,7 +1031,7 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Barnes, et al.</td>
-<td class="center">Expires 23 November 2022</td>
+<td class="center">Expires 24 November 2022</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1044,12 +1044,12 @@ svg [stroke="fill"], svg [fill^="#fff"] {
 <dd class="internet-draft">draft-ietf-mls-protocol-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2022-05-22" class="published">22 May 2022</time>
+<time datetime="2022-05-23" class="published">23 May 2022</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2022-11-23">23 November 2022</time></dd>
+<dd class="expires"><time datetime="2022-11-24">24 November 2022</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1119,7 +1119,7 @@ in size ranging from two to thousands.<a href="#section-abstract-1" class="pilcr
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 23 November 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 24 November 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -3789,11 +3789,11 @@ verified with the following exception: If the LeafNode is an update to
 another LeafNode, the authentication service MUST additionally validate that
 the set of identities attested by the credential in the new LeafNode is
 acceptable relative to the identities attested by the old credential.
-&lt;!-- For example:<a href="#section-8.3-4.1.1" class="pilcrow">¶</a></p>
+For example:<a href="#section-8.3-4.1.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-8.3-4.1.2.1">An Update proposal updates the sender's old LeafNode to a new one<a href="#section-8.3-4.1.2.1" class="pilcrow">¶</a>
 </li>
-              <li class="normal" id="section-8.3-4.1.2.2">A "resync" external commit removes the joiner's old LeafNode via a Remove proposal and replaces it with a new one --&gt;<a href="#section-8.3-4.1.2.2" class="pilcrow">¶</a>
+              <li class="normal" id="section-8.3-4.1.2.2">A "resync" external commit removes the joiner's old LeafNode via a Remove proposal and replaces it with a new one<a href="#section-8.3-4.1.2.2" class="pilcrow">¶</a>
 </li>
             </ul>
 </li>
@@ -6681,39 +6681,37 @@ following:<a href="#section-13.4-2" class="pilcrow">¶</a></p>
 has received multiple such proposals they SHOULD prefer any Remove received, or
 the most recent Update if there are no Removes.<a href="#section-13.4-3.4" class="pilcrow">¶</a>
 </li>
-        </ul>
-<ul class="normal">
-<li class="normal" id="section-13.4-4.1">Multiple PreSharedKey proposals that reference the same PreSharedKeyID.<a href="#section-13.4-4.1" class="pilcrow">¶</a>
+          <li class="normal" id="section-13.4-3.5">Multiple PreSharedKey proposals that reference the same PreSharedKeyID.<a href="#section-13.4-3.5" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-13.4-4.2">Multiple GroupContextExtensions proposals.<a href="#section-13.4-4.2" class="pilcrow">¶</a>
+          <li class="normal" id="section-13.4-3.6">Multiple GroupContextExtensions proposals.<a href="#section-13.4-3.6" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-13.4-4.3">A ReInit proposal together with any other proposal. If the committer has
+          <li class="normal" id="section-13.4-3.7">A ReInit proposal together with any other proposal. If the committer has
 received other proposals during the epoch, they SHOULD prefer them over the
 ReInit proposal, allowing the ReInit to be resent and applied in a subsequent
-epoch.<a href="#section-13.4-4.3" class="pilcrow">¶</a>
+epoch.<a href="#section-13.4-3.7" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-13.4-4.4">An ExternalInit proposal.<a href="#section-13.4-4.4" class="pilcrow">¶</a>
+          <li class="normal" id="section-13.4-3.8">An ExternalInit proposal.<a href="#section-13.4-3.8" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-13.4-4.5">A proposal with a non-default proposal type that is not supported by some
+          <li class="normal" id="section-13.4-3.9">A proposal with a non-default proposal type that is not supported by some
 members of the group that will process the Commit. Note that members being added
-or removed by the Commit do not need to support the proposal type.<a href="#section-13.4-4.5" class="pilcrow">¶</a>
+or removed by the Commit do not need to support the proposal type.<a href="#section-13.4-3.9" class="pilcrow">¶</a>
 </li>
         </ul>
-<p id="section-13.4-5">An application may extend the above procedure by additional rules, for example,
+<p id="section-13.4-4">An application may extend the above procedure by additional rules, for example,
 requiring application-level permissions to add members, or rules concerning
-non-default proposal types.<a href="#section-13.4-5" class="pilcrow">¶</a></p>
-<p id="section-13.4-6">For an external Commit, the list is invalid if:<a href="#section-13.4-6" class="pilcrow">¶</a></p>
+non-default proposal types.<a href="#section-13.4-4" class="pilcrow">¶</a></p>
+<p id="section-13.4-5">For an external Commit, the list is invalid if:<a href="#section-13.4-5" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-13.4-7.1">It contains any proposal types other than ExternalInit, Remove, or PreSharedKey.<a href="#section-13.4-7.1" class="pilcrow">¶</a>
+<li class="normal" id="section-13.4-6.1">It contains any proposal types other than ExternalInit, Remove, or PreSharedKey.<a href="#section-13.4-6.1" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-13.4-7.2">It doesn't contain exactly one ExternalInit proposal.<a href="#section-13.4-7.2" class="pilcrow">¶</a>
+          <li class="normal" id="section-13.4-6.2">It doesn't contain exactly one ExternalInit proposal.<a href="#section-13.4-6.2" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-13.4-7.3">It contains more than one Remove proposal.
+          <li class="normal" id="section-13.4-6.3">It contains more than one Remove proposal.
 If a Remove proposal is present, the LeafNode in the
 <code>path</code> field of the external commit MUST meet the same criteria as would the LeafNode
 in an Update for the removed leaf (see <a href="#update" class="xref">Section 13.1.2</a>). In particular, the <code>credential</code>
 in the LeafNode MUST present a set of identifiers that is acceptable to the
-application for the removed participant.<a href="#section-13.4-7.3" class="pilcrow">¶</a>
+application for the removed participant.<a href="#section-13.4-6.3" class="pilcrow">¶</a>
 </li>
         </ul>
 </section>

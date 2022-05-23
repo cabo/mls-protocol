@@ -5,7 +5,7 @@
 Network Working Group                                          R. Barnes
 Internet-Draft                                                     Cisco
 Intended status: Informational                             B. Beurdouche
-Expires: 23 November 2022                                Inria & Mozilla
+Expires: 24 November 2022                                Inria & Mozilla
                                                                R. Robert
                                                                         
                                                              J. Millican
@@ -14,7 +14,7 @@ Expires: 23 November 2022                                Inria & Mozilla
                                                                   Google
                                                           K. Cohn-Gordon
                                                     University of Oxford
-                                                             22 May 2022
+                                                             23 May 2022
 
 
               The Messaging Layer Security (MLS) Protocol
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 23 November 2022.
+   This Internet-Draft will expire on 24 November 2022.
 
 Copyright Notice
 
@@ -2068,13 +2068,13 @@ Welcome  KeyPackage  GroupInfo   MLSPlaintext      MLSCiphertext -'
       authentication service MUST additionally validate that the set of
       identities attested by the credential in the new LeafNode is
       acceptable relative to the identities attested by the old
-      credential. <!-- For example:
+      credential.  For example:
 
       -  An Update proposal updates the sender's old LeafNode to a new
          one
 
       -  A "resync" external commit removes the joiner's old LeafNode
-         via a Remove proposal and replaces it with a new one -->
+         via a Remove proposal and replaces it with a new one
 
    *  Verify that the signature on the LeafNode is valid using
       signature_key.
