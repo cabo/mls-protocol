@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-05-22T01:45:01.201217+00:00",
+  "timestamp": "2022-05-24T01:55:02.791301+00:00",
   "repo": "mlswg/mls-protocol",
   "labels": [
     {
@@ -6650,7 +6650,7 @@
       "labels": [],
       "body": "In order to use tree hashes to represent siblings in parent hashes, we had to compute a different tree hash on the right edge of the tree, pretending that the tree is full, in the sense of having `2^n` leaves.  Thus we actually have two tree hashes in play, one used for group agreement on the tree and one used for parent hash inputs.\r\n\r\nWe should consider specifying that the logical tree used by MLS is always full.  This change to the specification would not change the computations done by the protocol much, if at all.  Thanks to the fact that we no longer generate redundant nodes (#587), there is never anything non-blank to the right of the rightmost non-blank leaf anyway.  So the main impact is to insert some blank nodes between a parent node on the right edge of the tree and its right child -- and all of the algorithms in the specification already skip over such nodes.\r\n\r\nLikewise, implementations' internal represntations of the tree wouldn't have to change much, since the extra nodes could be \"virtual\".  The only time they would be noticed is when computing tree hashes.  We would have to update the description of the `ratchet_tree` extension to say that it only covers the tree up to the rightmost non-blank leaf.\r\n\r\nIt would simplify the specification in a few ways, for example: \r\n* The \"original sibling tree hash\" would just entail blanking unmerged leaves, not structure changes.  \r\n* The description of extending and truncating the tree would be much simpler.\r\n\r\nThe main cost would be extra hashes when joining, or when updating a member close to the right edge of the tree.  If you have a tree with `2^n + 1` leaves, then you have to compute tree hashes over `2^n - 1` blank leaves and their `2^n - 2` blank parents.\r\n",
       "createdAt": "2022-05-04T23:14:27Z",
-      "updatedAt": "2022-05-20T18:00:27Z",
+      "updatedAt": "2022-05-23T21:57:28Z",
       "closedAt": null,
       "comments": [
         {
@@ -6673,6 +6673,13 @@
           "body": "Discussed at 19 May interim: @bifurcation to draft a PR.",
           "createdAt": "2022-05-19T15:47:44Z",
           "updatedAt": "2022-05-19T15:47:44Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Holding a PR until after #689 lands.\r\n\r\nSome notes on what would need to change:\r\n\r\n* {{ratchet-tree-terminology}} would change from \"the unique left-balanced tree with N leaves\" to \"the unique balanced binary tree with depth `d`, where `d` is the smallest number such that `N <= 2^d`\".\r\n* {{adding-and-removing-leaves}} would either be removed, or updated so that it talks about increasing or decreasing the depth of the tree (equivalently, doubling or halving the number of leaves).\r\n* {{add}} would talk about increasing depth instead of adding leaves.\r\n* {{remove}} would talk about decreasing depth instead of removing leaves.\r\n* {{ratchet-tree-extension}} would be explicit that it only carries nodes up to the rightmost non-blank leaf.  The encoding/decoding algorithms would have to be updated.\r\n* {{array-based-trees}} and {{link-based-trees}} could probably be simplified.\r\n* We would need to make sure all figures showed full trees.",
+          "createdAt": "2022-05-23T21:57:28Z",
+          "updatedAt": "2022-05-23T21:57:28Z"
         }
       ]
     },
@@ -6721,9 +6728,17 @@
       ],
       "body": "In #511, we removed the requirement for an external Commit to have an Add proposal, under the theory that the required `path` already has a leaf node for the new joiner.  When I went to implement this, however, I noticed some ambiguities. \r\n\r\nFirst, the Commit processing section doesn't mention when the new joiner is added.  The obvious approach is to do the add as part of the `path` processing, but that processing presumes that the sender is already in the tree (for example, there is no provision for extending the tree).\r\n\r\nSecond, the UpdatePath for an external commit needs to be done in a specific order in order to avoid a circular dependency.  The TreeKEM encapsulation done by the joiner uses the GroupContext a context parameter, including the hash of the tree being used.  But the LeafNode in the `path.leaf_node` has to have a parent hash in it, which can only be computed after the encapsulation operation.  This circularity can be resolved, but only by preparing the UpdatePath with the following specific steps:\r\n\r\n1. Compute the path secrets\r\n2. Compute the parent hash and the new leaf node\r\n3. Compute the new tree hash\r\n4. Encrypt the path secrets to the rest of the group\r\n\r\nThat rules out some implementations that compute path secrets and encrypt them in one traversal of the direct path (this is what MLSpp does now).\r\n\r\nThe options here are basically:\r\n\r\n1. Re-add the Add proposal, thus having a throw-away temporary LeafNode for the joiner\r\n2. Specify that the UpdatePath must be computed in the specific order above\r\n\r\nTo me, (2) seems like a pretty clear winner.",
       "createdAt": "2022-05-05T03:22:55Z",
-      "updatedAt": "2022-05-20T17:59:07Z",
+      "updatedAt": "2022-05-23T22:10:14Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Actually, it seems like there's a simpler option here:\r\n\r\n* Extend the definition of an ExternalInit proposal to say that part of how it is applied is to ensure there is a blank leaf in the tree, extending the tree if necessary.  (This implies that ExternalInit must be done after any Remove.)  The leftmost blank leaf is the sender's leaf for purposes of UpdatePath processing.\r\n* The provisional tree used in encrypting path secrets is still the provisional tree, in the sense that all proposals have been applied.  This tree has a blank leaf for the UpdatePath sender.\r\n\r\nIf we clarify these points, I think everything else works unmodified.",
+          "createdAt": "2022-05-23T22:10:14Z",
+          "updatedAt": "2022-05-23T22:10:14Z"
+        }
+      ]
     },
     {
       "number": 649,
@@ -7103,7 +7118,7 @@
       ],
       "body": "Currently defined only briefly in \"RatchetTree Evolution\".  While that's where it's primarily used, it would fit better in the terminology section, especially if we expand it a little and add an illustration.",
       "createdAt": "2022-05-16T22:09:08Z",
-      "updatedAt": "2022-05-21T21:07:55Z",
+      "updatedAt": "2022-05-22T18:49:56Z",
       "closedAt": null,
       "comments": [
         {
@@ -7112,6 +7127,13 @@
           "body": "The problem here is that the definition of \"filtered direct path\" depends on the definition of \"resolution\" which isn't defined until a later section.",
           "createdAt": "2022-05-21T05:30:20Z",
           "updatedAt": "2022-05-21T05:30:20Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Indeed, so #689 proposes moving up the definition of resolution as well.",
+          "createdAt": "2022-05-22T18:49:56Z",
+          "updatedAt": "2022-05-22T18:49:56Z"
         }
       ]
     },
@@ -7265,7 +7287,7 @@
       ],
       "body": "The generation numbers should be increased sequentially, gaps should be avoided to avoid unnecessary expensive operations on clients. Clients might also abort if the gap is too large to prevent attacks from malicious insiders.",
       "createdAt": "2022-05-17T17:24:17Z",
-      "updatedAt": "2022-05-20T18:31:47Z",
+      "updatedAt": "2022-05-23T21:42:07Z",
       "closedAt": null,
       "comments": [
         {
@@ -7278,9 +7300,9 @@
         {
           "author": "bifurcation",
           "authorAssociation": "COLLABORATOR",
-          "body": "I suspect that what Raphael is worried about is that a malicious insider* could make an MLSCiphertext with `generation` set to `0xffffffff` that would cause the receiver to do `2^32-1` HKDF invocations.  The attacker doesn't have to incur this cost because they don't need to generate the required key -- the ciphertext can be garbage because the key generation happens before the decryption does.\r\n\r\nIt seems like we could use a paragraph at the end of `{{encryption-keys}}` covering this and the fact that if you want to allow for out-of-order messages, you need to keep the intermediate keys.  Since big gaps would force you to store the keys as well as doing the hashing.\r\n\r\n> Clients might not receive messages in the order they are sent.  In order to allow for decryption of out-of-order messages, clients MAY retain keys and nonces for generations earlier than the latest received generation.  clients MAY impose a limit on the size of gaps they will allow in the generation sequence, in order to avoid generating and/or storing large numbers of such keys and nonces.\r\n\r\nA figure here might also be helpful.\r\n\r\n* someone in possession of the `sender_data_secret`",
+          "body": "I suspect that what Raphael is worried about is that a malicious insider (someone in possession of the `sender_data_secret`) could make an MLSCiphertext with `generation` set to `0xffffffff` that would cause the receiver to do `2^32-1` HKDF invocations.  The attacker doesn't have to incur this cost because they don't need to generate the required key -- the ciphertext can be garbage because the key generation happens before the decryption does.\r\n\r\nIt seems like we could use a paragraph at the end of `{{encryption-keys}}` covering this and the fact that if you want to allow for out-of-order messages, you need to keep the intermediate keys.  Since big gaps would force you to store the keys as well as doing the hashing.\r\n\r\n> Clients might not receive messages in the order they are sent.  In order to allow for decryption of out-of-order messages, clients MAY retain keys and nonces for generations earlier than the latest received generation.  clients MAY impose a limit on the size of gaps they will allow in the generation sequence, in order to avoid generating and/or storing large numbers of such keys and nonces.\r\n\r\nA figure here might also be helpful.",
           "createdAt": "2022-05-20T18:20:47Z",
-          "updatedAt": "2022-05-20T18:20:47Z"
+          "updatedAt": "2022-05-23T21:42:07Z"
         }
       ]
     },
@@ -48498,7 +48520,7 @@
       "labels": [],
       "body": "The text in the RFC around validating proposals, choosing which proposals go into a commit and how to validate a received commit could do with a bit more work.\r\n\r\nThe root issue is that Section 13.2 states \u201cThe sender of a Commit MUST include all valid proposals that it has received during the current epoch. Invalid proposals include, for example, proposals with an invalid signature or proposals that are semantically invalid, such as an Add when the sender does not have the application-level permission to add new users.\u201d There are two intertwined issues with this text:\r\n1. The qualifier \u201cMUST\u201d\r\n2. The text is too vague about what a \u201cvalid Proposal\u201d is. E.g. it could be interpreted to mean a Proposal is \u201cvalid\u201d relative to the current group state: Can it be applied to the group as it stands now? Then it\u2019s \u201cvalid\u201d.\r\n\r\nPut simply, it doesn\u2019t make sense to only validate proposals individually. Instead one should validate if the full list of proposals can be committed. Indeed, other parts of the RFC enforce validation steps that apply to the full list. E.g.\r\n* A ReInit proposal MUST be the only one in the commit, and other existing proposals SHOULD be preferred (13.2.1).\r\n* Out of multiple proposals affecting the same leaf, the committer MUST choose an arbitrary one (13.2, \u201cIf there are multiple (\u2026)\u201d).\r\n* Out of multiple PSK proposals with the same ID, the committer MUST choose an arbitrary one (13.2).\r\n\r\nIn fact, once extensions come into play there are likely many more similar situations, even ones affecting lists of otherwise benign proposals (e.g. Add/Remove). Suppose a chat app is built on MLS with a custom room moderator roles extension. The app wants MLS to enforce two rules: Only mods can Add/Remove. Rooms should always have at least 1 Mod. Here\u2019s how the RFC\u2019s current text can become a problem: A and B are the only mods in a room. A makes proposal P1 that removes B. Meanwhile, B makes prop P2 that removes A. C gets both proposals. What should C do?\r\n* Option 1: validate & cache both proposals. \u2192 Problem: C can no longer issue a commit as it \u201cMUST include all valid proposals\u201d. (Alternatively, it does commit to both as instructed by the RFC which leaves the room without a mod.)\r\n* Option 2: validate & cache the first prop received (say, P1), but reject P2 as validating both means C can\u2019t commit. \u2192 Problem: If someone else commits to P2 by ref. C can\u2019t process the commit as it doesn\u2019t \u201cknow\u201d P2.\r\n\r\nSo, to clean all this up a bit more, this PR proposes the following main changes:\r\n1. Add a section \"Validating Proposals\" that defines a procedure for validating a *list* of proposals. The procedure starts with checking that each individual proposal is valid, as described in the \"Proposals\" section. It also has a note that applications may add more rules.\r\n2. Clean up a bit the validation rules in the \"Proposals\" section and remove redundancies. Now for each proposal, we precisely define when it is valid.\r\n3. In the \"Commit\" section, add a requirement that both a committer and a receiver of a commit MUST verify that the committed proposal list is valid according to section \"Validating Proposals\".\r\n4. Downgrade the requirement that \u201cThe sender of a Commit MUST include all valid proposals that it has received\u201c to \"The sender of a Commit SHOULD include all valid proposals that it has received, as long as this does not make the proposal list invalid.\"\r\n\r\nNote that the validation in section \"Proposals\" can be done when a commit is received. The final check in \"Validating Proposals\" is done when a commit is created and when it is received.\r\n\r\nThis also fixes #657.",
       "createdAt": "2022-05-17T10:35:46Z",
-      "updatedAt": "2022-05-20T16:10:03Z",
+      "updatedAt": "2022-05-23T22:18:36Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "f64c3ebb5ad2c5f1621e30fbf581c0e02246b1e5",
@@ -48523,6 +48545,13 @@
           "body": "Virtual interim 2022-05-19:\r\n\r\n* `SHOULD` include all valid proposals could use explanation of why it's not a `MUST`\r\n   * Proposals can contradict each other\r\n   * Application policy might declare some policy invalid\r\n* Agreement in principle, @raphaelrobert and @bifurcation to review and merge when ready ",
           "createdAt": "2022-05-19T14:53:21Z",
           "updatedAt": "2022-05-19T14:53:21Z"
+        },
+        {
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I opened a PR here that resolves the merge conflicts and makes some additional suggested changes: https://github.com/mulmarta/mls-protocol/pull/1",
+          "createdAt": "2022-05-22T18:48:45Z",
+          "updatedAt": "2022-05-22T18:48:45Z"
         }
       ],
       "reviews": [
@@ -48665,6 +48694,126 @@
               "updatedAt": "2022-05-20T16:10:03Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c46eNgE",
+          "commit": {
+            "abbreviatedOid": "a7487e3"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-22T17:16:48Z",
+          "updatedAt": "2022-05-22T17:16:48Z",
+          "comments": [
+            {
+              "originalPosition": 17,
+              "body": "Also checking if identities are the same in a resync is a good point, but isn't it undermined by being able to do the external join and remove separately?",
+              "createdAt": "2022-05-22T17:16:48Z",
+              "updatedAt": "2022-05-22T17:17:02Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c46eNz6",
+          "commit": {
+            "abbreviatedOid": "a7487e3"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-22T17:32:47Z",
+          "updatedAt": "2022-05-22T17:32:47Z",
+          "comments": [
+            {
+              "originalPosition": 128,
+              "body": "I don't think this was agreed on",
+              "createdAt": "2022-05-22T17:32:47Z",
+              "updatedAt": "2022-05-22T17:32:47Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c46fPjf",
+          "commit": {
+            "abbreviatedOid": "c0e6773"
+          },
+          "author": "kkohbrok",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-23T07:39:00Z",
+          "updatedAt": "2022-05-23T07:39:00Z",
+          "comments": [
+            {
+              "originalPosition": 17,
+              "body": "I think checking identities is also covered in the External Commits section, but mentioning it here or including a reference probably doesn't hurt. I guess allowing a remove in an external commit is more for the benefit of the external joiner itself. Although they might was well do it in a follow-up commit. In my mind, the restrictions on an external commit is meant less to reduce the capabilities of an external joiner and more to reduce the complexity of the external join as a somewhat asymmetric group operation.",
+              "createdAt": "2022-05-23T07:39:00Z",
+              "updatedAt": "2022-05-23T07:44:32Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c46gLD6",
+          "commit": {
+            "abbreviatedOid": "a7487e3"
+          },
+          "author": "mulmarta",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-23T10:16:41Z",
+          "updatedAt": "2022-05-23T10:16:41Z",
+          "comments": [
+            {
+              "originalPosition": 17,
+              "body": "Currently this requirement is in the External Commit section:\r\n>  There MAY be a single Remove proposal, where the LeafNode in the path field MUST meet the same criteria as the LeafNode in an Update for the removed leaf (see Section 13.1.2). In particular, the credential in the LeafNode MUST present a set of identifiers that is acceptable to the application for the removed participant.\r\n\r\nThe PR moves it here (so it's only in one place).\r\n\r\nThis PR is editorial, so I'd rather not remove the restriction here but instead discuss this as a separate issue. I've also been wondering why only one Remove is allowed? E.g. I may want to remove a couple of my old devices.",
+              "createdAt": "2022-05-23T10:16:41Z",
+              "updatedAt": "2022-05-23T10:16:41Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c46gMb1",
+          "commit": {
+            "abbreviatedOid": "a7487e3"
+          },
+          "author": "mulmarta",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-23T10:21:08Z",
+          "updatedAt": "2022-05-23T10:21:08Z",
+          "comments": [
+            {
+              "originalPosition": 128,
+              "body": "This is how we interpreted the text\r\n> If there are multiple Add proposals containing KeyPackages that the committer considers to represent the same client or a client already in the group (for example, identical KeyPackages or KeyPackages sharing the same Credential), the committer again chooses one to include and considers the rest invalid.\r\n\r\nIf this was not what was meant, the part \"or a client already in the group\" would be redundant. But of course I'll remove it if we were wrong.",
+              "createdAt": "2022-05-23T10:21:08Z",
+              "updatedAt": "2022-05-23T10:21:08Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c46jj4S",
+          "commit": {
+            "abbreviatedOid": "a7487e3"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-23T22:17:48Z",
+          "updatedAt": "2022-05-23T22:18:36Z",
+          "comments": [
+            {
+              "originalPosition": 17,
+              "body": "Agree that we should handle the revalidation separately, in #660.\r\n\r\nOn \"why only one\" -- The idea is to *only* cover the resync case, where a device is replacing *its own* state.  Other devices can be cleaned up after the new member has joined.",
+              "createdAt": "2022-05-23T22:17:48Z",
+              "updatedAt": "2022-05-23T22:18:36Z"
+            }
+          ]
         }
       ]
     },
@@ -48724,7 +48873,7 @@
       "labels": [],
       "body": "Closes #681 ",
       "createdAt": "2022-05-20T14:45:25Z",
-      "updatedAt": "2022-05-21T01:09:25Z",
+      "updatedAt": "2022-05-23T11:51:29Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "8a5d422f453ea4c7bd60d97a7fdae838573d58cd",
@@ -48767,6 +48916,26 @@
               "body": "Should the combo of SignaturePublicKey and Credential just be independently defined as a struct like Identity, and then used in LeafNode as well as in the extension? ",
               "createdAt": "2022-05-21T01:09:11Z",
               "updatedAt": "2022-05-21T01:09:26Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c46gnMD",
+          "commit": {
+            "abbreviatedOid": "a34abce"
+          },
+          "author": "kkohbrok",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "Looks good to me! @tomleavy's idea might be a good additional improvement.",
+          "createdAt": "2022-05-23T11:50:26Z",
+          "updatedAt": "2022-05-23T11:51:29Z",
+          "comments": [
+            {
+              "originalPosition": 13,
+              "body": "Not sure I'd call it \"identity\", but I think this is a good idea.",
+              "createdAt": "2022-05-23T11:50:26Z",
+              "updatedAt": "2022-05-23T11:51:29Z"
             }
           ]
         }
@@ -48861,21 +49030,21 @@
       "id": "PR_kwDOBoyH6c44OmkP",
       "title": "Partial work on #669",
       "url": "https://github.com/mlswg/mls-protocol/pull/685",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "Bren2010",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2022-05-21T04:44:22Z",
-      "updatedAt": "2022-05-21T05:28:24Z",
+      "updatedAt": "2022-05-23T21:49:40Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "b209e1744abd6c4224c45069361a89e5d78d728b",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "brendan/pics1",
       "headRefOid": "755ade80196d96d482b6f06604017756affcf1c8",
-      "closedAt": null,
+      "closedAt": "2022-05-23T21:49:40Z",
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
@@ -48886,6 +49055,20 @@
           "body": "Unfortunately I just realized this overlaps with #644. I'm happy to remove that part of the PR if you want, @bifurcation ",
           "createdAt": "2022-05-21T05:28:24Z",
           "updatedAt": "2022-05-21T05:28:24Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@Bren2010 I assume you mean #689?  Yeah, I think we can make that one responsible for the direct path / parent hash parts of #669, and this can just hit the secret tree part.",
+          "createdAt": "2022-05-22T18:51:14Z",
+          "updatedAt": "2022-05-22T18:51:14Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Sorry for the conflict btw.  It ended up being a natural part of reorganizing things.",
+          "createdAt": "2022-05-22T18:52:43Z",
+          "updatedAt": "2022-05-22T18:52:43Z"
         }
       ],
       "reviews": []
@@ -48902,7 +49085,7 @@
       "labels": [],
       "body": "Closes #661 ",
       "createdAt": "2022-05-21T05:22:05Z",
-      "updatedAt": "2022-05-21T05:22:20Z",
+      "updatedAt": "2022-05-23T21:18:59Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "b209e1744abd6c4224c45069361a89e5d78d728b",
@@ -48914,7 +49097,28 @@
       "mergedBy": null,
       "mergeCommit": null,
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOBoyH6c46jZCs",
+          "commit": {
+            "abbreviatedOid": "37447fb"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2022-05-23T21:18:55Z",
+          "updatedAt": "2022-05-23T21:18:59Z",
+          "comments": [
+            {
+              "originalPosition": 16,
+              "body": "I may be over-thinking this, but: The group ID isn't necessarily exposed to the DS at group creation time, since the act that creates the group is a Welcome message, which encrypts the group ID.  The group ID is visible in MLSPlaintext and MLSCiphertext, though, so the DS can pick it up there.",
+              "createdAt": "2022-05-23T21:18:55Z",
+              "updatedAt": "2022-05-23T21:18:59Z"
+            }
+          ]
+        }
+      ]
     },
     {
       "number": 687,
@@ -48928,7 +49132,7 @@
       "labels": [],
       "body": "Closes #663. I'm not sure if this is actually necessary, but there usually seem to be issues in Merkle trees when the leaves are not explicitly distinct from the parents.",
       "createdAt": "2022-05-21T05:37:30Z",
-      "updatedAt": "2022-05-21T05:37:30Z",
+      "updatedAt": "2022-05-23T21:13:29Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "b209e1744abd6c4224c45069361a89e5d78d728b",
@@ -48940,7 +49144,28 @@
       "mergedBy": null,
       "mergeCommit": null,
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOBoyH6c46jXV0",
+          "commit": {
+            "abbreviatedOid": "e17f7ab"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "I am also not totally clear on the necessity here.  It seems like the issues with Merkle trees are probably about an adversary being able to choose a leaf value that has the same form as a parent.  Assuming that's the case, we probably wouldn't have similar situations here, given the extra structure.  But having a marker saves us having to make that assumption or do the analysis to check it.\r\n\r\nSeems low-cost and unlikely to hurt in any case.",
+          "createdAt": "2022-05-23T21:10:19Z",
+          "updatedAt": "2022-05-23T21:13:29Z",
+          "comments": [
+            {
+              "originalPosition": 4,
+              "body": "Nit: I might call this `leaf_or_parent_marker`.",
+              "createdAt": "2022-05-23T21:10:19Z",
+              "updatedAt": "2022-05-23T21:13:29Z"
+            }
+          ]
+        }
+      ]
     },
     {
       "number": 688,
@@ -48954,19 +49179,66 @@
       "labels": [],
       "body": "Closes #640.",
       "createdAt": "2022-05-21T05:59:55Z",
-      "updatedAt": "2022-05-21T05:59:55Z",
+      "updatedAt": "2022-05-23T21:56:43Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "b209e1744abd6c4224c45069361a89e5d78d728b",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "brendan/longer-refs",
-      "headRefOid": "bdbb0ecbab6858d79367b4650ba38017a226e4b1",
+      "headRefOid": "eaa874f21dd8b6837bb12270a71f8550f468c1a0",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOBoyH6c46jV1G",
+          "commit": {
+            "abbreviatedOid": "bdbb0ec"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "CHANGES_REQUESTED",
+          "body": "",
+          "createdAt": "2022-05-23T21:02:59Z",
+          "updatedAt": "2022-05-23T21:09:07Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "```suggestion\r\nopaque HashReference<V>;\r\n```\r\n\r\nElsewhere, where we have values whose size depends on the ciphersuite, we use vectors instead of arrays.  See, e.g., HPKEPubicKey.  It costs a byte, but it means the parsing/serialization logic doesn't have to know about ciphersuites.",
+              "createdAt": "2022-05-23T21:03:00Z",
+              "updatedAt": "2022-05-23T21:09:07Z"
+            },
+            {
+              "originalPosition": 19,
+              "body": "Paging @kkohbrok @TWal et al. for crypto review.  @Bren2010 fwiw, I think the more minimal change would be:\r\n\r\n``` suggestion\r\nRefHash(label, value) = KDF.expand(KDF.extract(\"\", value), label, KDF.Nh)\r\n```\r\n\r\n(That is, just change `16` to `KDF.Nh`.)\r\n\r\nFrom an implementation POV, I don't think there's much difference either way.  Extract/expand is 4 hash invocations instead of 1, but none of this is done at much scale.",
+              "createdAt": "2022-05-23T21:05:53Z",
+              "updatedAt": "2022-05-23T21:09:07Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c46jgVm",
+          "commit": {
+            "abbreviatedOid": "bdbb0ec"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-23T21:56:37Z",
+          "updatedAt": "2022-05-23T21:56:37Z",
+          "comments": [
+            {
+              "originalPosition": 19,
+              "body": "Using a hash ensures that we're really relying on the ciphersuite's understanding of what a secure hash function is. If KDF.Nh is the size of the output of KDF.Extract (which outputs keys, not collision resistant hashes), then it may again be too small to be collision-secure.",
+              "createdAt": "2022-05-23T21:56:37Z",
+              "updatedAt": "2022-05-23T21:56:37Z"
+            }
+          ]
+        }
+      ]
     },
     {
       "number": 689,
@@ -48978,21 +49250,129 @@
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
-      "body": "Closes #670 \r\nCloses #644 \r\nFixes filtered direct path and parent hash parts of #669 \r\n\r\nThis PR reorganizes the exposition of tree concept to make them read more clearly.\r\n\r\n* A new Paths through the Ratchet Tree section is introduced, which covers direct paths, copaths, and filtered direct paths\r\n* The Ratchet Tree Nodes section is moved forward, so that the definition of filtered direct paths can refer to the notion of resolutions (see @Bren2010's note on #670)\r\n* The path example expanded so that there are blanks in the tree, and so that it shows all three path types (direct, copath, and filtered direct) for every leaf.\r\n* The section on verifying parent hashes uses the example tree from the path section to illustrate the concepts noted in #669 ",
+      "body": "Closes #670 \r\nCloses #644 \r\nCloses #669 \r\n\r\nThis PR reorganizes the exposition of tree concept to make them read more clearly.\r\n\r\n* A new Paths through the Ratchet Tree section is introduced, which covers direct paths, copaths, and filtered direct paths\r\n* The Ratchet Tree Nodes section is moved forward, so that the definition of filtered direct paths can refer to the notion of resolutions (see @Bren2010's note on #670)\r\n* The path example expanded so that there are blanks in the tree, and so that it shows all three path types (direct, copath, and filtered direct) for every leaf.\r\n* The section on verifying parent hashes uses the example tree from the path section to illustrate the concepts noted in #669 ",
       "createdAt": "2022-05-21T21:12:53Z",
-      "updatedAt": "2022-05-21T21:12:53Z",
+      "updatedAt": "2022-05-23T21:49:28Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "b209e1744abd6c4224c45069361a89e5d78d728b",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "filter-resolution-figure",
-      "headRefOid": "24b87e75476b40d6fcd8f7a3d5354e3a1542283d",
+      "headRefOid": "1c952fb8dd4242fb15ca060f073e7dc5abd9b25d",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Latest commit adds coverage for the last part of #669.  In addition to moving the figure forward, it refactors the explanation to be even more explicit about what must be consumed and what may be kept.",
+          "createdAt": "2022-05-23T21:40:40Z",
+          "updatedAt": "2022-05-23T21:40:40Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOBoyH6c46ePtK",
+          "commit": {
+            "abbreviatedOid": "24b87e7"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-22T19:01:21Z",
+          "updatedAt": "2022-05-22T19:14:03Z",
+          "comments": [
+            {
+              "originalPosition": 37,
+              "body": "```suggestion\r\n```",
+              "createdAt": "2022-05-22T19:01:21Z",
+              "updatedAt": "2022-05-22T19:14:03Z"
+            },
+            {
+              "originalPosition": 142,
+              "body": "```suggestion\r\n| G    | Z, X        | Y, V     | Z, X                 |\r\n```",
+              "createdAt": "2022-05-22T19:08:26Z",
+              "updatedAt": "2022-05-22T19:14:03Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c46iiU2",
+          "commit": {
+            "abbreviatedOid": "57db17e"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2022-05-23T17:28:49Z",
+          "updatedAt": "2022-05-23T17:28:49Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOBoyH6c46jfKq",
+          "commit": {
+            "abbreviatedOid": "1c952fb"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2022-05-23T21:49:28Z",
+          "updatedAt": "2022-05-23T21:49:28Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 691,
+      "id": "PR_kwDOBoyH6c44P_tk",
+      "title": "Clean up PSK provisions",
+      "url": "https://github.com/mlswg/mls-protocol/pull/691",
+      "state": "OPEN",
+      "author": "bifurcation",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #666 \r\n\r\nAlso covers the PSK part of #673 ",
+      "createdAt": "2022-05-22T18:42:02Z",
+      "updatedAt": "2022-05-23T21:20:15Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "b209e1744abd6c4224c45069361a89e5d78d728b",
+      "headRepository": "mlswg/mls-protocol",
+      "headRefName": "psk-cleanup",
+      "headRefOid": "6ef807083d92fdff1203adf40e91e3a123e55dc9",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOBoyH6c46inSd",
+          "commit": {
+            "abbreviatedOid": "347831e"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2022-05-23T17:44:41Z",
+          "updatedAt": "2022-05-23T17:44:45Z",
+          "comments": [
+            {
+              "originalPosition": 56,
+              "body": "```suggestion\r\nA PreSharedKey proposal MUST NOT contain a PSK of type `resumption` that has usage\r\n```",
+              "createdAt": "2022-05-23T17:44:41Z",
+              "updatedAt": "2022-05-23T17:44:45Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
