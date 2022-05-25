@@ -1420,10 +1420,10 @@ in size ranging from two to thousands.<a href="#section-abstract-1" class="pilcr
             <p id="section-toc.1-1.15.1"><a href="#section-15" class="xref">15</a>. <a href="#name-sequencing-of-state-changes" class="xref">Sequencing of State Changes</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15.2.1">
-                <p id="section-toc.1-1.15.2.1.1"><a href="#section-15.1" class="xref">15.1</a>.  <a href="#name-consistent-partition-tolera" class="xref">Consistent / Partition-Tolerant Ordering</a></p>
+                <p id="section-toc.1-1.15.2.1.1"><a href="#section-15.1" class="xref">15.1</a>.  <a href="#name-cp-ordering" class="xref">CP Ordering</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15.2.2">
-                <p id="section-toc.1-1.15.2.2.1"><a href="#section-15.2" class="xref">15.2</a>.  <a href="#name-available-partition-toleran" class="xref">Available / Partition-Tolerant Ordering</a></p>
+                <p id="section-toc.1-1.15.2.2.1"><a href="#section-15.2" class="xref">15.2</a>.  <a href="#name-ap-ordering" class="xref">AP Ordering</a></p>
 </li>
             </ul>
 </li>
@@ -6936,55 +6936,60 @@ group member sends a Commit message, it is based on the most
 current state of the group.  In practice, however, there is a risk
 that two members will generate Commit messages simultaneously,
 based on the same state.<a href="#section-15-2" class="pilcrow">¶</a></p>
-<p id="section-15-3">When this happens, there is a need for the members of the group to
-deconflict the simultaneous Commit messages.  There are two
-general approaches:<a href="#section-15-3" class="pilcrow">¶</a></p>
+<p id="section-15-3">The extent to which this is a problem, and the appropriate solution, depends on
+the design of the Delivery Service. Per the CAP theorem, there are two general
+classes of distributed system:<a href="#section-15-3" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-15-4.1">Have the Delivery Service enforce a total order<a href="#section-15-4.1" class="pilcrow">¶</a>
+<li class="normal" id="section-15-4.1">Consistent and Partition-tolerant, or CP, systems can provide a globally
+consistent view of data but may stop working if there are network issues.<a href="#section-15-4.1" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-15-4.2">Decide on an application-level signal that clients can use to break ties<a href="#section-15-4.2" class="pilcrow">¶</a>
+        <li class="normal" id="section-15-4.2">Available and Partition-tolerant, or AP, systems continue working despite
+network issues but may return different views of data to different users.<a href="#section-15-4.2" class="pilcrow">¶</a>
 </li>
       </ul>
-<p id="section-15-5">As long as Commit messages cannot be merged, there is a risk of
-starvation.  In a sufficiently busy group, a given member may never
-be able to send a Commit message because he always loses to other
-members.  The degree to which this is a practical problem will depend
-on the dynamics of the application.<a href="#section-15-5" class="pilcrow">¶</a></p>
-<p id="section-15-6">Regardless of how messages are kept in sequence, implementations MUST only
-update their cryptographic state when valid Commit messages are received. The
-generation of Commit messages MUST NOT modify a client's state, since the client
-doesn't know at that time whether the changes implied by the Commit message will
-succeed or not. Similarly, a client MUST refrain from sending Welcome messages
-corresponding to a Commit until it's clear that the Commit has been accepted.<a href="#section-15-6" class="pilcrow">¶</a></p>
-<div id="consistent-partition-tolerant-ordering">
+<p id="section-15-5">Strategies for sequencing messages in CP and AP systems are described in the
+next two sections. Implementations MUST only update their cryptographic state
+when they have a reasonable degree of certainty that their Commit was accepted.
+The generation of Commit messages MUST NOT modify a client's state, since the
+client doesn't know at that time whether the changes implied by the Commit
+message will conflict with another Commit or not. Similarly, a client MUST NOT
+send Welcome messages corresponding to a Commit until it's clear that the Commit
+has been accepted.<a href="#section-15-5" class="pilcrow">¶</a></p>
+<p id="section-15-6">Regardless of how messages are kept in sequence, there is a risk that
+in a sufficiently busy group, a given member may never
+be able to send a Commit message because they always lose to other
+members. The degree to which this is a practical problem will depend
+on the dynamics of the application.<a href="#section-15-6" class="pilcrow">¶</a></p>
+<div id="cp-ordering">
 <section id="section-15.1">
-        <h3 id="name-consistent-partition-tolera">
-<a href="#section-15.1" class="section-number selfRef">15.1. </a><a href="#name-consistent-partition-tolera" class="section-name selfRef">Consistent / Partition-Tolerant Ordering</a>
+        <h3 id="name-cp-ordering">
+<a href="#section-15.1" class="section-number selfRef">15.1. </a><a href="#name-cp-ordering" class="section-name selfRef">CP Ordering</a>
         </h3>
 <p id="section-15.1-1">With this approach, the Delivery Service ensures that incoming
 messages have a linear order and all members agree on that order.
 The Delivery Service is trusted to break ties
 when two members send a Commit message at the same time.<a href="#section-15.1-1" class="pilcrow">¶</a></p>
-<p id="section-15.1-2">Messages may have a counter field sent in cleartext that can
-be checked by the Delivery Service and used for tie-breaking. The counter
-starts at 0 and is incremented for each subsequent message.
-If two group members send a message with the same counter, the
-first message to arrive will be accepted and the
-second one will be rejected. The rejected message would either be dropped by the
-client or resent with the correct counter number.<a href="#section-15.1-2" class="pilcrow">¶</a></p>
-<p id="section-15.1-3">This may apply to all messages, or only state-changing messages like Commits.<a href="#section-15.1-3" class="pilcrow">¶</a></p>
+<p id="section-15.1-2">The Delivery Service can either rely on the <code>epoch</code> field of an MLSMessage, or
+messages can have an additional counter field sent in cleartext that's checked
+by the Delivery Service and used for tie-breaking. The counter would start at 0
+and be incremented for each subsequent message. If two group members send a
+message with the same counter, or two Commits with the same <code>epoch</code>, the first
+one to arrive would be accepted and the second one would be rejected. The
+rejected message would either be dropped by the client or resent later.<a href="#section-15.1-2" class="pilcrow">¶</a></p>
+<p id="section-15.1-3">The counter approach would be done to apply ordering to all messages, while the
+<code>epoch</code> approach would be done to only ensure an order on Commits.<a href="#section-15.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="available-partition-tolerant-ordering">
+<div id="ap-ordering">
 <section id="section-15.2">
-        <h3 id="name-available-partition-toleran">
-<a href="#section-15.2" class="section-number selfRef">15.2. </a><a href="#name-available-partition-toleran" class="section-name selfRef">Available / Partition-Tolerant Ordering</a>
+        <h3 id="name-ap-ordering">
+<a href="#section-15.2" class="section-number selfRef">15.2. </a><a href="#name-ap-ordering" class="section-name selfRef">AP Ordering</a>
         </h3>
-<p id="section-15.2-1">With this approach, the Delivery Service is built on a system that may be
-significantly more available or performant, but offers weaker consistency
-guarantees. Messages may arrive to different clients in different orders and
-with varying amounts of latency, which means clients are responsible for
-reconcilliation.<a href="#section-15.2-1" class="pilcrow">¶</a></p>
+<p id="section-15.2-1">With this approach, the Delivery Service is built in a way that may be
+significantly more available or performant than a CP system, but offers weaker
+consistency guarantees. Messages may arrive to different clients in different
+orders and with varying amounts of latency, which means clients are responsible
+for reconciliation.<a href="#section-15.2-1" class="pilcrow">¶</a></p>
 <p id="section-15.2-2">Upon receiving a Commit from the Delivery Service, clients can either:<a href="#section-15.2-2" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-15.2-3">
 <li id="section-15.2-3.1">Pause sending new messages for a short amount of time to account for a

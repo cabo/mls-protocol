@@ -151,8 +151,8 @@ Table of Contents
      14.2.  Proposals
      14.3.  Credential Extensibility
    15. Sequencing of State Changes
-     15.1.  Consistent / Partition-Tolerant Ordering
-     15.2.  Available / Partition-Tolerant Ordering
+     15.1.  CP Ordering
+     15.2.  AP Ordering
    16. Application Messages
      16.1.  Message Encryption and Decryption
      16.2.  Restrictions
@@ -4680,55 +4680,62 @@ psk_secret (or 0) --> KDF.Extract
    members will generate Commit messages simultaneously, based on the
    same state.
 
-   When this happens, there is a need for the members of the group to
-   deconflict the simultaneous Commit messages.  There are two general
-   approaches:
+   The extent to which this is a problem, and the appropriate solution,
+   depends on the design of the Delivery Service.  Per the CAP theorem,
+   there are two general classes of distributed system:
 
-   *  Have the Delivery Service enforce a total order
+   *  Consistent and Partition-tolerant, or CP, systems can provide a
+      globally consistent view of data but may stop working if there are
+      network issues.
 
-   *  Decide on an application-level signal that clients can use to
-      break ties
+   *  Available and Partition-tolerant, or AP, systems continue working
+      despite network issues but may return different views of data to
+      different users.
 
-   As long as Commit messages cannot be merged, there is a risk of
-   starvation.  In a sufficiently busy group, a given member may never
-   be able to send a Commit message because he always loses to other
-   members.  The degree to which this is a practical problem will depend
-   on the dynamics of the application.
+   Strategies for sequencing messages in CP and AP systems are described
+   in the next two sections.  Implementations MUST only update their
+   cryptographic state when they have a reasonable degree of certainty
+   that their Commit was accepted.  The generation of Commit messages
+   MUST NOT modify a client's state, since the client doesn't know at
+   that time whether the changes implied by the Commit message will
+   conflict with another Commit or not.  Similarly, a client MUST NOT
+   send Welcome messages corresponding to a Commit until it's clear that
+   the Commit has been accepted.
 
-   Regardless of how messages are kept in sequence, implementations MUST
-   only update their cryptographic state when valid Commit messages are
-   received.  The generation of Commit messages MUST NOT modify a
-   client's state, since the client doesn't know at that time whether
-   the changes implied by the Commit message will succeed or not.
-   Similarly, a client MUST refrain from sending Welcome messages
-   corresponding to a Commit until it's clear that the Commit has been
-   accepted.
+   Regardless of how messages are kept in sequence, there is a risk that
+   in a sufficiently busy group, a given member may never be able to
+   send a Commit message because they always lose to other members.  The
+   degree to which this is a practical problem will depend on the
+   dynamics of the application.
 
-15.1.  Consistent / Partition-Tolerant Ordering
+15.1.  CP Ordering
 
    With this approach, the Delivery Service ensures that incoming
    messages have a linear order and all members agree on that order.
    The Delivery Service is trusted to break ties when two members send a
    Commit message at the same time.
 
-   Messages may have a counter field sent in cleartext that can be
-   checked by the Delivery Service and used for tie-breaking.  The
-   counter starts at 0 and is incremented for each subsequent message.
-   If two group members send a message with the same counter, the first
-   message to arrive will be accepted and the second one will be
-   rejected.  The rejected message would either be dropped by the client
-   or resent with the correct counter number.
+   The Delivery Service can either rely on the epoch field of an
+   MLSMessage, or messages can have an additional counter field sent in
+   cleartext that's checked by the Delivery Service and used for tie-
+   breaking.  The counter would start at 0 and be incremented for each
+   subsequent message.  If two group members send a message with the
+   same counter, or two Commits with the same epoch, the first one to
+   arrive would be accepted and the second one would be rejected.  The
+   rejected message would either be dropped by the client or resent
+   later.
 
-   This may apply to all messages, or only state-changing messages like
+   The counter approach would be done to apply ordering to all messages,
+   while the epoch approach would be done to only ensure an order on
    Commits.
 
-15.2.  Available / Partition-Tolerant Ordering
+15.2.  AP Ordering
 
-   With this approach, the Delivery Service is built on a system that
-   may be significantly more available or performant, but offers weaker
-   consistency guarantees.  Messages may arrive to different clients in
-   different orders and with varying amounts of latency, which means
-   clients are responsible for reconcilliation.
+   With this approach, the Delivery Service is built in a way that may
+   be significantly more available or performant than a CP system, but
+   offers weaker consistency guarantees.  Messages may arrive to
+   different clients in different orders and with varying amounts of
+   latency, which means clients are responsible for reconciliation.
 
    Upon receiving a Commit from the Delivery Service, clients can
    either:
