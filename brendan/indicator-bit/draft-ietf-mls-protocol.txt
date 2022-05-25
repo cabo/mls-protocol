@@ -2379,15 +2379,13 @@ Welcome  KeyPackage  GroupInfo   MLSPlaintext      MLSCiphertext -'
    cryptographic state of the group, this section defines a scheme for
    generating a hash value (called the "tree hash") that represents the
    contents of the group's ratchet tree and the members' leaf nodes.
-   The tree hash of a tree is the tree hash of its root node, which we
-   define recursively, starting with the leaves.
 
-   The tree hash of a node is the hash of the node's TreeHashInput
-   object, which may contain either a LeafNodeHashInput or a
-   ParentNodeHashInput depending on the type of node.  LeafNodeHashInput
-   objects contain the leaf_index and the LeafNode (if any).
-   ParentNodeHashInput objects contain the ParentNode (if any) and the
-   tree hash of the node's left and right children.
+   The tree hash of an individual node is the hash of the node's
+   TreeHashInput object, which may contain either a LeafNodeHashInput or
+   a ParentNodeHashInput depending on the type of node.
+   LeafNodeHashInput objects contain the leaf_index and the LeafNode (if
+   any).  ParentNodeHashInput objects contain the ParentNode (if any)
+   and the tree hash of the node's left and right children.
 
    struct {
      uint8 leaf_or_parent_marker;

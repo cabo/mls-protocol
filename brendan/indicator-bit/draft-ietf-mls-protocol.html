@@ -4245,13 +4245,13 @@ specifically:<a href="#section-8.6-10" class="pilcrow">¶</a></p>
 <p id="section-8.7-1">To allow group members to verify that they agree on the public cryptographic state
 of the group, this section defines a scheme for generating a hash value (called
 the "tree hash") that represents the contents of the group's ratchet tree and the
-members' leaf nodes. The tree hash of a tree is the tree hash of its root node,
-which we define recursively, starting with the leaves.<a href="#section-8.7-1" class="pilcrow">¶</a></p>
-<p id="section-8.7-2">The tree hash of a node is the hash of the node's <code>TreeHashInput</code> object, which
-may contain either a <code>LeafNodeHashInput</code> or a <code>ParentNodeHashInput</code> depending on
-the type of node. <code>LeafNodeHashInput</code> objects contain the <code>leaf_index</code> and the
-<code>LeafNode</code> (if any). <code>ParentNodeHashInput</code> objects contain the <code>ParentNode</code> (if
-any) and the tree hash of the node's left and right children.<a href="#section-8.7-2" class="pilcrow">¶</a></p>
+members' leaf nodes.<a href="#section-8.7-1" class="pilcrow">¶</a></p>
+<p id="section-8.7-2">The tree hash of an individual node is the hash of the node's <code>TreeHashInput</code>
+object, which may contain either a <code>LeafNodeHashInput</code> or a
+<code>ParentNodeHashInput</code> depending on the type of node. <code>LeafNodeHashInput</code> objects
+contain the <code>leaf_index</code> and the <code>LeafNode</code> (if any). <code>ParentNodeHashInput</code>
+objects contain the <code>ParentNode</code> (if any) and the tree hash of the node's left
+and right children.<a href="#section-8.7-2" class="pilcrow">¶</a></p>
 <div id="section-8.7-3">
 <pre class="lang-tls sourcecode">
 struct {
