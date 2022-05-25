@@ -5026,7 +5026,7 @@ MLS-Exporter(Label, Context, Length) =
 identifies the secret's intended purpose. This is to help prevent the same
 secret from being generated and used in two different places.<a href="#section-9.5-3" class="pilcrow">¶</a></p>
 <p id="section-9.5-4">The exported values are bound to the group epoch from which the
-<code>exporter_secret</code> is derived, and hence reflects a particular state of
+<code>exporter_secret</code> is derived, and hence reflect a particular state of
 the group.<a href="#section-9.5-4" class="pilcrow">¶</a></p>
 <p id="section-9.5-5">It is RECOMMENDED for the application generating exported values
 to refresh those values after a Commit is processed.<a href="#section-9.5-5" class="pilcrow">¶</a></p>
@@ -5595,17 +5595,15 @@ considered invalid.<a href="#section-12.2-4" class="pilcrow">¶</a></p>
 the same parameters as the old group.<a href="#section-12.3-1" class="pilcrow">¶</a></p>
 <p id="section-12.3-2">A member can create a subgroup by performing the following steps:<a href="#section-12.3-2" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-12.3-3">
-<li id="section-12.3-3.1">Determine a subset of existing members that should be a part of the subgroup.<a href="#section-12.3-3.1" class="pilcrow">¶</a>
+<li id="section-12.3-3.1">Fetch a new KeyPackage for each group member that should be included in the
+subgroup.<a href="#section-12.3-3.1" class="pilcrow">¶</a>
 </li>
-          <li id="section-12.3-3.2">Fetch a new KeyPackage for each
-existing member that should be included in the subgroup.<a href="#section-12.3-3.2" class="pilcrow">¶</a>
-</li>
-          <li id="section-12.3-3.3">Create an initial Commit message that sets up the new group and contains a
+          <li id="section-12.3-3.2">Create an initial Commit message that sets up the new group and contains a
 PreSharedKey proposal of type <code>resumption</code> with usage <code>branch</code>. To avoid key
 re-use, the <code>psk_nonce</code> included in the <code>PreSharedKeyID</code> object MUST be a
-randomly sampled nonce of length <code>KDF.Nh</code>.<a href="#section-12.3-3.3" class="pilcrow">¶</a>
+randomly sampled nonce of length <code>KDF.Nh</code>.<a href="#section-12.3-3.2" class="pilcrow">¶</a>
 </li>
-          <li id="section-12.3-3.4">Send a Welcome message to the subgroup members.<a href="#section-12.3-3.4" class="pilcrow">¶</a>
+          <li id="section-12.3-3.3">Send the corresponding Welcome message to the subgroup members.<a href="#section-12.3-3.3" class="pilcrow">¶</a>
 </li>
         </ol>
 <p id="section-12.3-4">A client receiving a Welcome including a PreSharedKey of type <code>resumption</code> with

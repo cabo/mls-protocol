@@ -3019,7 +3019,7 @@ psk_secret (or 0) --> KDF.Extract
    places.
 
    The exported values are bound to the group epoch from which the
-   exporter_secret is derived, and hence reflects a particular state of
+   exporter_secret is derived, and hence reflect a particular state of
    the group.
 
    It is RECOMMENDED for the application generating exported values to
@@ -3476,19 +3476,16 @@ psk_secret (or 0) --> KDF.Extract
 
    A member can create a subgroup by performing the following steps:
 
-   1.  Determine a subset of existing members that should be a part of
-       the subgroup.
-
-   2.  Fetch a new KeyPackage for each existing member that should be
+   1.  Fetch a new KeyPackage for each group member that should be
        included in the subgroup.
 
-   3.  Create an initial Commit message that sets up the new group and
+   2.  Create an initial Commit message that sets up the new group and
        contains a PreSharedKey proposal of type resumption with usage
        branch.  To avoid key re-use, the psk_nonce included in the
        PreSharedKeyID object MUST be a randomly sampled nonce of length
        KDF.Nh.
 
-   4.  Send a Welcome message to the subgroup members.
+   3.  Send the corresponding Welcome message to the subgroup members.
 
    A client receiving a Welcome including a PreSharedKey of type
    resumption with usage branch MUST verify that the new group reflects
