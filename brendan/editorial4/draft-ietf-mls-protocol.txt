@@ -130,7 +130,7 @@ Table of Contents
    12. Group Creation
      12.1.  Required Capabilities
      12.2.  Reinitialization
-     12.3.  Sub-group Branching
+     12.3.  Subgroup Branching
    13. Group Evolution
      13.1.  Proposals
        13.1.1.  Add
@@ -3031,7 +3031,7 @@ psk_secret (or 0) --> KDF.Extract
    PSK to inject entropy from one epoch into another.  This
    functionality is used in the reinitialization and branching processes
    described in Section 12.2 and Section 12.3, but may be used by
-   applications for other purposes. // REMOVE?
+   applications for other purposes.
 
    Some uses of resumption PSKs might call for the use of PSKs from
    historical epochs.  The application SHOULD specify an upper limit on
@@ -3447,6 +3447,8 @@ psk_secret (or 0) --> KDF.Extract
           message MUST be the same as the corresponding fields in the
           ReInit proposal.
 
+       *  The epoch in the Welcome message MUST be 1.
+
        *  The Welcome MUST specify a PreSharedKey of type resumption
           with usage reinit.  The group_id MUST match the old group, and
           the epoch MUST indicate the epoch after the Commit covering
@@ -3467,18 +3469,18 @@ psk_secret (or 0) --> KDF.Extract
    A PreSharedKey proposal with type resumption and usage reinit MUST be
    considered invalid.
 
-12.3.  Sub-group Branching
+12.3.  Subgroup Branching
 
    A new group can be formed from a subset of an existing group's
    members, using the same parameters as the old group.
 
-   A member can create a sub-group by performing the following steps:
+   A member can create a subgroup by performing the following steps:
 
    1.  Determine a subset of existing members that should be a part of
-       the sub-group.
+       the subgroup.
 
    2.  Fetch a new KeyPackage for each existing member that should be
-       included in the sub-group.
+       included in the subgroup.
 
    3.  Create an initial Commit message that sets up the new group and
        contains a PreSharedKey proposal of type resumption with usage
@@ -3486,15 +3488,16 @@ psk_secret (or 0) --> KDF.Extract
        PreSharedKeyID object MUST be a randomly sampled nonce of length
        KDF.Nh.
 
-   4.  Send a Welcome message to the sub-group members.
+   4.  Send a Welcome message to the subgroup members.
 
    A client receiving a Welcome including a PreSharedKey of type
-   resumption with usage branch verifies the following:
+   resumption with usage branch MUST verify that the new group reflects
+   a subgroup branched from the referenced group by checking:
 
-   *  The version and ciphersuite values in the Welcome MUST be the same
-      as those used by the old group.
+   *  The version and ciphersuite values in the Welcome are the same as
+      those used by the old group.
 
-   *  Each LeafNode in a new subgroup MUST match some LeafNode in the
+   *  Each LeafNode in a new subgroup matches some LeafNode in the
       original group.  In this context, a pair of LeafNodes is said to
       "match" if the identifiers presented by their respective
       credentials are considered equivalent by the application.

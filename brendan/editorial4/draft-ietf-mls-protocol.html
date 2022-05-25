@@ -1347,7 +1347,7 @@ in size ranging from two to thousands.<a href="#section-abstract-1" class="pilcr
                 <p id="section-toc.1-1.12.2.2.1"><a href="#section-12.2" class="xref">12.2</a>.  <a href="#name-reinitialization" class="xref">Reinitialization</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.3">
-                <p id="section-toc.1-1.12.2.3.1"><a href="#section-12.3" class="xref">12.3</a>.  <a href="#name-sub-group-branching" class="xref">Sub-group Branching</a></p>
+                <p id="section-toc.1-1.12.2.3.1"><a href="#section-12.3" class="xref">12.3</a>.  <a href="#name-subgroup-branching" class="xref">Subgroup Branching</a></p>
 </li>
             </ul>
 </li>
@@ -5040,7 +5040,7 @@ to refresh those values after a Commit is processed.<a href="#section-9.5-5" cla
 <p id="section-9.6-1">The main MLS key schedule provides a <code>resumption_psk</code> that is used as a PSK
 to inject entropy from one epoch into another.  This functionality is used in the
 reinitialization and branching processes described in <a href="#reinitialization" class="xref">Section 12.2</a> and
-<a href="#sub-group-branching" class="xref">Section 12.3</a>, but may be used by applications for other purposes. // REMOVE?<a href="#section-9.6-1" class="pilcrow">¶</a></p>
+<a href="#subgroup-branching" class="xref">Section 12.3</a>, but may be used by applications for other purposes.<a href="#section-9.6-1" class="pilcrow">¶</a></p>
 <p id="section-9.6-2">Some uses of resumption PSKs might call for the use of PSKs from historical
 epochs. The application SHOULD specify an upper limit on the number of past
 epochs for which the <code>resumption_psk</code> may be stored.<a href="#section-9.6-2" class="pilcrow">¶</a></p>
@@ -5563,13 +5563,15 @@ that matches the ReInit and sends a Welcome message<a href="#section-12.2-2.3.1"
 message MUST be the same as the corresponding fields in the ReInit
 proposal.<a href="#section-12.2-2.3.2.1" class="pilcrow">¶</a>
 </li>
-              <li class="normal" id="section-12.2-2.3.2.2">The Welcome MUST specify a PreSharedKey of type <code>resumption</code> with usage
-<code>reinit</code>.  The <code>group_id</code> MUST match the old group, and the <code>epoch</code> MUST
-indicate the epoch after the Commit covering the ReInit.<a href="#section-12.2-2.3.2.2" class="pilcrow">¶</a>
+              <li class="normal" id="section-12.2-2.3.2.2">The <code>epoch</code> in the Welcome message MUST be 1.<a href="#section-12.2-2.3.2.2" class="pilcrow">¶</a>
 </li>
-              <li class="normal" id="section-12.2-2.3.2.3">The <code>psk_nonce</code> included in the <code>PreSharedKeyID</code> of the resumption PSK
+              <li class="normal" id="section-12.2-2.3.2.3">The Welcome MUST specify a PreSharedKey of type <code>resumption</code> with usage
+<code>reinit</code>.  The <code>group_id</code> MUST match the old group, and the <code>epoch</code> MUST
+indicate the epoch after the Commit covering the ReInit.<a href="#section-12.2-2.3.2.3" class="pilcrow">¶</a>
+</li>
+              <li class="normal" id="section-12.2-2.3.2.4">The <code>psk_nonce</code> included in the <code>PreSharedKeyID</code> of the resumption PSK
 MUST be a randomly sampled nonce of length <code>KDF.Nh</code>, for the KDF defined
-by the new group's ciphersuite.<a href="#section-12.2-2.3.2.3" class="pilcrow">¶</a>
+by the new group's ciphersuite.<a href="#section-12.2-2.3.2.4" class="pilcrow">¶</a>
 </li>
             </ul>
 </li>
@@ -5584,35 +5586,36 @@ PreSharedKey proposal with type <code>resumption</code> and usage <code>reinit</
 considered invalid.<a href="#section-12.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="sub-group-branching">
+<div id="subgroup-branching">
 <section id="section-12.3">
-        <h3 id="name-sub-group-branching">
-<a href="#section-12.3" class="section-number selfRef">12.3. </a><a href="#name-sub-group-branching" class="section-name selfRef">Sub-group Branching</a>
+        <h3 id="name-subgroup-branching">
+<a href="#section-12.3" class="section-number selfRef">12.3. </a><a href="#name-subgroup-branching" class="section-name selfRef">Subgroup Branching</a>
         </h3>
 <p id="section-12.3-1">A new group can be formed from a subset of an existing group's members, using
 the same parameters as the old group.<a href="#section-12.3-1" class="pilcrow">¶</a></p>
-<p id="section-12.3-2">A member can create a sub-group by performing the following steps:<a href="#section-12.3-2" class="pilcrow">¶</a></p>
+<p id="section-12.3-2">A member can create a subgroup by performing the following steps:<a href="#section-12.3-2" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-12.3-3">
-<li id="section-12.3-3.1">Determine a subset of existing members that should be a part of the sub-group.<a href="#section-12.3-3.1" class="pilcrow">¶</a>
+<li id="section-12.3-3.1">Determine a subset of existing members that should be a part of the subgroup.<a href="#section-12.3-3.1" class="pilcrow">¶</a>
 </li>
           <li id="section-12.3-3.2">Fetch a new KeyPackage for each
-existing member that should be included in the sub-group.<a href="#section-12.3-3.2" class="pilcrow">¶</a>
+existing member that should be included in the subgroup.<a href="#section-12.3-3.2" class="pilcrow">¶</a>
 </li>
           <li id="section-12.3-3.3">Create an initial Commit message that sets up the new group and contains a
 PreSharedKey proposal of type <code>resumption</code> with usage <code>branch</code>. To avoid key
 re-use, the <code>psk_nonce</code> included in the <code>PreSharedKeyID</code> object MUST be a
 randomly sampled nonce of length <code>KDF.Nh</code>.<a href="#section-12.3-3.3" class="pilcrow">¶</a>
 </li>
-          <li id="section-12.3-3.4">Send a Welcome message to the sub-group members.<a href="#section-12.3-3.4" class="pilcrow">¶</a>
+          <li id="section-12.3-3.4">Send a Welcome message to the subgroup members.<a href="#section-12.3-3.4" class="pilcrow">¶</a>
 </li>
         </ol>
 <p id="section-12.3-4">A client receiving a Welcome including a PreSharedKey of type <code>resumption</code> with
-usage <code>branch</code> verifies the following:<a href="#section-12.3-4" class="pilcrow">¶</a></p>
+usage <code>branch</code> MUST verify that the new group reflects a subgroup branched from
+the referenced group by checking:<a href="#section-12.3-4" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-12.3-5.1">The <code>version</code> and <code>ciphersuite</code> values in the Welcome MUST be the same as
+<li class="normal" id="section-12.3-5.1">The <code>version</code> and <code>ciphersuite</code> values in the Welcome are the same as
 those used by the old group.<a href="#section-12.3-5.1" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-12.3-5.2">Each LeafNode in a new subgroup MUST match some LeafNode in the original
+          <li class="normal" id="section-12.3-5.2">Each LeafNode in a new subgroup matches some LeafNode in the original
 group. In this context, a pair of LeafNodes is said to "match" if the
 identifiers presented by their respective credentials are considered
 equivalent by the application.<a href="#section-12.3-5.2" class="pilcrow">¶</a>
