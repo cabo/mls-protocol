@@ -1414,6 +1414,9 @@ in size ranging from two to thousands.<a href="#section-abstract-1" class="pilcr
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.3">
                 <p id="section-toc.1-1.14.2.3.1"><a href="#section-14.3" class="xref">14.3</a>.  <a href="#name-credential-extensibility" class="xref">Credential Extensibility</a></p>
 </li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.4">
+                <p id="section-toc.1-1.14.2.4.1"><a href="#section-14.4" class="xref">14.4</a>.  <a href="#name-extensions" class="xref">Extensions</a></p>
+</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15">
@@ -2554,7 +2557,7 @@ resumption pre-shared key (PSK) from each epoch to allow entropy extracted from
 one epoch to be injected into a future epoch. This link guarantees that members
 entering the new epoch agree on a key if and only if they were members of the group
 during the epoch from which the resumption key was extracted.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
-<p id="section-4.3-2">MLS supports two ways to tie a new group to an existing group. Re-initialization
+<p id="section-4.3-2">MLS supports two ways to tie a new group to an existing group. Reinitialization
 closes one group and creates a new group comprising the same members with
 different parameters. Branching starts a new group with a subset of the original
 group's participants (with no effect on the original group).  In both cases,
@@ -6610,8 +6613,8 @@ transcript hash in the new state.<a href="#section-13.2.3.2-9.8" class="pilcrow"
         <h3 id="name-ratchet-tree-extension">
 <a href="#section-13.3" class="section-number selfRef">13.3. </a><a href="#name-ratchet-tree-extension" class="section-name selfRef">Ratchet Tree Extension</a>
         </h3>
-<p id="section-13.3-1">By default, a GroupInfo message only provides the joiner with a commitment
-to the group's ratchet tree.  In order to process or generate handshake
+<p id="section-13.3-1">By default, a GroupInfo message only provides the joiner with a hash of
+the group's ratchet tree.  In order to process or generate handshake
 messages, the joiner will need to get a copy of the ratchet tree from some other
 source.  (For example, the DS might provide a cached copy.)  The inclusion of
 the tree hash in the GroupInfo message means that the source of the ratchet
@@ -6835,10 +6838,10 @@ all the members of the group that will process the Commit.<a href="#section-14.2
 <p id="section-14.3-1">In order to ensure that MLS provides meaningful authentication it is important
 that each member is able to authenticate some identity information for each
 other member.  Identity information is encoded in Credentials, so this property
-is assured by ensuring that members use compatible credential types.<a href="#section-14.3-1" class="pilcrow">¶</a></p>
+is provided by ensuring that members use compatible credential types.<a href="#section-14.3-1" class="pilcrow">¶</a></p>
 <p id="section-14.3-2">The types of credential that may be used in a group is restricted to what all
 members of the group support, as specified by the <code>capabilities</code> field of each
-LeafNode in the RatchetTree. An application can introduce new credential types
+LeafNode in the ratchet tree. An application can introduce new credential types
 by choosing an unallocated identifier from the registry in
 <a href="#mls-credential-types" class="xref">Section 18.4</a> and indicating support for the credential type in
 published LeafNodes, whether in Update proposals to existing groups or
@@ -6854,66 +6857,70 @@ attributes attested by different authorities.  To be consistent with the general
 principle stated at the beginning of this section, such an extension would need
 to ensure that each member can authenticate some identity for each other member.
 For each pair of members (Alice, Bob), Alice would need to present at least one
-credential of a type that Bob supports.
-## Extensions<a href="#section-14.3-3" class="pilcrow">¶</a></p>
-<p id="section-14.3-4">This protocol includes a mechanism for negotiating extension parameters similar
+credential of a type that Bob supports.<a href="#section-14.3-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="extensions">
+<section id="section-14.4">
+        <h3 id="name-extensions">
+<a href="#section-14.4" class="section-number selfRef">14.4. </a><a href="#name-extensions" class="section-name selfRef">Extensions</a>
+        </h3>
+<p id="section-14.4-1">This protocol includes a mechanism for negotiating extension parameters similar
 to the one in TLS <span>[<a href="#RFC8446" class="xref">RFC8446</a>]</span>.  In TLS, extension negotiation is one-to-one: The
 client offers extensions in its ClientHello message, and the server expresses
 its choices for the session with extensions in its ServerHello and
 EncryptedExtensions messages.  In MLS, extensions appear in the following
-places:<a href="#section-14.3-4" class="pilcrow">¶</a></p>
+places:<a href="#section-14.4-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-14.3-5.1">In KeyPackages, to describe additional information related to the client<a href="#section-14.3-5.1" class="pilcrow">¶</a>
+<li class="normal" id="section-14.4-2.1">In KeyPackages, to describe additional information related to the client<a href="#section-14.4-2.1" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-14.3-5.2">In LeafNodes, to describe additional information about the client or its
-participation in the group (once in the ratchet tree)<a href="#section-14.3-5.2" class="pilcrow">¶</a>
+          <li class="normal" id="section-14.4-2.2">In LeafNodes, to describe additional information about the client or its
+participation in the group (once in the ratchet tree)<a href="#section-14.4-2.2" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-14.3-5.3">In the GroupInfo, to tell new members of a group what parameters are
+          <li class="normal" id="section-14.4-2.3">In the GroupInfo, to tell new members of a group what parameters are
 being used by the group, and to provide any additional details required to
-join the group<a href="#section-14.3-5.3" class="pilcrow">¶</a>
+join the group<a href="#section-14.4-2.3" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-14.3-5.4">In the GroupContext object, to ensure that all members of the group have the
-same view of the parameters in use<a href="#section-14.3-5.4" class="pilcrow">¶</a>
+          <li class="normal" id="section-14.4-2.4">In the GroupContext object, to ensure that all members of the group have the
+same view of the parameters in use<a href="#section-14.4-2.4" class="pilcrow">¶</a>
 </li>
         </ul>
-<p id="section-14.3-6">In other words, an application can use GroupContext extensions to ensure that
+<p id="section-14.4-3">In other words, an application can use GroupContext extensions to ensure that
 all members of the group agree on a set of parameters. Clients indicate their
 support for parameters in the <code>capabilities</code> field of their LeafNode. New
 members of a group are informed of the group's GroupContext extensions via the
 <code>group_context_extensions</code> field in the GroupInfo object. The <code>other_extensions</code>
 field in a GroupInfo object can be used to provide additional parameters to new
-joiners that are used to join the group.<a href="#section-14.3-6" class="pilcrow">¶</a></p>
-<p id="section-14.3-7">This extension mechanism is designed to allow for secure and forward-compatible
+joiners that are used to join the group.<a href="#section-14.4-3" class="pilcrow">¶</a></p>
+<p id="section-14.4-4">This extension mechanism is designed to allow for the secure and forward-compatible
 negotiation of extensions.  For this to work, implementations MUST correctly
-handle extensible fields:<a href="#section-14.3-7" class="pilcrow">¶</a></p>
+handle extensible fields:<a href="#section-14.4-4" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-14.3-8.1">A client that posts a KeyPackage MUST support all parameters advertised in
+<li class="normal" id="section-14.4-5.1">A client that posts a KeyPackage MUST support all parameters advertised in
 it.  Otherwise, another client might fail to interoperate by selecting one of
-those parameters.<a href="#section-14.3-8.1" class="pilcrow">¶</a>
+those parameters.<a href="#section-14.4-5.1" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-14.3-8.2">A client initiating a group MUST ignore all unrecognized ciphersuites,
+          <li class="normal" id="section-14.4-5.2">A client initiating a group MUST ignore all unrecognized ciphersuites,
 extensions, and other parameters.  Otherwise, it may fail to interoperate with
-newer clients.<a href="#section-14.3-8.2" class="pilcrow">¶</a>
+newer clients.<a href="#section-14.4-5.2" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-14.3-8.3">A client adding a new member to a group MUST verify that the LeafNode for the
+          <li class="normal" id="section-14.4-5.3">Any field containing a list of extensions MUST NOT have more than one extension of any given type.<a href="#section-14.4-5.3" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-14.4-5.4">A client adding a new member to a group MUST verify that the LeafNode for the
 new member is compatible with the group's extensions.  The <code>capabilities</code>
-field MUST indicate support for each extension in the GroupContext.<a href="#section-14.3-8.3" class="pilcrow">¶</a>
+field MUST indicate support for each extension in the GroupContext.<a href="#section-14.4-5.4" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-14.3-8.4">If any extension in a GroupInfo message is unrecognized (i.e., not contained
+          <li class="normal" id="section-14.4-5.5">If any extension in a GroupInfo message is unrecognized (i.e., not contained
 in the <code>capabilities</code> of the corresponding KeyPackage), then the client MUST
-reject the Welcome message and not join the group.<a href="#section-14.3-8.4" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-14.3-8.5">The extensions populated into a GroupContext object are drawn from those in
-the GroupInfo object, according to the definitions of those extensions.<a href="#section-14.3-8.5" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-14.3-8.6">Any field containing a list of extensions MUST NOT have more than one extension of any given type.<a href="#section-14.3-8.6" class="pilcrow">¶</a>
+reject the Welcome message and not join the group.<a href="#section-14.4-5.5" class="pilcrow">¶</a>
 </li>
         </ul>
-<p id="section-14.3-9">Note that the latter two requirements mean that all MLS extensions are
+<p id="section-14.4-6">Note that the latter two requirements mean that all MLS extensions are
 mandatory, in the sense that an extension in use by the group MUST be supported
-by all members of the group.<a href="#section-14.3-9" class="pilcrow">¶</a></p>
-<p id="section-14.3-10">This document does not define any way for the parameters of the group to change
-once it has been created; such a behavior could be implemented as an extension.<a href="#section-14.3-10" class="pilcrow">¶</a></p>
+by all members of the group.<a href="#section-14.4-6" class="pilcrow">¶</a></p>
+<p id="section-14.4-7">The parameters of a group may be changed by sending a GroupContextExtensions
+proposal to enable additional extensions, or by reinitializing the group as
+described in <a href="#reinitialization" class="xref">Section 12.2</a>.<a href="#section-14.4-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -6925,12 +6932,12 @@ once it has been created; such a behavior could be implemented as an extension.<
       </h2>
 <p id="section-15-1">Each Commit message is premised on a given starting state,
 indicated by the <code>epoch</code> field of the enclosing MLSMessageContent.
-If the changes implied by a Commit messages are made
+If the changes implied by a Commit message are made
 starting from a different state, the results will be incorrect.<a href="#section-15-1" class="pilcrow">¶</a></p>
 <p id="section-15-2">This need for sequencing is not a problem as long as each time a
 group member sends a Commit message, it is based on the most
 current state of the group.  In practice, however, there is a risk
-that two members will generate Commit messages simultaneously,
+that two members will generate Commit messages simultaneously
 based on the same state.<a href="#section-15-2" class="pilcrow">¶</a></p>
 <p id="section-15-3">When this happens, there is a need for the members of the group to
 deconflict the simultaneous Commit messages.  There are two

@@ -150,6 +150,7 @@ Table of Contents
      14.1.  Ciphersuites
      14.2.  Proposals
      14.3.  Credential Extensibility
+     14.4.  Extensions
    15. Sequencing of State Changes
      15.1.  Server-Enforced Ordering
      15.2.  Client-Enforced Ordering
@@ -1003,8 +1004,8 @@ Table of Contents
    new epoch agree on a key if and only if they were members of the
    group during the epoch from which the resumption key was extracted.
 
-   MLS supports two ways to tie a new group to an existing group.  Re-
-   initialization closes one group and creates a new group comprising
+   MLS supports two ways to tie a new group to an existing group.
+   Reinitialization closes one group and creates a new group comprising
    the same members with different parameters.  Branching starts a new
    group with a subset of the original group's participants (with no
    effect on the original group).  In both cases, the new group is
@@ -4408,13 +4409,13 @@ psk_secret (or 0) --> KDF.Extract
 
 13.3.  Ratchet Tree Extension
 
-   By default, a GroupInfo message only provides the joiner with a
-   commitment to the group's ratchet tree.  In order to process or
-   generate handshake messages, the joiner will need to get a copy of
-   the ratchet tree from some other source.  (For example, the DS might
-   provide a cached copy.)  The inclusion of the tree hash in the
-   GroupInfo message means that the source of the ratchet tree need not
-   be trusted to maintain the integrity of tree.
+   By default, a GroupInfo message only provides the joiner with a hash
+   of the group's ratchet tree.  In order to process or generate
+   handshake messages, the joiner will need to get a copy of the ratchet
+   tree from some other source.  (For example, the DS might provide a
+   cached copy.)  The inclusion of the tree hash in the GroupInfo
+   message means that the source of the ratchet tree need not be trusted
+   to maintain the integrity of tree.
 
    In cases where the application does not wish to provide such an
    external source, the whole public state of the ratchet tree can be
@@ -4566,12 +4567,12 @@ psk_secret (or 0) --> KDF.Extract
    In order to ensure that MLS provides meaningful authentication it is
    important that each member is able to authenticate some identity
    information for each other member.  Identity information is encoded
-   in Credentials, so this property is assured by ensuring that members
+   in Credentials, so this property is provided by ensuring that members
    use compatible credential types.
 
    The types of credential that may be used in a group is restricted to
    what all members of the group support, as specified by the
-   capabilities field of each LeafNode in the RatchetTree.  An
+   capabilities field of each LeafNode in the ratchet tree.  An
    application can introduce new credential types by choosing an
    unallocated identifier from the registry in Section 18.4 and
    indicating support for the credential type in published LeafNodes,
@@ -4591,7 +4592,9 @@ psk_secret (or 0) --> KDF.Extract
    of this section, such an extension would need to ensure that each
    member can authenticate some identity for each other member.  For
    each pair of members (Alice, Bob), Alice would need to present at
-   least one credential of a type that Bob supports. ## Extensions
+   least one credential of a type that Bob supports.
+
+14.4.  Extensions
 
    This protocol includes a mechanism for negotiating extension
    parameters similar to the one in TLS [RFC8446].  In TLS, extension
@@ -4622,8 +4625,8 @@ psk_secret (or 0) --> KDF.Extract
    GroupInfo object can be used to provide additional parameters to new
    joiners that are used to join the group.
 
-   This extension mechanism is designed to allow for secure and forward-
-   compatible negotiation of extensions.  For this to work,
+   This extension mechanism is designed to allow for the secure and
+   forward-compatible negotiation of extensions.  For this to work,
    implementations MUST correctly handle extensible fields:
 
    *  A client that posts a KeyPackage MUST support all parameters
@@ -4633,6 +4636,9 @@ psk_secret (or 0) --> KDF.Extract
    *  A client initiating a group MUST ignore all unrecognized
       ciphersuites, extensions, and other parameters.  Otherwise, it may
       fail to interoperate with newer clients.
+
+   *  Any field containing a list of extensions MUST NOT have more than
+      one extension of any given type.
 
    *  A client adding a new member to a group MUST verify that the
       LeafNode for the new member is compatible with the group's
@@ -4644,32 +4650,25 @@ psk_secret (or 0) --> KDF.Extract
       then the client MUST reject the Welcome message and not join the
       group.
 
-   *  The extensions populated into a GroupContext object are drawn from
-      those in the GroupInfo object, according to the definitions of
-      those extensions.
-
-   *  Any field containing a list of extensions MUST NOT have more than
-      one extension of any given type.
-
    Note that the latter two requirements mean that all MLS extensions
    are mandatory, in the sense that an extension in use by the group
    MUST be supported by all members of the group.
 
-   This document does not define any way for the parameters of the group
-   to change once it has been created; such a behavior could be
-   implemented as an extension.
+   The parameters of a group may be changed by sending a
+   GroupContextExtensions proposal to enable additional extensions, or
+   by reinitializing the group as described in Section 12.2.
 
 15.  Sequencing of State Changes
 
    Each Commit message is premised on a given starting state, indicated
    by the epoch field of the enclosing MLSMessageContent.  If the
-   changes implied by a Commit messages are made starting from a
+   changes implied by a Commit message are made starting from a
    different state, the results will be incorrect.
 
    This need for sequencing is not a problem as long as each time a
    group member sends a Commit message, it is based on the most current
    state of the group.  In practice, however, there is a risk that two
-   members will generate Commit messages simultaneously, based on the
+   members will generate Commit messages simultaneously based on the
    same state.
 
    When this happens, there is a need for the members of the group to
