@@ -3069,7 +3069,7 @@ messages refer to KeyPackages for the members being welcomed, and Commits refer
 to Proposals they cover.  These identifiers are computed as follows:<a href="#section-6.2-1" class="pilcrow">¶</a></p>
 <div id="section-6.2-2">
 <pre class="lang-tls sourcecode">
-opaque HashReference[16];
+opaque HashReference&lt;V&gt;;
 
 HashReference KeyPackageRef;
 HashReference ProposalRef;
@@ -3077,11 +3077,17 @@ HashReference ProposalRef;
 </div>
 <div id="section-6.2-3">
 <pre class="lang-pseudocode sourcecode">
-MakeKeyPackageRef(value) = KDF.expand(
-  KDF.extract("", value), "MLS 1.0 KeyPackage Reference", 16)
+MakeKeyPackageRef(value) = RefHash("MLS 1.0 KeyPackage Reference", value)
+MakeProposalRef(value)   = RefHash("MLS 1.0 Proposal Reference", value)
 
-MakeProposalRef(value) = KDF.expand(
-  KDF.extract("", value), "MLS 1.0 Proposal Reference", 16)
+RefHash(label, value) = Hash(RefHashInput)
+
+Where RefHashInput is defined as:
+
+struct {
+  opaque label&lt;V&gt; = label;
+  opaque value&lt;V&gt; = value;
+} RefHashInput;
 </pre><a href="#section-6.2-3" class="pilcrow">¶</a>
 </div>
 <p id="section-6.2-4">For a KeyPackageRef, the <code>value</code> input is the encoded KeyPackage, and the
