@@ -5,7 +5,7 @@
 Network Working Group                                          R. Barnes
 Internet-Draft                                                     Cisco
 Intended status: Informational                             B. Beurdouche
-Expires: 26 November 2022                                Inria & Mozilla
+Expires: 27 November 2022                                Inria & Mozilla
                                                                R. Robert
                                                                         
                                                              J. Millican
@@ -14,7 +14,7 @@ Expires: 26 November 2022                                Inria & Mozilla
                                                                   Google
                                                           K. Cohn-Gordon
                                                     University of Oxford
-                                                             25 May 2022
+                                                             26 May 2022
 
 
               The Messaging Layer Security (MLS) Protocol
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 26 November 2022.
+   This Internet-Draft will expire on 27 November 2022.
 
 Copyright Notice
 
@@ -3766,10 +3766,15 @@ psk_secret (or 0) --> KDF.Extract
 13.1.8.1.  External Senders Extension
 
    The external_senders extension is a group context extension that
-   contains credentials of senders that are permitted to send external
-   proposals to the group.
+   contains the credentials and signature keys of senders that are
+   permitted to send external proposals to the group.
 
-   Credential external_senders<V>;
+   struct {
+     SignaturePublicKey signature_key;
+     Credential credential;
+   } ExternalSender;
+
+   ExternalSender external_senders<V>;
 
 13.2.  Commit
 
