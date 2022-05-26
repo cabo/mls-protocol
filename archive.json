@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-05-24T01:55:02.791301+00:00",
+  "timestamp": "2022-05-26T01:57:39.996969+00:00",
   "repo": "mlswg/mls-protocol",
   "labels": [
     {
@@ -6603,7 +6603,7 @@
       "id": "I_kwDOBoyH6c5JFAE_",
       "title": "Explanatory text: MLSMessageCommitContent ",
       "url": "https://github.com/mlswg/mls-protocol/issues/643",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "br-hale",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
@@ -6612,8 +6612,8 @@
       ],
       "body": "TODO at some point: \r\nNarrative text to briefly explain MLSMessageCommitContent would be useful. At the moment this appears as a struct only twice in the spec - its contents in MLSMessageContent are defined and used frequently, but MLSMessageCommitContent is not ever mentioned in discussion text. Something as simple as a narrative comment that MLSMessageCommitContent is used as a combiner for transcript hashes and will not be referred to elsewhere would be useful, giving some scoping for the introduced term. ",
       "createdAt": "2022-05-04T23:01:36Z",
-      "updatedAt": "2022-05-20T17:48:33Z",
-      "closedAt": null,
+      "updatedAt": "2022-05-24T23:14:32Z",
+      "closedAt": "2022-05-24T23:14:32Z",
       "comments": []
     },
     {
@@ -6621,7 +6621,7 @@
       "id": "I_kwDOBoyH6c5JFAFL",
       "title": "Illustrations for \u201cfiltered direct path\u201d",
       "url": "https://github.com/mlswg/mls-protocol/issues/644",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bifurcation",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -6632,8 +6632,8 @@
       ],
       "body": "In #587, we introduced the idea of a \"filtered direct path\".  It would be helpful to have an illustration of how a filtered direct path differs from a direct path.",
       "createdAt": "2022-05-04T23:01:38Z",
-      "updatedAt": "2022-05-20T19:58:31Z",
-      "closedAt": null,
+      "updatedAt": "2022-05-24T23:12:54Z",
+      "closedAt": "2022-05-24T23:12:54Z",
       "comments": []
     },
     {
@@ -6650,7 +6650,7 @@
       "labels": [],
       "body": "In order to use tree hashes to represent siblings in parent hashes, we had to compute a different tree hash on the right edge of the tree, pretending that the tree is full, in the sense of having `2^n` leaves.  Thus we actually have two tree hashes in play, one used for group agreement on the tree and one used for parent hash inputs.\r\n\r\nWe should consider specifying that the logical tree used by MLS is always full.  This change to the specification would not change the computations done by the protocol much, if at all.  Thanks to the fact that we no longer generate redundant nodes (#587), there is never anything non-blank to the right of the rightmost non-blank leaf anyway.  So the main impact is to insert some blank nodes between a parent node on the right edge of the tree and its right child -- and all of the algorithms in the specification already skip over such nodes.\r\n\r\nLikewise, implementations' internal represntations of the tree wouldn't have to change much, since the extra nodes could be \"virtual\".  The only time they would be noticed is when computing tree hashes.  We would have to update the description of the `ratchet_tree` extension to say that it only covers the tree up to the rightmost non-blank leaf.\r\n\r\nIt would simplify the specification in a few ways, for example: \r\n* The \"original sibling tree hash\" would just entail blanking unmerged leaves, not structure changes.  \r\n* The description of extending and truncating the tree would be much simpler.\r\n\r\nThe main cost would be extra hashes when joining, or when updating a member close to the right edge of the tree.  If you have a tree with `2^n + 1` leaves, then you have to compute tree hashes over `2^n - 1` blank leaves and their `2^n - 2` blank parents.\r\n",
       "createdAt": "2022-05-04T23:14:27Z",
-      "updatedAt": "2022-05-23T21:57:28Z",
+      "updatedAt": "2022-05-24T18:48:57Z",
       "closedAt": null,
       "comments": [
         {
@@ -6680,6 +6680,13 @@
           "body": "Holding a PR until after #689 lands.\r\n\r\nSome notes on what would need to change:\r\n\r\n* {{ratchet-tree-terminology}} would change from \"the unique left-balanced tree with N leaves\" to \"the unique balanced binary tree with depth `d`, where `d` is the smallest number such that `N <= 2^d`\".\r\n* {{adding-and-removing-leaves}} would either be removed, or updated so that it talks about increasing or decreasing the depth of the tree (equivalently, doubling or halving the number of leaves).\r\n* {{add}} would talk about increasing depth instead of adding leaves.\r\n* {{remove}} would talk about decreasing depth instead of removing leaves.\r\n* {{ratchet-tree-extension}} would be explicit that it only carries nodes up to the rightmost non-blank leaf.  The encoding/decoding algorithms would have to be updated.\r\n* {{array-based-trees}} and {{link-based-trees}} could probably be simplified.\r\n* We would need to make sure all figures showed full trees.",
           "createdAt": "2022-05-23T21:57:28Z",
           "updatedAt": "2022-05-23T21:57:28Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I went ahead and filed #694 for this, based on top of #689.  Once that merges, we can update the PR to be a little easier to read.  The changes are basically as described above.\r\n\r\nOne additional note: We have actually already incurred the cost to a new joiner of hashing all the extra nodes, because they have to do it for parent hash verification anyway.  So this approach is actually a net reduction in the amount of hashing that has to be done, since they don't have to also compute the non-full-tree hashes.",
+          "createdAt": "2022-05-24T18:48:57Z",
+          "updatedAt": "2022-05-24T18:48:57Z"
         }
       ]
     },
@@ -6728,7 +6735,7 @@
       ],
       "body": "In #511, we removed the requirement for an external Commit to have an Add proposal, under the theory that the required `path` already has a leaf node for the new joiner.  When I went to implement this, however, I noticed some ambiguities. \r\n\r\nFirst, the Commit processing section doesn't mention when the new joiner is added.  The obvious approach is to do the add as part of the `path` processing, but that processing presumes that the sender is already in the tree (for example, there is no provision for extending the tree).\r\n\r\nSecond, the UpdatePath for an external commit needs to be done in a specific order in order to avoid a circular dependency.  The TreeKEM encapsulation done by the joiner uses the GroupContext a context parameter, including the hash of the tree being used.  But the LeafNode in the `path.leaf_node` has to have a parent hash in it, which can only be computed after the encapsulation operation.  This circularity can be resolved, but only by preparing the UpdatePath with the following specific steps:\r\n\r\n1. Compute the path secrets\r\n2. Compute the parent hash and the new leaf node\r\n3. Compute the new tree hash\r\n4. Encrypt the path secrets to the rest of the group\r\n\r\nThat rules out some implementations that compute path secrets and encrypt them in one traversal of the direct path (this is what MLSpp does now).\r\n\r\nThe options here are basically:\r\n\r\n1. Re-add the Add proposal, thus having a throw-away temporary LeafNode for the joiner\r\n2. Specify that the UpdatePath must be computed in the specific order above\r\n\r\nTo me, (2) seems like a pretty clear winner.",
       "createdAt": "2022-05-05T03:22:55Z",
-      "updatedAt": "2022-05-23T22:10:14Z",
+      "updatedAt": "2022-05-24T13:06:50Z",
       "closedAt": null,
       "comments": [
         {
@@ -6737,6 +6744,27 @@
           "body": "Actually, it seems like there's a simpler option here:\r\n\r\n* Extend the definition of an ExternalInit proposal to say that part of how it is applied is to ensure there is a blank leaf in the tree, extending the tree if necessary.  (This implies that ExternalInit must be done after any Remove.)  The leftmost blank leaf is the sender's leaf for purposes of UpdatePath processing.\r\n* The provisional tree used in encrypting path secrets is still the provisional tree, in the sense that all proposals have been applied.  This tree has a blank leaf for the UpdatePath sender.\r\n\r\nIf we clarify these points, I think everything else works unmodified.",
           "createdAt": "2022-05-23T22:10:14Z",
           "updatedAt": "2022-05-23T22:10:14Z"
+        },
+        {
+          "author": "kkohbrok",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I agree with the first point. Even if the Add is not explicitly present, the external commit effectively emulates an Add anyway.\r\n\r\nTo the second point: The solution is only simpler if that's how you want to implement it \ud83d\ude1c. I haven't tried it, but if you have chosen a different order of implementation, i.e. perform all changes to the provisional tree (including the update path and parent hash), then compute the tree hash and then encrypt the path, you now have to go and compute an additional tree hash before applying the update path, then apply the update path and keep the partial tree hash around for later encryption/decryption.\r\n\r\nThis was not a part of MLS that I have looked at from a provable security perspective, but I'm wondering what the consequences are from a security perspective if we're including a parent hash for an incomplete provisional tree.",
+          "createdAt": "2022-05-24T05:35:52Z",
+          "updatedAt": "2022-05-24T05:35:52Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "It seems like the main question here is what tree is provided to TreeKEM encryptions of path secrets.  I'll call this the \"context tree\" below.\r\n\r\nIt sounds like you have in mind that the tree provided to TreeKEM has the UpdatePath applied as well as the proposals, but that's not what the spec says right now:\r\n\r\n> \"Provisional\" refers to the ratchet tree and GroupContext constructed after applying the proposals that are referenced by the Commit. \r\n\r\n> \"New\" refers to the ratchet tree and GroupContext constructed after applying the proposals and the UpdatePath (if any).\r\n\r\n> Create an UpdatePath using the provisional ratchet tree and GroupContext\r\n\r\nThe starting point for this issue is that the \"provisional\" tree right now doesn't really faithfully capture the tree you're encrypting to, at least in the sense that it has a different number of leaves.  That seemed wrong to me.\r\n\r\nIt seems like we have the following options here:\r\n\r\n1. Do nothing. \r\n    * The context tree doesn't necessarily have a blank for the joiner.\r\n    * Maximal divergence between the new tree and the context tree (among these options)\r\n    * TreeKEM encryption operates on a different tree than the context tree\r\n\r\n2. Ensure the provisional tree has a blank leaf for the joiner (as up-thread).\r\n    * Context tree has a blank leaf for the joiner, but direct path doesn't match new tree\r\n    * TreeKEM encryption can operate on the context tree, because the structure is correct\r\n\r\n3. Use the \"new\" ratchet tree as the TreeKEM context.\r\n    * Context tree is exactly the new tree -- could probably eliminate provisional\r\n    * Requires separate steps for (1) updating tree nodes and (2) encrypting path secrets\r\n    * ... when these are currently described together as effectively one operation\r\n\r\nPersonally, it seems like the answer is (2) or (3), and I probably lean toward (3).  I don't think (1) is insecure, because the context tree does capture all of the nodes to which path secrets are encrypted.  But the divergence is worrisome and it's cheap to do better.\r\n\r\nBetween (2) and (3), there's a trade-off between fidelity and spec change size.  The impact of (2) is more localized (just the ExternalInit section).  Updating the spec to do (3) will require amending the description of update paths as well as the Commit creation / processing rules (to separate update/encrypt and remove provisional, respectively).  But honestly, removing the provisional tree seems like a worthwhile simplification, so between that and the greater fidelity of the context tree, (3) seems worth the cost.",
+          "createdAt": "2022-05-24T12:57:18Z",
+          "updatedAt": "2022-05-24T12:57:18Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Actually, as I look into implementing this: We still need a provisional GroupContext, because the `confirmed_transcript_hash` will differ. But we can at least have two trees instead of three.",
+          "createdAt": "2022-05-24T13:06:50Z",
+          "updatedAt": "2022-05-24T13:06:50Z"
         }
       ]
     },
@@ -6834,15 +6862,15 @@
       "id": "I_kwDOBoyH6c5JN0hi",
       "title": "Undefined behavior around removed Committer",
       "url": "https://github.com/mlswg/mls-protocol/issues/657",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "Bren2010",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "It's not clear to me from reading the spec what should happen when a Commit includes a Remove proposal for the committer.",
       "createdAt": "2022-05-06T20:30:21Z",
-      "updatedAt": "2022-05-17T06:13:27Z",
-      "closedAt": null,
+      "updatedAt": "2022-05-25T18:57:04Z",
+      "closedAt": "2022-05-25T18:57:04Z",
       "comments": [
         {
           "author": "rohan-wire",
@@ -7079,7 +7107,7 @@
       "id": "I_kwDOBoyH6c5JxxSD",
       "title": "More pictures",
       "url": "https://github.com/mlswg/mls-protocol/issues/669",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bifurcation",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -7090,8 +7118,8 @@
       ],
       "body": "* Add illustration of filtered direct path\r\n* Add illustration of parent hash validation, including:\r\n    * Leaves with no parent hash\r\n    * Nodes with invalid parent hash\r\n    * Skipping blank nodes\r\n* Add corresponding derivations to Appendix A\r\n* Move figure in Section 10.2 up to Section 10 as an overview",
       "createdAt": "2022-05-16T22:07:15Z",
-      "updatedAt": "2022-05-21T21:13:30Z",
-      "closedAt": null,
+      "updatedAt": "2022-05-24T16:59:27Z",
+      "closedAt": "2022-05-24T16:59:27Z",
       "comments": [
         {
           "author": "bifurcation",
@@ -7099,6 +7127,13 @@
           "body": "@Bren2010 Note that I have taken a stab at parts of this in #689 because it came along with some other tree stuff.",
           "createdAt": "2022-05-21T21:13:30Z",
           "updatedAt": "2022-05-21T21:13:30Z"
+        },
+        {
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Duplicate #644",
+          "createdAt": "2022-05-24T16:59:27Z",
+          "updatedAt": "2022-05-24T16:59:27Z"
         }
       ]
     },
@@ -7107,7 +7142,7 @@
       "id": "I_kwDOBoyH6c5Jxx0E",
       "title": "Define filtered direct path in Ratchet Tree Terminology",
       "url": "https://github.com/mlswg/mls-protocol/issues/670",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bifurcation",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -7118,8 +7153,8 @@
       ],
       "body": "Currently defined only briefly in \"RatchetTree Evolution\".  While that's where it's primarily used, it would fit better in the terminology section, especially if we expand it a little and add an illustration.",
       "createdAt": "2022-05-16T22:09:08Z",
-      "updatedAt": "2022-05-22T18:49:56Z",
-      "closedAt": null,
+      "updatedAt": "2022-05-24T23:12:54Z",
+      "closedAt": "2022-05-24T23:12:54Z",
       "comments": [
         {
           "author": "Bren2010",
@@ -7167,7 +7202,7 @@
       "labels": [],
       "body": "* \u201cAdding and Removing Leaves\u201d after \u201cSynchronizing Views of the Tree\u201d\r\n* Consider merging \u201cRatchet Tree Evolution\u201d and \u201cSynchronizing Views of the Tree\u201d and \u201cUpdate Paths\u201d\r\n* Swap \u201cJoining via External Commits\u201d and \u201cJoining via Welcome Message\u201d\r\n* Restore section break for \u201cExtensions\u201d",
       "createdAt": "2022-05-16T22:10:40Z",
-      "updatedAt": "2022-05-20T18:01:17Z",
+      "updatedAt": "2022-05-25T18:30:14Z",
       "closedAt": null,
       "comments": [
         {
@@ -7176,6 +7211,13 @@
           "body": "Assuming people are OK with this, we should probably do it at a \"pause\" in PRs -- where we've merged a round and there are no new ones in flight -- in order to avoid merge conflicts.",
           "createdAt": "2022-05-20T18:01:17Z",
           "updatedAt": "2022-05-20T18:01:17Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "* Move \"Proposal List Validation\" under \"Proposals\"",
+          "createdAt": "2022-05-25T18:30:14Z",
+          "updatedAt": "2022-05-25T18:30:14Z"
         }
       ]
     },
@@ -7281,13 +7323,15 @@
       "state": "OPEN",
       "author": "raphaelrobert",
       "authorAssociation": "MEMBER",
-      "assignees": [],
+      "assignees": [
+        "Bren2010"
+      ],
       "labels": [
         "ready for PR"
       ],
       "body": "The generation numbers should be increased sequentially, gaps should be avoided to avoid unnecessary expensive operations on clients. Clients might also abort if the gap is too large to prevent attacks from malicious insiders.",
       "createdAt": "2022-05-17T17:24:17Z",
-      "updatedAt": "2022-05-23T21:42:07Z",
+      "updatedAt": "2022-05-25T17:06:05Z",
       "closedAt": null,
       "comments": [
         {
@@ -7335,6 +7379,120 @@
       "body": "As I was pondering pathological cases related to #645, it occurred to me that we already have a slightly odd situation that can arise as a result of the suppression of redundant nodes.  When a Commit has an UpdatePath, the `commit_secret` is defined as follows:\r\n\r\n> Define commit_secret as the value path_secret[n+1] derived from the path_secret[n] value assigned to the root node.\r\n\r\nHowever, there are situations where the root node is not assigned a value, namely when the left half of the tree is blank.  For example, suppose A creates a group with B, C, D:\r\n\r\n```\r\n      Y\r\n    __|__\r\n   /     \\\r\n  X       _ = Z\r\n / \\     / \\\r\nA   B   C   D\r\n```\r\n\r\nSuppose that then C removes A and B, leaving C and D as the only leaves in the tree.  After removing A and B, the tree on which C computes an UpdatePath is as follows:\r\n\r\n```\r\n      _ = Y\r\n    __|__\r\n   /     \\\r\n  _       _ = Z\r\n / \\     / \\\r\n_   _   C   D  \r\n```\r\n\r\nC's direct path is (Z, Y), but it's filtered direct path is just (Z) because the copath subtree of Y is all blank.  So C will not generate a path_secret for Y, which means that the commit secret is not really defined.\r\n\r\nIt seems like there are two paths to fix this:\r\n\r\n1. Keep the current definition of `commit_secret` and require that a path secret always be generated for the root node\r\n    * Presumably the root node path secret would be generated directly from the path secret in the UpdatePath\r\n    * This would be simple to implement by just forcing the root node to be in the filtered direct path\r\n2. Keep the current path secret generation and specify that the `commit_secret` is derived from the last path secret in the UpdatePath \r\n    * In the above example, the last path secret from the path secret for Z\r\n\r\nI lean slightly toward (2) because it makes the computation the same for two neighbors regardless of where they are in the tree. It seems like the two options primarily differ in whether there are one or two invocations of the key derivation.\r\n",
       "createdAt": "2022-05-21T21:35:45Z",
       "updatedAt": "2022-05-21T21:35:45Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 693,
+      "id": "I_kwDOBoyH6c5KU2j8",
+      "title": "External Add proposals revisited",
+      "url": "https://github.com/mlswg/mls-protocol/issues/693",
+      "state": "OPEN",
+      "author": "bifurcation",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "@rohan-wire raised a few points today, which I'm trying to capture in this issue with some thoughts on proposed solutions.\r\n\r\nIn #659, we removed the usage of `new_member` to send Add proposals, in order to allow for the signature on an external commit to cover the GroupContext (which is not necessarily possible for an external Add sender).  In the discussion, the point was made that an Add proposal only really differs from a KeyPackage in that the KeyPackage doesn't have `group_id` or `epoch` fields.  Part of the resolution in #659 was a decision that folks didn't think `group_id` was a significant loss.  And I think there's pretty broad agreement that `epoch` is actively undesirable, since it means that the new joiner has to be sufficiently in sync with the group to know the epoch hasn't changed before sending its proposal.\r\n\r\nAfter talking with @rohan-wire, there are two other issues to highlight:\r\n\r\n* Losing `group_id` is a bigger deal than it might first seem in a system that has both \"prepublished KeyPackages\" and \"KeyPackage as request to be added\".  Someone could go grab a bunch of prepublished KeyPackages that they don't own, and send them in as requests to be added.  This isn't an immediate security risk, since the attacker doesn't necessarily have the private keys that go with the KeyPackages (if they do, they have other attack avenues).  But it would mean, for example, that a client would have an even less certain idea of all the groups it was a member of.\r\n\r\n* When \"requests to be added\" were expressed as Proposals, the \"request\" semantic followed from being a Proposal, which tied into the recommendations for what should be included in a Commit.  Expressing these requests in a different way, means that the \"request\" semantic rests outside of the core MLS logic.\r\n\r\nA few possible avenues come to mind for addressing these issues:\r\n\r\n1. Don't change the protocol, but document the operational considerations.  For example:\r\n    * The \"unintended join\" issue with abuse of prepublished KPs could be mitigated by a DS that supports proactive joins enforcing that the sender owns the signature key (e.g., checking that `kp.leaf_node.credential` authenticates the same identity that the DS has for the client).\r\n    * The request semantic could be captured in the architecture document / protocol overview as a thing that applications could implement if they choose. \r\n\r\n2. Re-add joiner-sent Add proposals, using a different SenderType this time to avoid the conflict with external commits.\r\n     * Say `new_member_add_proposal` and `new_member_commit`\r\n     * This would still have the epoch problem.\r\n\r\n3. Add a field to KeyPackage indicating whether the KeyPackage is general or directed to a specific group\r\n    * Something like `optional<GroupID> target_group_id`\r\n    * Require that if the field is set in an Add proposal, then it MUST match the group's ID.\r\n    * Specify that only directed KPs can be used to request to be added\r\n    * Add parallel text to proposals that recommend the the committer commit Add proposals for any directed KPs it has received.\r\n\r\n4. Define a new top level message (an entry in the MLSMessage enum) that expresses precisely the semantic we want, something like:\r\n\r\n```\r\nstruct {\r\n    opaque group_id<V>;\r\n    KeyPackage key_package;\r\n    // SignWithLabel(., \"JoinRequestTBS\", JoinRequestTBS)\r\n    opaque signature<V>;\r\n} JoinRequest;\r\n```",
+      "createdAt": "2022-05-24T18:34:29Z",
+      "updatedAt": "2022-05-25T19:34:21Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "rohan-wire",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Thanks @bifurcation for writing this up.\r\n\r\nMy problems with using KeyPackages as a \"verb\" are more extensive than what Richard described. The rules for deciding which combinations of Proposals are valid are already pretty complicated. Relying on a new implicit mechanism that interacts with this explicit Proposal logic makes me very uncomfortable. \r\n\r\nWhile it might require some retries to get the correct epoch, I am also concerned about copy paste attacks. I think approaches 1, 3, and 4 are all vulnerable some form of copy paste attack.\r\n\r\nI propose re-adding new joiner-sent Add Proposals with a new SenderType. While catching the correct epoch can be a nuisance, I think it is a separable problem. \r\nThanks,\r\n-rohan\r\n",
+          "createdAt": "2022-05-24T19:13:17Z",
+          "updatedAt": "2022-05-24T19:13:53Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Personally, I'm less concerned about the flow concerns here and more concerned about epoch mismatches.\r\n\r\nIn real-time scenarios, epoch mismatches are a huge pain.  You have potentially hundreds of people joining at the beginning of a meeting and retrying a join adds a lot of latency.  So the ability for the committer to choose which requests to join go in which Commits is really important for things to work smoothly.  I would not be able to use (2) in Webex, but would gladly use (3).\r\n\r\nAs for being more implicit: I actually have the opposite concern, that allowing joiner-signed Adds is riskier from a policy POV.  In general, before someone is added to the group, some application logic at a member needs to check that the new member is acceptable.  If an Add proposal has to be made by a member, you get two opportunities to check, when the proposal is made and when it's committed.  If the new joiner makes the proposal, you lose the first. \r\n\r\n(I also have a more minor aesthetic concern about re-using the general framing for this specific niche use case.  We have this general framing that is actually general for members; they can send any content type.  External proposals and external commits are constrained to one content type, but still pretty general.  New member add proposals would be limited to one content type and one proposal type, which is getting quite narrow.)\r\n\r\nBy contrast, the semantic shift for extending KeyPackage is really pretty minor.  The semantic of KeyPackage is already \"Please make an Add proposal with this object to add me to a group\".  That's not far away from \"Please make an Add proposal to add me to ${THIS_SPECIFIC_GROUP}.\"\r\n\r\nThat seems like a smaller semantic shift than the shift from \"Someone authorized to make changes to this group proposed a change\" to \"Some rando on the Internet proposed a change\".\r\n\r\nNet of all that, I'm pretty strongly in favor of (3).",
+          "createdAt": "2022-05-24T20:23:01Z",
+          "updatedAt": "2022-05-24T20:23:01Z"
+        },
+        {
+          "author": "rohan-wire",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "@bifurcation I specifically mentioned copy paste attacks. I would be happy for us to have a reasonable general solution to epoch mismatches within a narrow time window, but not at the expense of an unbounded timeframe for a copy paste attack.\r\n\r\nThat said, if you want to implement some implicit KeyPackage behavior to add using authorization rules that work for your implementation and your DS is in a position to prevent those attacks, you can still do what you proposed. I'm just asking not to take away the tool we are using. \r\n\r\nIn terms of scope, external add proposals have been in the protocol document since -08 (2019). We use them extensively and implemented them in good faith. Removing them now and proposing we use an implicit approach with a know security concern that happens to solve a problem that was previously out of scope seems a bit arbitrary.\r\n\r\nProposal 2 (new SenderType) does not harm anyone else and preserves functionality in the draft. It does not prevent you from solving the epoch problem your way or in any other future way.\r\n \r\n\r\n",
+          "createdAt": "2022-05-24T21:33:37Z",
+          "updatedAt": "2022-05-24T21:34:23Z"
+        },
+        {
+          "author": "raphaelrobert",
+          "authorAssociation": "MEMBER",
+          "body": "I think the points raised by @bifurcation are quite valid, in particular since external proposals can still be used with preconfigured senders (and there is a better symmetry with external remove proposals). I don't see why that wouldn't be good enough in a scenario where the DS is quite involved beyond the handshake message ordering anyway.\r\n\r\nThat being said, from all the options above (3) would also be my favorite. I like the idea of purpose-bound KeyPackages.",
+          "createdAt": "2022-05-24T21:59:47Z",
+          "updatedAt": "2022-05-24T21:59:47Z"
+        },
+        {
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "body": "> Losing group_id is a bigger deal than it might first seem in a system that has both \"prepublished KeyPackages\" and \"KeyPackage as request to be added\". ... But it would mean, for example, that a client would have an even less certain idea of all the groups it was a member of.\r\n\r\nI don't understand this concern since adding someone to a group has never required their consent or knowledge. The change here is just that you can perhaps get someone else to do the adding, though I would say that's *better* in the sense that a non-malicious client doing the Add would actually send the Welcome. If the malicious user is doing the Add, they might not send a Welcome.\r\n\r\n@rohan-wire Would you mind expanding more on what you mean by copy-paste attack?\r\n\r\n> When \"requests to be added\" were expressed as Proposals, the \"request\" semantic followed from being a Proposal, which tied into the recommendations for what should be included in a Commit. Expressing these requests in a different way, means that the \"request\" semantic rests outside of the core MLS logic.\r\n\r\nThis isn't a downside, this is a core reason that it external Adds were removed. We observed that applications seem to prefer doing this themselves (at least those that spoke on the ticket / interim did).",
+          "createdAt": "2022-05-24T23:01:34Z",
+          "updatedAt": "2022-05-24T23:01:34Z"
+        },
+        {
+          "author": "rohan-wire",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "> > Losing group_id is a bigger deal than it might first seem in a system that has both \"prepublished KeyPackages\" and \"KeyPackage as request to be added\". ... But it would mean, for example, that a client would have an even less certain idea of all the groups it was a member of.\r\n> \r\n> I don't understand this concern since adding someone to a group has never required their consent or knowledge. The change here is just that you can perhaps get someone else to do the adding, though I would say that's _better_ in the sense that a non-malicious client doing the Add would actually send the Welcome. If the malicious user is doing the Add, they might not send a Welcome.\r\n\r\nThe concern with implying Add semantics using a bare (undirected) keypackage is we don't have any record of _anyone's_ intent to add the MLS client to the group. [I don't understand what is supposedly \"better\" about not sending an external proposal. Either way someone sends a Proposal and whoever sends a valid commit containing that Proposal is supposed to send the Welcome.]\r\n\r\n> @rohan-wire Would you mind expanding more on what you mean by copy-paste attack?\r\n\r\nAlice (in domain A) decides to join the Bananas group in domain B. Alice sends a directed KeyPackage (option 3). \r\nVariation 1: Two members of the Bananas group, Cathy and Doug, copy this request and replay it repeatedly to the group, possibly after Alice leaves the group.\r\n[Currently we only will forward a Welcome to an MLS client if the KeyPackageRef was seen when consuming a KeyPackage from the Directory; or from sending an External Proposal or External Commit in that epoch. So before this change we could scope the state needed to forward a Welcome to a specific sender, or a particular epoch. Either way this was easy to clean up.  With the current proposal this needs to be sent across all the domains in the group, and is no longer time bounded.]\r\nVariation 2: An attacker Bob on B returns an error and copies (stored) the add request. Later at a time of Bob's choosing, he sends (pastes) the request to the Bananas group, causing Alice to be added to Bananas at a different time than Alice intended. \r\n\r\n> > When \"requests to be added\" were expressed as Proposals, the \"request\" semantic followed from being a Proposal, which tied into the recommendations for what should be included in a Commit. Expressing these requests in a different way, means that the \"request\" semantic rests outside of the core MLS logic.\r\n> \r\n> This isn't a downside, this is a core reason that it external Adds were removed. We observed that applications seem to prefer doing this themselves (at least those that spoke on the ticket / interim did).\r\n\r\nWell, we are an implementer and are definitely using them and like them, so it *is* a downside for us, and it sounds like for everyone else it was a no-op, not an upside (they can do it their way whether or not External Proposals for Adds are possible or not).  \r\n\r\nFor background, we are using External Proposal Adds only to add a new client device representing a user who is already in the group. We never use them to add a different user or for a server to add a user. \r\nOur clients are not necessarily online at the same time, so there may not be an MLS member online when the request is sent. This is fine for External Proposal because each client can process and verify MlsMessage linearly.\r\nIn addition, all our use cases are federated, so the user who ends up sending the Commit which finally adds the new client often has no direct relationship with the backend/directory through which the new client normally forwards MlsCiphertext/MlsPlaintext messages or in which is stores its KeyPackages. ",
+          "createdAt": "2022-05-25T19:25:24Z",
+          "updatedAt": "2022-05-25T19:25:24Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "On the copy/paste risk: It occurs to me that we actually have a solution for this already: The `lifetime` field in LeafNode.  KeyPackages are already designed to expire, and that mechanism provides flexibility that matches the use case much better than `epoch`.",
+          "createdAt": "2022-05-25T19:27:38Z",
+          "updatedAt": "2022-05-25T19:27:38Z"
+        },
+        {
+          "author": "rohan-wire",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "> I think the points raised by @bifurcation are quite valid, in particular since external proposals can still be used with preconfigured senders (and there is a better symmetry with external remove proposals). \r\n\r\nOur use case for external add proposals is for an ordinary client adding itself (never a preconfigured sender), whereas for external removes this is always a backend taking action (preconfigured sender).\r\n\r\n>I don't see why that wouldn't be good enough in a scenario where the DS is quite involved beyond the handshake message ordering anyway.\r\n\r\nI'm not sure I follow you. Coordinating enough DS involvement across federated domains looks hard to me. Could you elaborate please?\r\n",
+          "createdAt": "2022-05-25T19:32:57Z",
+          "updatedAt": "2022-05-25T19:33:17Z"
+        },
+        {
+          "author": "rohan-wire",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "> On the copy/paste risk: It occurs to me that we actually have a solution for this already: The `lifetime` field in LeafNode. KeyPackages are already designed to expire, and that mechanism provides flexibility that matches the use case much better than `epoch`.\r\n\r\nGood point, although running a bunch of timers on servers is definitely more work than checking the epoch.",
+          "createdAt": "2022-05-25T19:34:21Z",
+          "updatedAt": "2022-05-25T19:34:21Z"
+        }
+      ]
+    },
+    {
+      "number": 696,
+      "id": "I_kwDOBoyH6c5KVvuW",
+      "title": "external_key_id extension for LeafNode",
+      "url": "https://github.com/mlswg/mls-protocol/issues/696",
+      "state": "OPEN",
+      "author": "Bren2010",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "Bren2010"
+      ],
+      "labels": [],
+      "body": "",
+      "createdAt": "2022-05-24T23:09:46Z",
+      "updatedAt": "2022-05-24T23:09:46Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 700,
+      "id": "I_kwDOBoyH6c5KbjVa",
+      "title": "Not allowing the same member to join the group multiple times?",
+      "url": "https://github.com/mlswg/mls-protocol/issues/700",
+      "state": "OPEN",
+      "author": "Bren2010",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "In #675, it was pointed out that we previously had a clause:\r\n\r\n> If there are multiple Add proposals containing KeyPackages that the committer considers to represent the same client or a client already in the group (for example, identical KeyPackages or KeyPackages sharing the same Credential), the committer again chooses one to include and considers the rest invalid.\r\n\r\nBut this was amplified in #675 to say that we also can't send Add proposals for users that are already in the group. I think we should talk about if this is the actual desired behavior or not.",
+      "createdAt": "2022-05-25T21:12:41Z",
+      "updatedAt": "2022-05-25T21:12:41Z",
       "closedAt": null,
       "comments": []
     }
@@ -48357,7 +48515,7 @@
       "labels": [],
       "body": "I don't think the \"MUST\" clause here is really weight-bearing, especially given that we don't provide any specific way to do the verification. We already say that applications \"SHOULD require that a client present the same identifiers\" and going against the \"SHOULD\" means the implementer is taking responsibility for any problems.",
       "createdAt": "2022-05-12T23:11:41Z",
-      "updatedAt": "2022-05-19T15:12:57Z",
+      "updatedAt": "2022-05-24T06:48:09Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "f64c3ebb5ad2c5f1621e30fbf581c0e02246b1e5",
@@ -48389,6 +48547,13 @@
           "body": "Park this for now while we evolve #678.",
           "createdAt": "2022-05-19T15:12:56Z",
           "updatedAt": "2022-05-19T15:12:56Z"
+        },
+        {
+          "author": "kkohbrok",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "After the discussion at the interim, I now lean towards keeping the MUST, but maybe we can phrase it a little differently. Instead of mandating that the application MUST do the verification, we could mandate that the implementation MUST present the credentials to the AS for verification of the credential succession. Then it's really up to the AS what it wants to do, but at least different implementations have a somewhat consistent interface with the AS (which we can discuss in #678).",
+          "createdAt": "2022-05-24T06:48:08Z",
+          "updatedAt": "2022-05-24T06:48:08Z"
         }
       ],
       "reviews": []
@@ -48513,24 +48678,26 @@
       "id": "PR_kwDOBoyH6c438mN5",
       "title": "More clarity around validating proposals",
       "url": "https://github.com/mlswg/mls-protocol/pull/675",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "mulmarta",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "The text in the RFC around validating proposals, choosing which proposals go into a commit and how to validate a received commit could do with a bit more work.\r\n\r\nThe root issue is that Section 13.2 states \u201cThe sender of a Commit MUST include all valid proposals that it has received during the current epoch. Invalid proposals include, for example, proposals with an invalid signature or proposals that are semantically invalid, such as an Add when the sender does not have the application-level permission to add new users.\u201d There are two intertwined issues with this text:\r\n1. The qualifier \u201cMUST\u201d\r\n2. The text is too vague about what a \u201cvalid Proposal\u201d is. E.g. it could be interpreted to mean a Proposal is \u201cvalid\u201d relative to the current group state: Can it be applied to the group as it stands now? Then it\u2019s \u201cvalid\u201d.\r\n\r\nPut simply, it doesn\u2019t make sense to only validate proposals individually. Instead one should validate if the full list of proposals can be committed. Indeed, other parts of the RFC enforce validation steps that apply to the full list. E.g.\r\n* A ReInit proposal MUST be the only one in the commit, and other existing proposals SHOULD be preferred (13.2.1).\r\n* Out of multiple proposals affecting the same leaf, the committer MUST choose an arbitrary one (13.2, \u201cIf there are multiple (\u2026)\u201d).\r\n* Out of multiple PSK proposals with the same ID, the committer MUST choose an arbitrary one (13.2).\r\n\r\nIn fact, once extensions come into play there are likely many more similar situations, even ones affecting lists of otherwise benign proposals (e.g. Add/Remove). Suppose a chat app is built on MLS with a custom room moderator roles extension. The app wants MLS to enforce two rules: Only mods can Add/Remove. Rooms should always have at least 1 Mod. Here\u2019s how the RFC\u2019s current text can become a problem: A and B are the only mods in a room. A makes proposal P1 that removes B. Meanwhile, B makes prop P2 that removes A. C gets both proposals. What should C do?\r\n* Option 1: validate & cache both proposals. \u2192 Problem: C can no longer issue a commit as it \u201cMUST include all valid proposals\u201d. (Alternatively, it does commit to both as instructed by the RFC which leaves the room without a mod.)\r\n* Option 2: validate & cache the first prop received (say, P1), but reject P2 as validating both means C can\u2019t commit. \u2192 Problem: If someone else commits to P2 by ref. C can\u2019t process the commit as it doesn\u2019t \u201cknow\u201d P2.\r\n\r\nSo, to clean all this up a bit more, this PR proposes the following main changes:\r\n1. Add a section \"Validating Proposals\" that defines a procedure for validating a *list* of proposals. The procedure starts with checking that each individual proposal is valid, as described in the \"Proposals\" section. It also has a note that applications may add more rules.\r\n2. Clean up a bit the validation rules in the \"Proposals\" section and remove redundancies. Now for each proposal, we precisely define when it is valid.\r\n3. In the \"Commit\" section, add a requirement that both a committer and a receiver of a commit MUST verify that the committed proposal list is valid according to section \"Validating Proposals\".\r\n4. Downgrade the requirement that \u201cThe sender of a Commit MUST include all valid proposals that it has received\u201c to \"The sender of a Commit SHOULD include all valid proposals that it has received, as long as this does not make the proposal list invalid.\"\r\n\r\nNote that the validation in section \"Proposals\" can be done when a commit is received. The final check in \"Validating Proposals\" is done when a commit is created and when it is received.\r\n\r\nThis also fixes #657.",
       "createdAt": "2022-05-17T10:35:46Z",
-      "updatedAt": "2022-05-23T22:18:36Z",
+      "updatedAt": "2022-05-25T18:57:04Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
-      "baseRefOid": "f64c3ebb5ad2c5f1621e30fbf581c0e02246b1e5",
+      "baseRefOid": "bd56532ab26a586d1e951705c068f836a3960f51",
       "headRepository": "mulmarta/mls-protocol",
       "headRefName": "mulmarta/proposal-validation",
-      "headRefOid": "a7487e318eeddf90c2ba3a83e497cac0b6e85ab4",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "2bf3d34867f4b08739e1df47fb3fa6684d7fe323",
+      "closedAt": "2022-05-25T18:57:04Z",
+      "mergedAt": "2022-05-25T18:57:04Z",
+      "mergedBy": "bifurcation",
+      "mergeCommit": {
+        "oid": "a662e60c3584eb3d7d5a94694ca719b515d88114"
+      },
       "comments": [
         {
           "author": "seanturner",
@@ -48552,6 +48719,20 @@
           "body": "I opened a PR here that resolves the merge conflicts and makes some additional suggested changes: https://github.com/mulmarta/mls-protocol/pull/1",
           "createdAt": "2022-05-22T18:48:45Z",
           "updatedAt": "2022-05-22T18:48:45Z"
+        },
+        {
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@mulmarta Please update to resolve merge conflicts.",
+          "createdAt": "2022-05-24T16:37:44Z",
+          "updatedAt": "2022-05-24T16:37:44Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@mulmarta I proactively merged my editorial nits (with review from @Bren2010) in the interest of getting this merged.  If I've screwed anything up, obviously feel free to file a follow up to fix.",
+          "createdAt": "2022-05-25T18:56:57Z",
+          "updatedAt": "2022-05-25T18:56:57Z"
         }
       ],
       "reviews": [
@@ -48814,6 +48995,68 @@
               "updatedAt": "2022-05-23T22:18:36Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c46ui1N",
+          "commit": {
+            "abbreviatedOid": "364bf31"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "Couple of nits, otherwise lgtm.",
+          "createdAt": "2022-05-25T18:18:51Z",
+          "updatedAt": "2022-05-25T18:36:13Z",
+          "comments": [
+            {
+              "originalPosition": 70,
+              "body": "```suggestion\r\n  * If the LeafNode appears in a KeyPackage, verify that `leaf_node_source` is\r\n    set to `key_package`.\r\n```",
+              "createdAt": "2022-05-25T18:18:51Z",
+              "updatedAt": "2022-05-25T18:36:13Z"
+            },
+            {
+              "originalPosition": 90,
+              "body": "```suggestion\r\n* Verify that the `leaf_node` of the KeyPackage is valid for a KeyPackage\r\n  according to {{leaf-node-validation}}.\r\n```",
+              "createdAt": "2022-05-25T18:19:41Z",
+              "updatedAt": "2022-05-25T18:36:13Z"
+            },
+            {
+              "originalPosition": 144,
+              "body": "```suggestion\r\nAn Update proposal is invalid if the LeafNode is invalid for an Update\r\nproposal according to {{leaf-node-validation}}.\r\n```",
+              "createdAt": "2022-05-25T18:23:17Z",
+              "updatedAt": "2022-05-25T18:36:13Z"
+            },
+            {
+              "originalPosition": 148,
+              "body": "```suggestion\r\n```",
+              "createdAt": "2022-05-25T18:23:53Z",
+              "updatedAt": "2022-05-25T18:36:13Z"
+            },
+            {
+              "originalPosition": 282,
+              "body": "```suggestion\r\n* Verify that the list of proposals to be committed is valid as specified in\r\n  {{proposal-list-validation}}.\r\n```",
+              "createdAt": "2022-05-25T18:26:28Z",
+              "updatedAt": "2022-05-25T18:36:13Z"
+            },
+            {
+              "originalPosition": 320,
+              "body": "```suggestion\r\n## Proposal List Validation\r\n```",
+              "createdAt": "2022-05-25T18:27:05Z",
+              "updatedAt": "2022-05-25T18:36:13Z"
+            },
+            {
+              "originalPosition": 320,
+              "body": "I would put this above, probably as a subsection of {{proposals}}.  But we can handle that in a section reordering PR; I have added this to #672 ",
+              "createdAt": "2022-05-25T18:30:59Z",
+              "updatedAt": "2022-05-25T18:36:13Z"
+            },
+            {
+              "originalPosition": 359,
+              "body": "I'm not sure why this is here.  It seems like it follows from the Add/Update LeafNode validity requirements.",
+              "createdAt": "2022-05-25T18:36:02Z",
+              "updatedAt": "2022-05-25T18:36:13Z"
+            }
+          ]
         }
       ]
     },
@@ -48873,7 +49116,7 @@
       "labels": [],
       "body": "Closes #681 ",
       "createdAt": "2022-05-20T14:45:25Z",
-      "updatedAt": "2022-05-23T11:51:29Z",
+      "updatedAt": "2022-05-24T18:15:33Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "8a5d422f453ea4c7bd60d97a7fdae838573d58cd",
@@ -48938,6 +49181,19 @@
               "updatedAt": "2022-05-23T11:51:29Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c46oZMZ",
+          "commit": {
+            "abbreviatedOid": "a34abce"
+          },
+          "author": "rohan-wire",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2022-05-24T18:15:33Z",
+          "updatedAt": "2022-05-24T18:15:33Z",
+          "comments": []
         }
       ]
     },
@@ -49132,18 +49388,26 @@
       "labels": [],
       "body": "Closes #663. I'm not sure if this is actually necessary, but there usually seem to be issues in Merkle trees when the leaves are not explicitly distinct from the parents.",
       "createdAt": "2022-05-21T05:37:30Z",
-      "updatedAt": "2022-05-23T21:13:29Z",
+      "updatedAt": "2022-05-25T21:02:13Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
-      "baseRefOid": "b209e1744abd6c4224c45069361a89e5d78d728b",
+      "baseRefOid": "a662e60c3584eb3d7d5a94694ca719b515d88114",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "brendan/indicator-bit",
-      "headRefOid": "e17f7abd1ec48ee48cb383ddf97e7df4f90aa5fb",
+      "headRefOid": "cb95dfcb169aee5d794956c092d9ffd43815d1ad",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "TWal",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I would find it nicer to describe things with a `select` like in other parts of the protocol:\r\n\r\n```\r\nstruct {\r\n  uint8 leaf_or_parent_marker;\r\n  select (leaf_or_parent_marker) {\r\n    case 0:\r\n      LeafNodeHashInput hash_input;\r\n    case 1:\r\n      ParentNodeHashInput hash_input;\r\n  }\r\n} TreeHashInput;\r\n```\r\n\r\nIt is equivalent to your modification. Stating things that way ensures there is no ambiguity: TreeHashInput is parseable, which is I think the property you want to ensure with this PR.",
+          "createdAt": "2022-05-25T19:57:26Z",
+          "updatedAt": "2022-05-25T19:57:26Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOBoyH6c46jXV0",
@@ -49179,7 +49443,7 @@
       "labels": [],
       "body": "Closes #640.",
       "createdAt": "2022-05-21T05:59:55Z",
-      "updatedAt": "2022-05-23T21:56:43Z",
+      "updatedAt": "2022-05-25T17:24:25Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "b209e1744abd6c4224c45069361a89e5d78d728b",
@@ -49237,6 +49501,46 @@
               "updatedAt": "2022-05-23T21:56:37Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c46kWSQ",
+          "commit": {
+            "abbreviatedOid": "bdbb0ec"
+          },
+          "author": "kkohbrok",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-24T05:23:12Z",
+          "updatedAt": "2022-05-24T05:23:12Z",
+          "comments": [
+            {
+              "originalPosition": 19,
+              "body": "At least for the key derivation proofs, we're already assuming that KDFs are collision resistant, which I believe is fairly standard. That being said increasing the length is probably a good idea. \r\n\r\nAlso, I don't think that it makes much of a difference if we're using a hash function or a KDF, since we don't rely on any pseudorandomness properties of the hash references. ",
+              "createdAt": "2022-05-24T05:23:12Z",
+              "updatedAt": "2022-05-24T05:23:12Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c46uRZ4",
+          "commit": {
+            "abbreviatedOid": "bdbb0ec"
+          },
+          "author": "mulmarta",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-25T17:24:24Z",
+          "updatedAt": "2022-05-25T17:24:25Z",
+          "comments": [
+            {
+              "originalPosition": 19,
+              "body": "I lean towards using the hash. A hash function is \"the\" collision resistant primitive and since collision resistance is what we want here, hash would be the right primitive. The main purpose of extract is pseudo-randomness, which is unrelated to collision resistance. (Even if we have to assume collision resistance of extract for some property, using hash here makes it less ambiguous which property is needed.)",
+              "createdAt": "2022-05-25T17:24:24Z",
+              "updatedAt": "2022-05-25T17:24:25Z"
+            }
+          ]
         }
       ]
     },
@@ -49245,24 +49549,26 @@
       "id": "PR_kwDOBoyH6c44PPUb",
       "title": "Reorganize discussion of ratchet tree concepts",
       "url": "https://github.com/mlswg/mls-protocol/pull/689",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "bifurcation",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Closes #670 \r\nCloses #644 \r\nCloses #669 \r\n\r\nThis PR reorganizes the exposition of tree concept to make them read more clearly.\r\n\r\n* A new Paths through the Ratchet Tree section is introduced, which covers direct paths, copaths, and filtered direct paths\r\n* The Ratchet Tree Nodes section is moved forward, so that the definition of filtered direct paths can refer to the notion of resolutions (see @Bren2010's note on #670)\r\n* The path example expanded so that there are blanks in the tree, and so that it shows all three path types (direct, copath, and filtered direct) for every leaf.\r\n* The section on verifying parent hashes uses the example tree from the path section to illustrate the concepts noted in #669 ",
       "createdAt": "2022-05-21T21:12:53Z",
-      "updatedAt": "2022-05-23T21:49:28Z",
+      "updatedAt": "2022-05-24T23:12:54Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "b209e1744abd6c4224c45069361a89e5d78d728b",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "filter-resolution-figure",
       "headRefOid": "1c952fb8dd4242fb15ca060f073e7dc5abd9b25d",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2022-05-24T23:12:54Z",
+      "mergedAt": "2022-05-24T23:12:54Z",
+      "mergedBy": "bifurcation",
+      "mergeCommit": {
+        "oid": "a32c5a4c6ef957d4887b7902f59307ec1c6e338f"
+      },
       "comments": [
         {
           "author": "bifurcation",
@@ -49339,13 +49645,13 @@
       "labels": [],
       "body": "Closes #666 \r\n\r\nAlso covers the PSK part of #673 ",
       "createdAt": "2022-05-22T18:42:02Z",
-      "updatedAt": "2022-05-23T21:20:15Z",
+      "updatedAt": "2022-05-24T18:52:02Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "b209e1744abd6c4224c45069361a89e5d78d728b",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "psk-cleanup",
-      "headRefOid": "6ef807083d92fdff1203adf40e91e3a123e55dc9",
+      "headRefOid": "aeacff56f133217dbc9dbbdbbc933b0b6d6a00ce",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -49371,6 +49677,419 @@
               "updatedAt": "2022-05-23T17:44:45Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c46kVW8",
+          "commit": {
+            "abbreviatedOid": "6ef8070"
+          },
+          "author": "kkohbrok",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2022-05-24T05:16:46Z",
+          "updatedAt": "2022-05-24T05:16:46Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOBoyH6c46inSe",
+          "commit": {
+            "abbreviatedOid": "6ef8070"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-23T17:44:41Z",
+          "updatedAt": "2022-05-24T17:31:34Z",
+          "comments": [
+            {
+              "originalPosition": 56,
+              "body": "```suggestion\r\nA PreSharedKey proposal MUST NOT contain a PSK of type `resumption` that has usage\r\n```",
+              "createdAt": "2022-05-23T17:44:41Z",
+              "updatedAt": "2022-05-24T17:31:34Z"
+            },
+            {
+              "originalPosition": 27,
+              "body": "The above line about \"epoch must be 1\" conflicts with this line that \"epoch must be +1 the last Commit\"",
+              "createdAt": "2022-05-24T17:31:03Z",
+              "updatedAt": "2022-05-24T17:31:34Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c46ojT5",
+          "commit": {
+            "abbreviatedOid": "6ef8070"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-24T18:51:44Z",
+          "updatedAt": "2022-05-24T18:51:57Z",
+          "comments": [
+            {
+              "originalPosition": 24,
+              "body": "```suggestion\r\n```",
+              "createdAt": "2022-05-24T18:51:45Z",
+              "updatedAt": "2022-05-24T18:51:57Z"
+            },
+            {
+              "originalPosition": 27,
+              "body": "Good point, reverted.",
+              "createdAt": "2022-05-24T18:51:49Z",
+              "updatedAt": "2022-05-24T18:51:57Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 692,
+      "id": "PR_kwDOBoyH6c44XpPL",
+      "title": "Use new tree for context in path secret encryption",
+      "url": "https://github.com/mlswg/mls-protocol/pull/692",
+      "state": "OPEN",
+      "author": "bifurcation",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #648 via option (3)",
+      "createdAt": "2022-05-24T14:36:28Z",
+      "updatedAt": "2022-05-24T20:28:15Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "b209e1744abd6c4224c45069361a89e5d78d728b",
+      "headRepository": "mlswg/mls-protocol",
+      "headRefName": "update-path-creation",
+      "headRefOid": "9cbdc45bc976036bb214000d118c99a824ecad8b",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "mulmarta",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Bringing up the issue mentioned in the comments to #648: this can be inconvenient for implementations because this way the update path can't be generated and encrypted at the same time.\r\n\r\nFrom security perspective, I think it can't break anything, since we include strictly more in the context. On the other hand, it's not clear to me what it buys.",
+          "createdAt": "2022-05-24T15:45:20Z",
+          "updatedAt": "2022-05-24T15:45:20Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I sympathize with the idea that this constraints applications.  MLSpp does exactly what you're talking about, updating and encrypting at the same time.  But I'm not really seeing why that refactoring matters all that much.  It's not any more net work, aside from maybe computing a filtered direct path twice.  ",
+          "createdAt": "2022-05-24T20:28:15Z",
+          "updatedAt": "2022-05-24T20:28:15Z"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "number": 694,
+      "id": "PR_kwDOBoyH6c44Ywdg",
+      "title": "Always use a full tree",
+      "url": "https://github.com/mlswg/mls-protocol/pull/694",
+      "state": "OPEN",
+      "author": "bifurcation",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Based on #689 \r\n\r\nCloses #645 ",
+      "createdAt": "2022-05-24T18:46:47Z",
+      "updatedAt": "2022-05-25T20:54:57Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "b209e1744abd6c4224c45069361a89e5d78d728b",
+      "headRepository": "mlswg/mls-protocol",
+      "headRefName": "always-full",
+      "headRefOid": "3944507d4bc35c789721d69286e18dd252238578",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOBoyH6c46vF8b",
+          "commit": {
+            "abbreviatedOid": "3944507"
+          },
+          "author": "TWal",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "Using full tree + filtered direct path seems like a fine combo!\r\n\r\nAs you said in #645 it not only faster, but also makes things a lot easier to understand in various places of the protocol.\r\n\r\nI also like a lot the two examples you added (the one for filtered direct path, and the one for parent-hash link), they have a nice pedagogical value!",
+          "createdAt": "2022-05-25T20:18:50Z",
+          "updatedAt": "2022-05-25T20:54:57Z",
+          "comments": [
+            {
+              "originalPosition": 57,
+              "body": "```suggestion\r\nof a node is effectively a left-first enumeration of the nearest\r\n```\r\n\r\nI find the \"depth-first\" misleading, e.g. in the following tree:\r\n```\r\n      Y\r\n    __|__\r\n   /     \\\r\n  _       Z\r\n / \\     / \\\r\nA   B   C   D\r\n```\r\nthe resolution of Y is A, B, Z and not Z, A, B.\r\n\r\nThinking more about it, this high-level description of what is a \"resolution\" is a bit weird because it doesn't takes into account unmerged leaves.\r\nI think a better high-level description of the \"resolution\" would be something like \"The resolution of a node contains the smallest set of keys required to encrypt a secret to its subtree\".\r\n\r\nWhat do you think?",
+              "createdAt": "2022-05-25T20:18:51Z",
+              "updatedAt": "2022-05-25T20:54:57Z"
+            },
+            {
+              "originalPosition": 687,
+              "body": "```suggestion\r\n* Add: Append `N + 1` blank values to the end of the array.\r\n```\r\n\r\nI think it's N+1 because you need the new right tree of the root (N nodes) + 1 node for the root",
+              "createdAt": "2022-05-25T20:46:25Z",
+              "updatedAt": "2022-05-25T20:54:57Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 695,
+      "id": "PR_kwDOBoyH6c44Y1C_",
+      "title": "Better documentation for transcript hash",
+      "url": "https://github.com/mlswg/mls-protocol/pull/695",
+      "state": "MERGED",
+      "author": "bifurcation",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Fixes #643 \r\n\r\nChanges `MLSMessageCommitContent -> ConfirmedTranscriptHashInput` and `MLSMessageAuthData -> InterimTranscriptHashInput`.",
+      "createdAt": "2022-05-24T19:07:52Z",
+      "updatedAt": "2022-05-24T23:14:32Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "b209e1744abd6c4224c45069361a89e5d78d728b",
+      "headRepository": "mlswg/mls-protocol",
+      "headRefName": "commit-content-clarify",
+      "headRefOid": "5de54299a70a5a1132c92579d1d9cc02f627b90e",
+      "closedAt": "2022-05-24T23:14:32Z",
+      "mergedAt": "2022-05-24T23:14:32Z",
+      "mergedBy": "bifurcation",
+      "mergeCommit": {
+        "oid": "bd56532ab26a586d1e951705c068f836a3960f51"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOBoyH6c46pgAC",
+          "commit": {
+            "abbreviatedOid": "5de5429"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2022-05-24T23:13:59Z",
+          "updatedAt": "2022-05-24T23:13:59Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 697,
+      "id": "PR_kwDOBoyH6c44aPz_",
+      "title": "More thorough discussion of sequencing solutions.",
+      "url": "https://github.com/mlswg/mls-protocol/pull/697",
+      "state": "OPEN",
+      "author": "Bren2010",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "This PR changes the \"client / server ordering\" distinction to more appropriate \"CP / AP ordering\".",
+      "createdAt": "2022-05-25T03:51:18Z",
+      "updatedAt": "2022-05-25T03:51:18Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "bd56532ab26a586d1e951705c068f836a3960f51",
+      "headRepository": "mlswg/mls-protocol",
+      "headRefName": "brendan/sequencing",
+      "headRefOid": "3fb562ea76f88a89202c2c9812cff84545fc2b56",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 698,
+      "id": "PR_kwDOBoyH6c44aQJT",
+      "title": "Editorial",
+      "url": "https://github.com/mlswg/mls-protocol/pull/698",
+      "state": "OPEN",
+      "author": "Bren2010",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2022-05-25T03:53:47Z",
+      "updatedAt": "2022-05-25T21:06:00Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "a662e60c3584eb3d7d5a94694ca719b515d88114",
+      "headRepository": "mlswg/mls-protocol",
+      "headRefName": "brendan/editorial4",
+      "headRefOid": "709aacaa6aa4e3a5fdd346175242cf5558ed29ad",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOBoyH6c46udPv",
+          "commit": {
+            "abbreviatedOid": "e7adf28"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "Couple of minor things, otherwise lgtm.",
+          "createdAt": "2022-05-25T17:56:51Z",
+          "updatedAt": "2022-05-25T18:14:01Z",
+          "comments": [
+            {
+              "originalPosition": 206,
+              "body": "Why is this requirement being removed?",
+              "createdAt": "2022-05-25T17:56:51Z",
+              "updatedAt": "2022-05-25T18:14:01Z"
+            },
+            {
+              "originalPosition": 315,
+              "body": "I would prefer to keep the explicit requirement to verify the signature.",
+              "createdAt": "2022-05-25T18:05:29Z",
+              "updatedAt": "2022-05-25T18:14:01Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c46uvFi",
+          "commit": {
+            "abbreviatedOid": "e7adf28"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-25T18:55:05Z",
+          "updatedAt": "2022-05-25T18:55:06Z",
+          "comments": [
+            {
+              "originalPosition": 206,
+              "body": "Since this is the section on group creation, it doesn't really go here. I believe this requirement is already repeated in other places, but if not, I'll add it back when reviewing ReInit",
+              "createdAt": "2022-05-25T18:55:05Z",
+              "updatedAt": "2022-05-25T18:55:06Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 699,
+      "id": "PR_kwDOBoyH6c44dib6",
+      "title": "Clarify some parts of Application Messages section.",
+      "url": "https://github.com/mlswg/mls-protocol/pull/699",
+      "state": "OPEN",
+      "author": "Bren2010",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #679 ",
+      "createdAt": "2022-05-25T17:14:50Z",
+      "updatedAt": "2022-05-25T21:00:34Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "bd56532ab26a586d1e951705c068f836a3960f51",
+      "headRepository": "mlswg/mls-protocol",
+      "headRefName": "brendan/app-messages",
+      "headRefOid": "8ff5dcdb04191a228f1515c2e1f4fdc9cc531a64",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOBoyH6c46uyc6",
+          "commit": {
+            "abbreviatedOid": "50228fd"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "Couple of friendly amendments, otherwise lgtm.\r\n\r\nI am going to hold this as slightly more than editorial, given the number of MUSTs that are affected.  But I would note for others that the MUSTs that are removed here are all redundant with requirements above.",
+          "createdAt": "2022-05-25T19:08:16Z",
+          "updatedAt": "2022-05-25T19:11:12Z",
+          "comments": [
+            {
+              "originalPosition": 117,
+              "body": "```suggestion\r\nsteps that clients will move the ratchet forward in response to a new message. Messages received\r\n```",
+              "createdAt": "2022-05-25T19:08:16Z",
+              "updatedAt": "2022-05-25T19:11:12Z"
+            },
+            {
+              "originalPosition": 119,
+              "body": "```suggestion\r\ncausing a denial-of-service attack by requiring the recipient to perform an\r\nexcessive number of key derivations.  For example, a malicious group member\r\ncould send a message with `generation = 0xffffffff` at the beginning of a new \r\nepoch, forcing recipients to perform billions of key derivations.\r\n```",
+              "createdAt": "2022-05-25T19:09:58Z",
+              "updatedAt": "2022-05-25T19:11:12Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c46vQOE",
+          "commit": {
+            "abbreviatedOid": "e421202"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-25T21:00:30Z",
+          "updatedAt": "2022-05-25T21:00:30Z",
+          "comments": [
+            {
+              "originalPosition": 121,
+              "body": "```suggestion\r\ncould send a message with `generation = 0xffffffff` at the beginning of a new\r\n```",
+              "createdAt": "2022-05-25T21:00:30Z",
+              "updatedAt": "2022-05-25T21:00:30Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 701,
+      "id": "PR_kwDOBoyH6c44fHMQ",
+      "title": "Change KeyPackage identifier to be LeafNode identifier.",
+      "url": "https://github.com/mlswg/mls-protocol/pull/701",
+      "state": "OPEN",
+      "author": "Bren2010",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "At first I was going to make `external_key_id` an extension for both KeyPackages and LeafNodes. But I was thinking and couldn't come up with a reason for KeyPackages to need this extension, so did just LeafNode. Closes #696.",
+      "createdAt": "2022-05-25T23:29:35Z",
+      "updatedAt": "2022-05-26T00:13:39Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "a662e60c3584eb3d7d5a94694ca719b515d88114",
+      "headRepository": "mlswg/mls-protocol",
+      "headRefName": "brendan/leaf-node-id",
+      "headRefOid": "00f941f90918694fc97fa610544e17c534158b8a",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOBoyH6c46vwoX",
+          "commit": {
+            "abbreviatedOid": "00f941f"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2022-05-26T00:13:39Z",
+          "updatedAt": "2022-05-26T00:13:39Z",
+          "comments": []
         }
       ]
     }
