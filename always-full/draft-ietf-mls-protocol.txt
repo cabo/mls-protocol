@@ -5,7 +5,7 @@
 Network Working Group                                          R. Barnes
 Internet-Draft                                                     Cisco
 Intended status: Informational                             B. Beurdouche
-Expires: 25 November 2022                                Inria & Mozilla
+Expires: 28 November 2022                                Inria & Mozilla
                                                                R. Robert
                                                                         
                                                              J. Millican
@@ -14,7 +14,7 @@ Expires: 25 November 2022                                Inria & Mozilla
                                                                   Google
                                                           K. Cohn-Gordon
                                                     University of Oxford
-                                                             24 May 2022
+                                                             27 May 2022
 
 
               The Messaging Layer Security (MLS) Protocol
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 25 November 2022.
+   This Internet-Draft will expire on 28 November 2022.
 
 Copyright Notice
 
@@ -5591,7 +5591,7 @@ Appendix B.  Array-Based Trees
    removing nodes at the right edge of the tree are quite simple.  If
    there are N nodes in the array:
 
-   *  Add: Append N - 1 blank values to the end of the array.
+   *  Add: Append N + 1 blank values to the end of the array.
 
    *  Remove: Truncate the array to its first (N-1) / 2 entries.
 
