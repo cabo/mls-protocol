@@ -5,7 +5,7 @@
 Network Working Group                                          R. Barnes
 Internet-Draft                                                     Cisco
 Intended status: Informational                             B. Beurdouche
-Expires: 26 November 2022                                Inria & Mozilla
+Expires: 29 November 2022                                Inria & Mozilla
                                                                R. Robert
                                                                         
                                                              J. Millican
@@ -14,7 +14,7 @@ Expires: 26 November 2022                                Inria & Mozilla
                                                                   Google
                                                           K. Cohn-Gordon
                                                     University of Oxford
-                                                             25 May 2022
+                                                             28 May 2022
 
 
               The Messaging Layer Security (MLS) Protocol
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 26 November 2022.
+   This Internet-Draft will expire on 29 November 2022.
 
 Copyright Notice
 
@@ -1493,15 +1493,15 @@ Table of Contents
    identifiers.
 
    If needed, applications may add application-specific identifiers to
-   the extensions field of a LeafNode object with the external_id
+   the extensions field of a LeafNode object with the application_id
    extension.
 
-   opaque external_id<V>;
+   opaque application_id<V>;
 
-   However, applications SHOULD NOT rely on the data in an external_id
-   extension as if it were authenticated by the Authentication Service,
-   and SHOULD gracefully handle cases where the identifier presented is
-   not unique.
+   However, applications SHOULD NOT rely on the data in an
+   application_id extension as if it were authenticated by the
+   Authentication Service, and SHOULD gracefully handle cases where the
+   identifier presented is not unique.
 
 7.  Message Framing
 
@@ -5217,7 +5217,7 @@ psk_secret (or 0) --> KDF.Extract
    +======+=======================+============+=============+=========+
    |0x0000| RESERVED              | N/A        | N/A         |RFC XXXX |
    +------+-----------------------+------------+-------------+---------+
-   |0x0001| external_id           | LN         | Y           |RFC XXXX |
+   |0x0001| application_id        | LN         | Y           |RFC XXXX |
    +------+-----------------------+------------+-------------+---------+
    |0x0002| ratchet_tree          | GI         | Y           |RFC XXXX |
    +------+-----------------------+------------+-------------+---------+
