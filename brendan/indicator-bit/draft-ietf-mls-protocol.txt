@@ -2387,6 +2387,13 @@ Welcome  KeyPackage  GroupInfo   MLSPlaintext      MLSCiphertext -'
    any).  ParentNodeHashInput objects contain the ParentNode (if any)
    and the tree hash of the node's left and right children.
 
+   enum {
+       reserved(0),
+       leaf(1),
+       parent(2),
+       (255)
+   } NodeType;
+
    struct {
      NodeType node_type;
      select (TreeHashInput.node_type) {
@@ -4424,13 +4431,6 @@ psk_secret (or 0) --> KDF.Extract
    external source, the whole public state of the ratchet tree can be
    provided in an extension of type ratchet_tree, containing a
    ratchet_tree object of the following form:
-
-   enum {
-       reserved(0),
-       leaf(1),
-       parent(2),
-       (255)
-   } NodeType;
 
    struct {
        NodeType node_type;

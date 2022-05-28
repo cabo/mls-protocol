@@ -4254,6 +4254,13 @@ objects contain the <code>ParentNode</code> (if any) and the tree hash of the no
 and right children.<a href="#section-8.7-2" class="pilcrow">¶</a></p>
 <div id="section-8.7-3">
 <pre class="lang-tls sourcecode">
+enum {
+    reserved(0),
+    leaf(1),
+    parent(2),
+    (255)
+} NodeType;
+
 struct {
   NodeType node_type;
   select (TreeHashInput.node_type) {
@@ -6624,13 +6631,6 @@ the whole public state of the ratchet tree can be provided in an extension of
 type <code>ratchet_tree</code>, containing a <code>ratchet_tree</code> object of the following form:<a href="#section-13.3-2" class="pilcrow">¶</a></p>
 <div id="section-13.3-3">
 <pre class="lang-tls sourcecode">
-enum {
-    reserved(0),
-    leaf(1),
-    parent(2),
-    (255)
-} NodeType;
-
 struct {
     NodeType node_type;
     select (Node.node_type) {
