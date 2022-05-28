@@ -5,7 +5,7 @@
 Network Working Group                                          R. Barnes
 Internet-Draft                                                     Cisco
 Intended status: Informational                             B. Beurdouche
-Expires: 26 November 2022                                Inria & Mozilla
+Expires: 29 November 2022                                Inria & Mozilla
                                                                R. Robert
                                                                         
                                                              J. Millican
@@ -14,7 +14,7 @@ Expires: 26 November 2022                                Inria & Mozilla
                                                                   Google
                                                           K. Cohn-Gordon
                                                     University of Oxford
-                                                             25 May 2022
+                                                             28 May 2022
 
 
               The Messaging Layer Security (MLS) Protocol
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 26 November 2022.
+   This Internet-Draft will expire on 29 November 2022.
 
 Copyright Notice
 
@@ -2388,12 +2388,10 @@ Welcome  KeyPackage  GroupInfo   MLSPlaintext      MLSCiphertext -'
    and the tree hash of the node's left and right children.
 
    struct {
-     uint8 leaf_or_parent_marker;
-     select (TreeHashInput.leaf_or_parent_marker) {
-       case 0:
-         LeafNodeHashInput hash_input;
-       case 1:
-         ParentNodeHashInput hash_input;
+     NodeType node_type;
+     select (TreeHashInput.node_type) {
+       case leaf:   LeafNodeHashInput leaf_node;
+       case parent: ParentNodeHashInput parent_node;
      }
    } TreeHashInput;
 
