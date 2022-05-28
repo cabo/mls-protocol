@@ -5,7 +5,7 @@
 Network Working Group                                          R. Barnes
 Internet-Draft                                                     Cisco
 Intended status: Informational                             B. Beurdouche
-Expires: 26 November 2022                                Inria & Mozilla
+Expires: 29 November 2022                                Inria & Mozilla
                                                                R. Robert
                                                                         
                                                              J. Millican
@@ -14,7 +14,7 @@ Expires: 26 November 2022                                Inria & Mozilla
                                                                   Google
                                                           K. Cohn-Gordon
                                                     University of Oxford
-                                                             25 May 2022
+                                                             28 May 2022
 
 
               The Messaging Layer Security (MLS) Protocol
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 26 November 2022.
+   This Internet-Draft will expire on 29 November 2022.
 
 Copyright Notice
 
@@ -4812,12 +4812,13 @@ psk_secret (or 0) --> KDF.Extract
    deleted when the epoch ends.  Applications SHOULD also define a
    policy limiting the maximum number of steps that clients will move
    the ratchet forward in response to a new message.  Messages received
-   with an unusually high generation counter would then be rejected to
-   avoid causing a denial-of-service attack by requiring the recipient
-   to perform an excessive number of key derivations.  For example, a
-   malicious group member could send a message with generation =
-   0xffffffff at the beginning of a new epoch, forcing recipients to
-   perform billions of key derivations.
+   with a generation counter that's too much higher than the last
+   message received would then be rejected.  This avoids causing a
+   denial-of-service attack by requiring the recipient to perform an
+   excessive number of key derivations.  For example, a malicious group
+   member could send a message with generation = 0xffffffff at the
+   beginning of a new epoch, forcing recipients to perform billions of
+   key derivations.
 
 17.  Security Considerations
 
