@@ -5,7 +5,7 @@
 Network Working Group                                          R. Barnes
 Internet-Draft                                                     Cisco
 Intended status: Informational                             B. Beurdouche
-Expires: 28 November 2022                                Inria & Mozilla
+Expires: 29 November 2022                                Inria & Mozilla
                                                                R. Robert
                                                                         
                                                              J. Millican
@@ -14,7 +14,7 @@ Expires: 28 November 2022                                Inria & Mozilla
                                                                   Google
                                                           K. Cohn-Gordon
                                                     University of Oxford
-                                                             27 May 2022
+                                                             28 May 2022
 
 
               The Messaging Layer Security (MLS) Protocol
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 28 November 2022.
+   This Internet-Draft will expire on 29 November 2022.
 
 Copyright Notice
 
@@ -3413,6 +3413,14 @@ psk_secret (or 0) --> KDF.Extract
 
    *  Transmit the Welcome message to the other new members
 
+   Group IDs SHOULD be constructed in such a way that there's an
+   overwhelmingly low probability of honest group creators generating
+   the same group ID, even without assistance from the Delivery Service.
+   For example, by making the group ID a freshly generated random value
+   of size KDF.Nh.  The Delivery Service MAY attempt to ensure that
+   group IDs are globally unique by rejecting the creation of new groups
+   with a previously used ID.
+
    The recipient of a Welcome message processes it as described in
    Section 13.2.3.2.  If application context informs the recipient that
    the Welcome should reflect the creation of a new group (for example,
@@ -4203,10 +4211,13 @@ psk_secret (or 0) --> KDF.Extract
        opaque signature<V>;
    } GroupInfo;
 
-   New members MUST verify the signature using the public key taken from
-   the credential in the leaf node of the ratchet tree with leaf index
-   signer.  The signature covers the following structure, comprising all
-   the fields in the GroupInfo above signature:
+   New members MUST verify that group_id is unique among the groups
+   they're currently participating in.
+
+   New members also MUST verify the signature using the public key taken
+   from the leaf node of the ratchet tree with leaf index signer.  The
+   signature covers the following structure, comprising all the fields
+   in the GroupInfo above signature:
 
    struct {
        CipherSuite cipher_suite;
@@ -4394,6 +4405,9 @@ psk_secret (or 0) --> KDF.Extract
       credential in the leaf node of the ratchet tree with leaf index
       signer.  If the node is blank or if signature verification fails,
       return an error.
+
+   *  Verify that the group_id is unique among the groups that the
+      client is currently participating in.
 
    *  Verify the integrity of the ratchet tree.
 
