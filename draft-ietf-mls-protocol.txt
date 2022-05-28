@@ -126,7 +126,6 @@ Table of Contents
      10.2.  Deletion Schedule
    11. Key Packages
      11.1.  KeyPackage Validation
-     11.2.  KeyPackage Identifiers
    12. Group Creation
      12.1.  Required Capabilities
      12.2.  Reinitialization
@@ -1499,9 +1498,16 @@ Table of Contents
    those devices' clients could all present the user's application-layer
    identifiers.
 
-   If needed, applications may add application-specific unique
-   identifiers to the extensions field of KeyPackage or LeafNode
-   objects.
+   If needed, applications may add application-specific identifiers to
+   the extensions field of a LeafNode object with the application_id
+   extension.
+
+   opaque application_id<V>;
+
+   However, applications SHOULD NOT rely on the data in an
+   application_id extension as if it were authenticated by the
+   Authentication Service, and SHOULD gracefully handle cases where the
+   identifier presented is not unique.
 
 7.  Message Framing
 
@@ -3369,14 +3375,6 @@ psk_secret (or 0) --> KDF.Extract
 
    *  Verify that the value of leaf_node.encryption_key is different
       from the value of the init_key field.
-
-11.2.  KeyPackage Identifiers
-
-   Within MLS, a KeyPackage is identified by its hash (see, e.g.,
-   Section 13.2.3.2).  The external_key_id extension allows applications
-   to add an explicit, application-defined identifier to a KeyPackage.
-
-   opaque external_key_id<V>;
 
 12.  Group Creation
 
@@ -5290,7 +5288,7 @@ psk_secret (or 0) --> KDF.Extract
    +======+=======================+============+=============+=========+
    |0x0000| RESERVED              | N/A        | N/A         |RFC XXXX |
    +------+-----------------------+------------+-------------+---------+
-   |0x0001| external_key_id       | KP         | Y           |RFC XXXX |
+   |0x0001| application_id        | LN         | Y           |RFC XXXX |
    +------+-----------------------+------------+-------------+---------+
    |0x0002| ratchet_tree          | GI         | Y           |RFC XXXX |
    +------+-----------------------+------------+-------------+---------+
