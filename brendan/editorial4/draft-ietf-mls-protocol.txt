@@ -5,7 +5,7 @@
 Network Working Group                                          R. Barnes
 Internet-Draft                                                     Cisco
 Intended status: Informational                             B. Beurdouche
-Expires: 26 November 2022                                Inria & Mozilla
+Expires: 29 November 2022                                Inria & Mozilla
                                                                R. Robert
                                                                         
                                                              J. Millican
@@ -14,7 +14,7 @@ Expires: 26 November 2022                                Inria & Mozilla
                                                                   Google
                                                           K. Cohn-Gordon
                                                     University of Oxford
-                                                             25 May 2022
+                                                             28 May 2022
 
 
               The Messaging Layer Security (MLS) Protocol
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 26 November 2022.
+   This Internet-Draft will expire on 29 November 2022.
 
 Copyright Notice
 
@@ -1399,16 +1399,22 @@ Table of Contents
    and Commits refer to Proposals they cover.  These identifiers are
    computed as follows:
 
-   opaque HashReference[16];
+   opaque HashReference<V>;
 
    HashReference KeyPackageRef;
    HashReference ProposalRef;
 
-   MakeKeyPackageRef(value) = KDF.expand(
-     KDF.extract("", value), "MLS 1.0 KeyPackage Reference", 16)
+   MakeKeyPackageRef(value) = RefHash("MLS 1.0 KeyPackage Reference", value)
+   MakeProposalRef(value)   = RefHash("MLS 1.0 Proposal Reference", value)
 
-   MakeProposalRef(value) = KDF.expand(
-     KDF.extract("", value), "MLS 1.0 Proposal Reference", 16)
+   RefHash(label, value) = Hash(RefHashInput)
+
+   Where RefHashInput is defined as:
+
+   struct {
+     opaque label<V> = label;
+     opaque value<V> = value;
+   } RefHashInput;
 
    For a KeyPackageRef, the value input is the encoded KeyPackage, and
    the ciphersuite specified in the KeyPackage determines the KDF used.
@@ -2636,12 +2642,15 @@ Welcome  KeyPackage  GroupInfo   MLSPlaintext      MLSCiphertext -'
    ciphertext = context.Seal("", path_secret)
 
    where node_public_key is the public key of the node that the path
-   secret is being encrypted for, group_context is the current
+   secret is being encrypted for, group_context is the provisional
    GroupContext object for the group, and the functions SetupBaseS and
    Seal are defined according to [RFC9180].
 
    Decryption is performed in the corresponding way, using the private
    key of the resolution node.
+
+   context = SetupBaseR(kem_output, node_private_key, group_context)
+   path_secret = context.Open("", ciphertext)
 
 9.  Key Schedule
 
@@ -2965,9 +2974,12 @@ psk_secret (or 0) --> KDF.Extract
      opaque psk_nonce<V>;
    } PreSharedKeyID;
 
-   struct {
-       PreSharedKeyID psks<V>;
-   } PreSharedKeys;
+   Each time a client injects a PSK into a group, the psk_nonce of its
+   PreSharedKeyID MUST be set to a fresh random value of length KDF.Nh,
+   where KDF is the KDF for the ciphersuite of the group into which the
+   PSK is being injected.  This ensures that even when a PSK is used
+   multiple times, the value used as an input into the key schedule is
+   different each time.
 
    Upon receiving a Commit with a PreSharedKey proposal or a
    GroupSecrets object with the psks field set, the receiving Client
@@ -3460,16 +3472,10 @@ psk_secret (or 0) --> KDF.Extract
           message MUST be the same as the corresponding fields in the
           ReInit proposal.
 
-       *  The epoch in the Welcome message MUST be 1.
-
        *  The Welcome MUST specify a PreSharedKey of type resumption
           with usage reinit.  The group_id MUST match the old group, and
           the epoch MUST indicate the epoch after the Commit covering
           the ReInit.
-
-       *  The psk_nonce included in the PreSharedKeyID of the resumption
-          PSK MUST be a randomly sampled nonce of length KDF.Nh, for the
-          KDF defined by the new group's ciphersuite.
 
    Note that these three steps may be done by the same group member or
    different members.  For example, if a group member sends a Commit
@@ -3507,7 +3513,9 @@ psk_secret (or 0) --> KDF.Extract
    *  The version and ciphersuite values in the Welcome are the same as
       those used by the old group.
 
-   *  Each LeafNode in a new subgroup matches some LeafNode in the
+   *  The epoch in the Welcome message MUST be 1.
+
+   *  Each LeafNode in a new subgroup MUST match some LeafNode in the
       original group.  In this context, a pair of LeafNodes is said to
       "match" if the identifiers presented by their respective
       credentials are considered equivalent by the application.
@@ -3667,7 +3675,8 @@ psk_secret (or 0) --> KDF.Extract
 
    A PreSharedKey proposal is invalid if any of the following is true:
 
-   *  The psktype in the PreSharedKeyID struct is not set to external.
+   *  The psktype in the PreSharedKeyID struct is not set to resumption
+      and the usage is reinit or branch.
 
    *  The psk_nonce is not of length KDF.Nh.
 
@@ -3761,10 +3770,15 @@ psk_secret (or 0) --> KDF.Extract
 13.1.8.1.  External Senders Extension
 
    The external_senders extension is a group context extension that
-   contains credentials of senders that are permitted to send external
-   proposals to the group.
+   contains the credentials and signature keys of senders that are
+   permitted to send external proposals to the group.
 
-   Credential external_senders<V>;
+   struct {
+     SignaturePublicKey signature_key;
+     Credential credential;
+   } ExternalSender;
+
+   ExternalSender external_senders<V>;
 
 13.2.  Commit
 
@@ -3897,27 +3911,13 @@ psk_secret (or 0) --> KDF.Extract
 
 13.2.1.  Creating a Commit
 
-   When creating or processing a Commit, three different ratchet trees
-   and their associated GroupContexts are used:
-
-   1.  "Old" refers to the ratchet tree and GroupContext for the epoch
-       before the commit.  The old GroupContext is used when signing the
-       MLSPlainText so that existing group members can verify the
-       signature before processing the commit.
-
-   2.  "Provisional" refers to the ratchet tree and GroupContext
-       constructed after applying the proposals that are referenced by
-       the Commit.  The provisional GroupContext uses the epoch number
-       for the new epoch, and the old confirmed transcript hash.  This
-       is used when creating the UpdatePath, if the UpdatePath is
-       needed.
-
-   3.  "New" refers to the ratchet tree and GroupContext constructed
-       after applying the proposals and the UpdatePath (if any).  The
-       new GroupContext uses the epoch number for the new epoch, and the
-       new confirmed transcript hash.  This is used when deriving the
-       new epoch secrets, and is the only GroupContext that newly-added
-       members will have.
+   When creating or processing a Commit, a client updates the ratchet
+   tree and GroupContext for the group.  These values advance from an
+   "old" state reflecting the current epoch to a "new" state reflecting
+   the new epoch initiated by the Commit.  When the Commit includes an
+   UpdatePath, a "provisional" group context is constructed that
+   reflects changes due to the proposals and UpdatePath, but with the
+   old confirmed transcript hash.
 
    A member of the group creates a Commit message and the corresponding
    Welcome message at the same time, by taking the following steps:
@@ -3929,13 +3929,13 @@ psk_secret (or 0) --> KDF.Extract
       populated from Proposals received during the current epoch, and an
       empty path field.
 
-   *  Generate the provisional ratchet tree and GroupContext by applying
-      the proposals referenced in the initial Commit object, as
-      described in Section 13.1.  Update proposals are applied first,
-      followed by Remove proposals, and then finally Add proposals.  Add
-      proposals are applied in the order listed in the proposals vector,
-      and always to the leftmost unoccupied leaf in the tree, or the
-      right edge of the tree if all leaves are occupied.
+   *  Initialize the new ratchet tree and GroupContext by applying the
+      proposals referenced in the initial Commit object, as described in
+      Section 13.1.  Update proposals are applied first, followed by
+      Remove proposals, and then finally Add proposals.  Add proposals
+      are applied in the order listed in the proposals vector, and
+      always to the leftmost unoccupied leaf in the tree, or the right
+      edge of the tree if all leaves are occupied.
 
       -  Note that the order in which different types of proposals are
          applied should be updated by the implementation to include any
@@ -3949,27 +3949,61 @@ psk_secret (or 0) --> KDF.Extract
       above), then it MUST be populated.  Otherwise, the sender MAY omit
       the path field at its discretion.
 
-   *  If populating the path field: Create an UpdatePath using the
-      provisional ratchet tree and GroupContext.  Any new member (from
-      an Add proposal) MUST be excluded from the resolution during the
-      computation of the UpdatePath.  The leaf_node for this UpdatePath
-      MUST have leaf_node_source set to commit.  Note that the LeafNode
-      in the UpdatePath effectively updates an existing LeafNode in the
-      group and thus MUST adhere to the same restrictions as LeafNodes
-      used in Update proposals (aside from leaf_node_source).
+   *  If populating the path field:
+
+      -  If this is an external commit, assign the sender the leftmost
+         blank leaf node in the new ratchet tree.  If there are no blank
+         leaf nodes in the new ratchet tree, add a blank leaf to the
+         right side of the new ratchet tree and assign it to the sender.
+
+      -  Generate path secrets for the parent nodes along the sender's
+         filtered direct path, as described in Section 8.6.  Define
+         commit_secret as the value path_secret[n+1] derived from the
+         path_secret[n] value assigned to the root node.
+
+      -  Update the new ratchet tree by setting the parent nodes on the
+         sender's filtered direct path based on the path secrets.
+         Compute parent hashes for these nodes.  Set the sender's leaf
+         node in the new tree to a new leaf node including the resulting
+         parent hash for its nearest ancestor.
+
+         o  The new leaf node MUST have leaf_node_source set to commit.
+
+         o  Since the new leaf node effectively updates an existing leaf
+            node in the group, it MUST adhere to the same restrictions
+            as LeafNodes used in Update proposals (aside from
+            leaf_node_source).
+
+         o  The application MAY specify other changes to the leaf node,
+            e.g., providing a new signature key, updated capabilities,
+            or different extensions.
+
+      -  Construct a provisional GroupContext object containing the
+         following values:
+
+         o  group_id: Same as the old GroupContext
+
+         o  epoch: The epoch number for the new epoch
+
+         o  tree_hash: The tree hash of the new ratchet tree
+
+         o  confirmed_transcript_hash: Same as the old GroupContext
+
+         o  extensions: The new GroupContext extensions (possibly
+            updated by a GroupContextExtensions proposal)
+
+      -  Create an UpdatePath that encrypts the path secrets for the
+         nodes along the sender's filtered direct path to the new
+         ratchet tree, using the provisional GroupContext as context.
+         Any new member (from an Add proposal) MUST be excluded from the
+         resolution during the computation of the UpdatePath.
 
       -  Assign this UpdatePath to the path field in the Commit.
-
-      -  Apply the UpdatePath to the tree, as described in Section 8.6,
-         creating the new ratchet tree.  Define commit_secret as the
-         value path_secret[n+1] derived from the path_secret[n] value
-         assigned to the root node.
 
    *  If not populating the path field: Set the path field in the Commit
       to the null optional.  Define commit_secret as the all-zero vector
       of length KDF.Nh (the same length as a path_secret value would
-      be).  In this case, the new ratchet tree is the same as the
-      provisional ratchet tree.
+      be).
 
    *  Derive the psk_secret as specified in Section 9.4, where the order
       of PSKs in the derivation corresponds to the order of PreSharedKey
@@ -3980,7 +4014,7 @@ psk_secret (or 0) --> KDF.Extract
       context.
 
       -  Use the MLSMessageContent to update the confirmed transcript
-         hash and generate the new GroupContext.
+         hash and update the new GroupContext.
 
       -  Use the init_secret from the previous epoch, the commit_secret
          and the psk_secret as defined in the previous steps, and the
@@ -4062,13 +4096,13 @@ psk_secret (or 0) --> KDF.Extract
    *  Verify that all PreSharedKey proposals in the proposals vector are
       available.
 
-   *  Generate the provisional ratchet tree and GroupContext by applying
-      the proposals referenced in the initial Commit object, as
-      described in Section 13.1.  Update proposals are applied first,
-      followed by Remove proposals, and then finally Add proposals.  Add
-      proposals are applied in the order listed in the proposals vector,
-      and always to the leftmost unoccupied leaf in the tree, or the
-      right edge of the tree if all leaves are occupied.
+   *  Initialize the new ratchet tree and GroupContext by applying the
+      proposals referenced in the initial Commit object, as described in
+      Section 13.1.  Update proposals are applied first, followed by
+      Remove proposals, and then finally Add proposals.  Add proposals
+      are applied in the order listed in the proposals vector, and
+      always to the leftmost unoccupied leaf in the tree, or the right
+      edge of the tree if all leaves are occupied.
 
       -  Note that the order in which different types of proposals are
          applied should be updated by the implementation to include any
@@ -4078,9 +4112,13 @@ psk_secret (or 0) --> KDF.Extract
       contains any Update or Remove proposals, or if it's empty.
       Otherwise, the path value MAY be omitted.
 
-   *  If the path value is populated: Process the path value using the
-      provisional ratchet tree and GroupContext, to generate the new
-      ratchet tree and the commit_secret:
+   *  If the path value is populated, validate it and apply it to the
+      tree:
+
+      -  If this is an external commit, assign the sender the leftmost
+         blank leaf node in the new ratchet tree.  If there are no blank
+         leaf nodes in the new ratchet tree, add a blank leaf to the
+         right side of the new ratchet tree and assign it to the sender.
 
       -  Validate the LeafNode as specified in Section 8.3.  The
          leaf_node_source field MUST be set to commit.
@@ -4088,11 +4126,28 @@ psk_secret (or 0) --> KDF.Extract
       -  Verify that the encryption_key value in the LeafNode is
          different from the committer's current leaf node.
 
-      -  Apply the UpdatePath to the tree, as described in Section 8.6,
-         and store leaf_node at the committer's leaf.
+      -  Compute parent hashes for the parent nodes in the UpdatePath
+         (relative to the new ratchet tree) and verify that the
+         parent_hash field of the leaf node matches the parent hash for
+         the first node its filtered direct path.
 
-      -  Verify that the LeafNode has a parent_hash field and that its
-         value matches the new parent of the sender's leaf node.
+      -  Construct a provisional GroupContext object containing the
+         following values:
+
+         o  group_id: Same as the old GroupContext
+
+         o  epoch: The epoch number for the new epoch
+
+         o  tree_hash: The tree hash of the new ratchet tree
+
+         o  confirmed_transcript_hash: Same as the old GroupContext
+
+         o  extensions: The new GroupContext extensions (possibly
+            updated by a GroupContextExtensions proposal)
+
+      -  Apply the UpdatePath to the tree, as described in Section 8.6,
+         using the provisional GroupContext when decrypting the path
+         secret and storing leaf_node at the committer's leaf.
 
       -  Define commit_secret as the value path_secret[n+1] derived from
          the path_secret[n] value assigned to the root node.
@@ -4288,7 +4343,7 @@ psk_secret (or 0) --> KDF.Extract
    struct {
      opaque joiner_secret<V>;
      optional<PathSecret> path_secret;
-     PreSharedKeys psks;
+     PreSharedKeyID psks<V>
    } GroupSecrets;
 
    struct {
