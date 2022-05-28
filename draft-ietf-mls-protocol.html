@@ -4251,32 +4251,44 @@ specifically:<a href="#section-8.6-10" class="pilcrow">¶</a></p>
 <p id="section-8.7-1">To allow group members to verify that they agree on the public cryptographic state
 of the group, this section defines a scheme for generating a hash value (called
 the "tree hash") that represents the contents of the group's ratchet tree and the
-members' leaf nodes. The tree hash of a tree is the tree hash of its root node,
-which we define recursively, starting with the leaves.<a href="#section-8.7-1" class="pilcrow">¶</a></p>
-<p id="section-8.7-2">The tree hash of a leaf node is the hash of leaf's <code>LeafNodeHashInput</code> object which
-might include a <code>LeafNode</code> object depending on whether or not it is blank.<a href="#section-8.7-2" class="pilcrow">¶</a></p>
+members' leaf nodes.<a href="#section-8.7-1" class="pilcrow">¶</a></p>
+<p id="section-8.7-2">The tree hash of an individual node is the hash of the node's <code>TreeHashInput</code>
+object, which may contain either a <code>LeafNodeHashInput</code> or a
+<code>ParentNodeHashInput</code> depending on the type of node. <code>LeafNodeHashInput</code> objects
+contain the <code>leaf_index</code> and the <code>LeafNode</code> (if any). <code>ParentNodeHashInput</code>
+objects contain the <code>ParentNode</code> (if any) and the tree hash of the node's left
+and right children.<a href="#section-8.7-2" class="pilcrow">¶</a></p>
 <div id="section-8.7-3">
 <pre class="lang-tls sourcecode">
+enum {
+    reserved(0),
+    leaf(1),
+    parent(2),
+    (255)
+} NodeType;
+
+struct {
+  NodeType node_type;
+  select (TreeHashInput.node_type) {
+    case leaf:   LeafNodeHashInput leaf_node;
+    case parent: ParentNodeHashInput parent_node;
+  }
+} TreeHashInput;
+
 struct {
     uint32 leaf_index;
     optional&lt;LeafNode&gt; leaf_node;
 } LeafNodeHashInput;
-</pre><a href="#section-8.7-3" class="pilcrow">¶</a>
-</div>
-<p id="section-8.7-4">Now the tree hash of any non-leaf node is recursively defined to be the hash of
-its <code>ParentNodeHashInput</code>. This includes an optional <code>ParentNode</code>
-object depending on whether the node is blank or not.<a href="#section-8.7-4" class="pilcrow">¶</a></p>
-<div id="section-8.7-5">
-<pre class="lang-tls sourcecode">
+
 struct {
     optional&lt;ParentNode&gt; parent_node;
     opaque left_hash&lt;V&gt;;
     opaque right_hash&lt;V&gt;;
 } ParentNodeHashInput;
-</pre><a href="#section-8.7-5" class="pilcrow">¶</a>
+</pre><a href="#section-8.7-3" class="pilcrow">¶</a>
 </div>
-<p id="section-8.7-6">The <code>left_hash</code> and <code>right_hash</code> fields hold the tree hashes of the node's
-left and right children, respectively.<a href="#section-8.7-6" class="pilcrow">¶</a></p>
+<p id="section-8.7-4">The tree hash of an entire tree corresponds to the tree hash of the root node,
+which is computed recursively by starting at the leaf nodes and building up.<a href="#section-8.7-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="parent-hash">
@@ -6695,13 +6707,6 @@ the whole public state of the ratchet tree can be provided in an extension of
 type <code>ratchet_tree</code>, containing a <code>ratchet_tree</code> object of the following form:<a href="#section-13.3-2" class="pilcrow">¶</a></p>
 <div id="section-13.3-3">
 <pre class="lang-tls sourcecode">
-enum {
-    reserved(0),
-    leaf(1),
-    parent(2),
-    (255)
-} NodeType;
-
 struct {
     NodeType node_type;
     select (Node.node_type) {
