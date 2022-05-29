@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-05-26T01:57:39.996969+00:00",
+  "timestamp": "2022-05-29T02:03:37.458307+00:00",
   "repo": "mlswg/mls-protocol",
   "labels": [
     {
@@ -6514,7 +6514,7 @@
       "id": "I_kwDOBoyH6c5JE_h5",
       "title": "Weak transcript binding of proposals by reference",
       "url": "https://github.com/mlswg/mls-protocol/issues/640",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bifurcation",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -6525,8 +6525,8 @@
       ],
       "body": "In #510 we changed from using full-size hash references to using truncated hashes.  This is fine for cases where the reference is only acting as a reference, so unambiguous identification is the only concern.\r\n\r\nFor proposal references, however, the hash-based reference is also the way that the proposal is incorporated into the transcript.  In this case, we end up with a looser binding with truncated hashes, since a malicious transcript need only match a subset of the bits of the hash.\r\n\r\nThis doesn\u2019t seem like a huge issue in practice, since if the hash function is broken enough to allow 128-bit collisions, we likely have deeper problems.  But it might mean that transcript integrity fails before other aspects of the protocol.\r\n\r\nTo fix this, we could either restore all hash-based identifiers to full size (basically, revert #510), or we could revert just the proposal references.  The former would be more uniform; the latter would be more parsimonious.  I\u2019m pretty ambivalent between the two.",
       "createdAt": "2022-05-04T22:56:59Z",
-      "updatedAt": "2022-05-21T05:58:54Z",
-      "closedAt": null,
+      "updatedAt": "2022-05-26T14:32:51Z",
+      "closedAt": "2022-05-26T14:32:51Z",
       "comments": [
         {
           "author": "bifurcation",
@@ -6726,7 +6726,7 @@
       "id": "I_kwDOBoyH6c5JFblh",
       "title": "Clarify order of operations in processing external join",
       "url": "https://github.com/mlswg/mls-protocol/issues/648",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bifurcation",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
@@ -6735,8 +6735,8 @@
       ],
       "body": "In #511, we removed the requirement for an external Commit to have an Add proposal, under the theory that the required `path` already has a leaf node for the new joiner.  When I went to implement this, however, I noticed some ambiguities. \r\n\r\nFirst, the Commit processing section doesn't mention when the new joiner is added.  The obvious approach is to do the add as part of the `path` processing, but that processing presumes that the sender is already in the tree (for example, there is no provision for extending the tree).\r\n\r\nSecond, the UpdatePath for an external commit needs to be done in a specific order in order to avoid a circular dependency.  The TreeKEM encapsulation done by the joiner uses the GroupContext a context parameter, including the hash of the tree being used.  But the LeafNode in the `path.leaf_node` has to have a parent hash in it, which can only be computed after the encapsulation operation.  This circularity can be resolved, but only by preparing the UpdatePath with the following specific steps:\r\n\r\n1. Compute the path secrets\r\n2. Compute the parent hash and the new leaf node\r\n3. Compute the new tree hash\r\n4. Encrypt the path secrets to the rest of the group\r\n\r\nThat rules out some implementations that compute path secrets and encrypt them in one traversal of the direct path (this is what MLSpp does now).\r\n\r\nThe options here are basically:\r\n\r\n1. Re-add the Add proposal, thus having a throw-away temporary LeafNode for the joiner\r\n2. Specify that the UpdatePath must be computed in the specific order above\r\n\r\nTo me, (2) seems like a pretty clear winner.",
       "createdAt": "2022-05-05T03:22:55Z",
-      "updatedAt": "2022-05-24T13:06:50Z",
-      "closedAt": null,
+      "updatedAt": "2022-05-26T14:47:46Z",
+      "closedAt": "2022-05-26T14:47:46Z",
       "comments": [
         {
           "author": "bifurcation",
@@ -6900,7 +6900,7 @@
       "id": "I_kwDOBoyH6c5Jo4xz",
       "title": "Specify that clients MUST ensure the group id is unique and fixed for each group.",
       "url": "https://github.com/mlswg/mls-protocol/issues/661",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "Bren2010",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
@@ -6909,8 +6909,8 @@
       ],
       "body": "Group ids are signed to bind certain information to specific groups. But I can imagine a case where a user mis-uses the group id to be something like a \"room title\" which lets an adversary control the group id and introduces potential problems.\r\n\r\n- If we can prove that it's fine for a group id to be reused, then should we get rid of group ids?\r\n- If not (as I expect), then group ids need to be guaranteed to be unique [globally | per client | per signing key] and we need to specify that.",
       "createdAt": "2022-05-13T16:31:40Z",
-      "updatedAt": "2022-05-20T17:59:08Z",
-      "closedAt": null,
+      "updatedAt": "2022-05-28T18:56:41Z",
+      "closedAt": "2022-05-28T18:56:41Z",
       "comments": [
         {
           "author": "seanturner",
@@ -6940,7 +6940,7 @@
       "id": "I_kwDOBoyH6c5JsmQD",
       "title": "Leaf/parent indicator bit in tree hash?",
       "url": "https://github.com/mlswg/mls-protocol/issues/663",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "Bren2010",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
@@ -6949,8 +6949,8 @@
       ],
       "body": "When computing the tree hash, should there be an indicator bit for whether the value being hashed represents a leaf or parent node?",
       "createdAt": "2022-05-15T21:48:20Z",
-      "updatedAt": "2022-05-20T17:59:08Z",
-      "closedAt": null,
+      "updatedAt": "2022-05-28T18:58:45Z",
+      "closedAt": "2022-05-28T18:58:45Z",
       "comments": [
         {
           "author": "bifurcation",
@@ -7000,7 +7000,7 @@
       "id": "I_kwDOBoyH6c5JxvH6",
       "title": "Clean up PSK specification",
       "url": "https://github.com/mlswg/mls-protocol/issues/666",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bifurcation",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
@@ -7009,8 +7009,8 @@
       ],
       "body": "* `psk_nonce` currently described at time of use.  In the \"Pre-Shared Keys\" section, we should just specify that it must always be a fresh value of length `KDF.Nh`\r\n* The ReInit provisions require `epoch=1`, but those for branching do not.  Presumably these should be the same?\r\n* Currently, the processing rules for PreSharedKey proposal says \u201cMUST be external\u201d.  This seems overly restrictive; for example, it rules out the scenario in Figure 8.  Suggest \u201cMUST NOT be branch/reinit\u201d instead.",
       "createdAt": "2022-05-16T21:58:49Z",
-      "updatedAt": "2022-05-20T17:59:42Z",
-      "closedAt": null,
+      "updatedAt": "2022-05-27T13:45:03Z",
+      "closedAt": "2022-05-27T13:45:03Z",
       "comments": []
     },
     {
@@ -7355,15 +7355,15 @@
       "id": "I_kwDOBoyH6c5KBkyY",
       "title": "External Senders Extension is incomplete",
       "url": "https://github.com/mlswg/mls-protocol/issues/681",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "kkohbrok",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "The External Senders Extension allows clients to agree on the entities that are allowed to send external proposals, as well as the signature public keys required to verify them. It contains a list of credentials that is meant to achieve this goal. However, due to a recent change, Credentials don't necessarily contain signature public keys anymore. @bifurcation suggested to have it contain a signature public key, as well as a corresponding Credential, which allows members to verify the binding between signature public key and the owning entity's identity, which I think would be a good solution.",
       "createdAt": "2022-05-19T15:04:59Z",
-      "updatedAt": "2022-05-19T15:04:59Z",
-      "closedAt": null,
+      "updatedAt": "2022-05-26T14:14:18Z",
+      "closedAt": "2022-05-26T14:14:18Z",
       "comments": []
     },
     {
@@ -7375,12 +7375,29 @@
       "author": "bifurcation",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
-      "labels": [],
+      "labels": [
+        "ready for PR"
+      ],
       "body": "As I was pondering pathological cases related to #645, it occurred to me that we already have a slightly odd situation that can arise as a result of the suppression of redundant nodes.  When a Commit has an UpdatePath, the `commit_secret` is defined as follows:\r\n\r\n> Define commit_secret as the value path_secret[n+1] derived from the path_secret[n] value assigned to the root node.\r\n\r\nHowever, there are situations where the root node is not assigned a value, namely when the left half of the tree is blank.  For example, suppose A creates a group with B, C, D:\r\n\r\n```\r\n      Y\r\n    __|__\r\n   /     \\\r\n  X       _ = Z\r\n / \\     / \\\r\nA   B   C   D\r\n```\r\n\r\nSuppose that then C removes A and B, leaving C and D as the only leaves in the tree.  After removing A and B, the tree on which C computes an UpdatePath is as follows:\r\n\r\n```\r\n      _ = Y\r\n    __|__\r\n   /     \\\r\n  _       _ = Z\r\n / \\     / \\\r\n_   _   C   D  \r\n```\r\n\r\nC's direct path is (Z, Y), but it's filtered direct path is just (Z) because the copath subtree of Y is all blank.  So C will not generate a path_secret for Y, which means that the commit secret is not really defined.\r\n\r\nIt seems like there are two paths to fix this:\r\n\r\n1. Keep the current definition of `commit_secret` and require that a path secret always be generated for the root node\r\n    * Presumably the root node path secret would be generated directly from the path secret in the UpdatePath\r\n    * This would be simple to implement by just forcing the root node to be in the filtered direct path\r\n2. Keep the current path secret generation and specify that the `commit_secret` is derived from the last path secret in the UpdatePath \r\n    * In the above example, the last path secret from the path secret for Z\r\n\r\nI lean slightly toward (2) because it makes the computation the same for two neighbors regardless of where they are in the tree. It seems like the two options primarily differ in whether there are one or two invocations of the key derivation.\r\n",
       "createdAt": "2022-05-21T21:35:45Z",
-      "updatedAt": "2022-05-21T21:35:45Z",
+      "updatedAt": "2022-05-26T16:58:58Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Interim 2022-05-26:\r\n\r\n* @mulmarta supports doing \"end of UpdatePath plus one\"\r\n* @bifurcation to write up a PR",
+          "createdAt": "2022-05-26T16:01:44Z",
+          "updatedAt": "2022-05-26T16:01:44Z"
+        },
+        {
+          "author": "mulmarta",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "First, both fixes are secure. I lean towards \"end of path plus one\", because it matches better my mental model: a) if any node (including root) has a child with a blank subtree, then it's blank, b) we generate `commit_secret` from the last secret generated by the committer.\r\n\r\n@bifurcation while you're at it, you could also address the empty-UpdatePath ambiguity: If a member is alone in the group and sends a commit that doesn't add anyone, his UpdatePath is empty and he doesn't know how to derive `commit_secret`. This can happen even without filtered paths, if the tree has exactly 1 node. There are 2 solutions:\r\n\r\n1. Pick a random secret\r\n2. Disallow such commits\r\n\r\nRegarding 2, does anyone know any reason we may want such commits?",
+          "createdAt": "2022-05-26T16:51:42Z",
+          "updatedAt": "2022-05-26T16:58:58Z"
+        }
+      ]
     },
     {
       "number": 693,
@@ -7394,7 +7411,7 @@
       "labels": [],
       "body": "@rohan-wire raised a few points today, which I'm trying to capture in this issue with some thoughts on proposed solutions.\r\n\r\nIn #659, we removed the usage of `new_member` to send Add proposals, in order to allow for the signature on an external commit to cover the GroupContext (which is not necessarily possible for an external Add sender).  In the discussion, the point was made that an Add proposal only really differs from a KeyPackage in that the KeyPackage doesn't have `group_id` or `epoch` fields.  Part of the resolution in #659 was a decision that folks didn't think `group_id` was a significant loss.  And I think there's pretty broad agreement that `epoch` is actively undesirable, since it means that the new joiner has to be sufficiently in sync with the group to know the epoch hasn't changed before sending its proposal.\r\n\r\nAfter talking with @rohan-wire, there are two other issues to highlight:\r\n\r\n* Losing `group_id` is a bigger deal than it might first seem in a system that has both \"prepublished KeyPackages\" and \"KeyPackage as request to be added\".  Someone could go grab a bunch of prepublished KeyPackages that they don't own, and send them in as requests to be added.  This isn't an immediate security risk, since the attacker doesn't necessarily have the private keys that go with the KeyPackages (if they do, they have other attack avenues).  But it would mean, for example, that a client would have an even less certain idea of all the groups it was a member of.\r\n\r\n* When \"requests to be added\" were expressed as Proposals, the \"request\" semantic followed from being a Proposal, which tied into the recommendations for what should be included in a Commit.  Expressing these requests in a different way, means that the \"request\" semantic rests outside of the core MLS logic.\r\n\r\nA few possible avenues come to mind for addressing these issues:\r\n\r\n1. Don't change the protocol, but document the operational considerations.  For example:\r\n    * The \"unintended join\" issue with abuse of prepublished KPs could be mitigated by a DS that supports proactive joins enforcing that the sender owns the signature key (e.g., checking that `kp.leaf_node.credential` authenticates the same identity that the DS has for the client).\r\n    * The request semantic could be captured in the architecture document / protocol overview as a thing that applications could implement if they choose. \r\n\r\n2. Re-add joiner-sent Add proposals, using a different SenderType this time to avoid the conflict with external commits.\r\n     * Say `new_member_add_proposal` and `new_member_commit`\r\n     * This would still have the epoch problem.\r\n\r\n3. Add a field to KeyPackage indicating whether the KeyPackage is general or directed to a specific group\r\n    * Something like `optional<GroupID> target_group_id`\r\n    * Require that if the field is set in an Add proposal, then it MUST match the group's ID.\r\n    * Specify that only directed KPs can be used to request to be added\r\n    * Add parallel text to proposals that recommend the the committer commit Add proposals for any directed KPs it has received.\r\n\r\n4. Define a new top level message (an entry in the MLSMessage enum) that expresses precisely the semantic we want, something like:\r\n\r\n```\r\nstruct {\r\n    opaque group_id<V>;\r\n    KeyPackage key_package;\r\n    // SignWithLabel(., \"JoinRequestTBS\", JoinRequestTBS)\r\n    opaque signature<V>;\r\n} JoinRequest;\r\n```",
       "createdAt": "2022-05-24T18:34:29Z",
-      "updatedAt": "2022-05-25T19:34:21Z",
+      "updatedAt": "2022-05-26T15:44:07Z",
       "closedAt": null,
       "comments": [
         {
@@ -7459,6 +7476,27 @@
           "body": "> On the copy/paste risk: It occurs to me that we actually have a solution for this already: The `lifetime` field in LeafNode. KeyPackages are already designed to expire, and that mechanism provides flexibility that matches the use case much better than `epoch`.\r\n\r\nGood point, although running a bunch of timers on servers is definitely more work than checking the epoch.",
           "createdAt": "2022-05-25T19:34:21Z",
           "updatedAt": "2022-05-25T19:34:21Z"
+        },
+        {
+          "author": "raphaelrobert",
+          "authorAssociation": "MEMBER",
+          "body": "> Our use case for external add proposals is for an ordinary client adding itself (never a preconfigured sender), whereas for external removes this is always a backend taking action (preconfigured sender).\r\n\r\nSo in that instance you say it is fine to use preconfigured senders, why wouldn't it be fine when adding members?\r\n\r\n> I'm not sure I follow you. Coordinating enough DS involvement across federated domains looks hard to me. Could you elaborate please?\r\n\r\nDistributing keys is indeed a hard problem in a federated environment. But I don't see how that's getting better with \"new member\" external Add proposals. In both cases, there is a signature to be verified and the key material needs to be available to the verifier.\r\n",
+          "createdAt": "2022-05-26T14:09:55Z",
+          "updatedAt": "2022-05-26T14:09:55Z"
+        },
+        {
+          "author": "raphaelrobert",
+          "authorAssociation": "MEMBER",
+          "body": "One more note on the preconfigured senders: They are synchronized as a group extension (something that was added recently and I forgot about it). That makes the distribution much easier and less error-prone than the external Add with sender type \"new member\".",
+          "createdAt": "2022-05-26T14:15:05Z",
+          "updatedAt": "2022-05-26T14:15:05Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Interim 2022-05-26:\r\n\r\n* A few comparisons:\r\n    * `new_member` Add vs. `external` Add ~ `new_member` Add includes client's intent to join\r\n    * `new_member` Add vs. directed KeyPackage ~ main difference is epoch vs. lifetime\r\n* @rohan-wire to make a PR implementing the \"new sender type\" approach\r\n* @bifurcation to make a PR implementing the \"directed KeyPackage\" approach\r\n* Aim to decide on next call",
+          "createdAt": "2022-05-26T15:44:07Z",
+          "updatedAt": "2022-05-26T15:44:07Z"
         }
       ]
     },
@@ -7467,7 +7505,7 @@
       "id": "I_kwDOBoyH6c5KVvuW",
       "title": "external_key_id extension for LeafNode",
       "url": "https://github.com/mlswg/mls-protocol/issues/696",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "Bren2010",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -7476,9 +7514,24 @@
       "labels": [],
       "body": "",
       "createdAt": "2022-05-24T23:09:46Z",
-      "updatedAt": "2022-05-24T23:09:46Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2022-05-28T19:02:03Z",
+      "closedAt": "2022-05-28T19:02:03Z",
+      "comments": [
+        {
+          "author": "rohan-wire",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "What's the use case for this?",
+          "createdAt": "2022-05-26T07:00:14Z",
+          "updatedAt": "2022-05-26T07:00:14Z"
+        },
+        {
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Mentioned at the last interim, but the use-case for this feature is either:\r\n- giving applications an easier way to lookup the private key corresponding to their LeafNode\r\n- giving applications a place to put client UUIDs",
+          "createdAt": "2022-05-28T16:21:02Z",
+          "updatedAt": "2022-05-28T16:21:02Z"
+        }
+      ]
     },
     {
       "number": 700,
@@ -7492,9 +7545,24 @@
       "labels": [],
       "body": "In #675, it was pointed out that we previously had a clause:\r\n\r\n> If there are multiple Add proposals containing KeyPackages that the committer considers to represent the same client or a client already in the group (for example, identical KeyPackages or KeyPackages sharing the same Credential), the committer again chooses one to include and considers the rest invalid.\r\n\r\nBut this was amplified in #675 to say that we also can't send Add proposals for users that are already in the group. I think we should talk about if this is the actual desired behavior or not.",
       "createdAt": "2022-05-25T21:12:41Z",
-      "updatedAt": "2022-05-25T21:12:41Z",
+      "updatedAt": "2022-05-26T16:03:51Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "rohan-wire",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I agree with Brendan. Specifically I want to make sure an MLS client can replace itself. \r\n\r\nMy other concern is that because we have no guidance yet on identity, we need to make sure that multiple instances/clients of the same user are allowed.",
+          "createdAt": "2022-05-26T15:24:07Z",
+          "updatedAt": "2022-05-26T15:24:07Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Interim 2022-05-26:\r\n\r\n* We want to:\r\n    * Avoid having multiple appearances of the same device\r\n    * Allow a device to resync itself\r\n* Text at issue here is \"An Add proposal is invalid if ... The Credential in the KeyPackage represents a client already in the group according to the application\" \r\n* It sounds like changing to \"... The KeyPackage represents a client already in the group according to the application\" would address the immediate concern\r\n* @Bren2010 to write a PR",
+          "createdAt": "2022-05-26T16:03:51Z",
+          "updatedAt": "2022-05-26T16:03:51Z"
+        }
+      ]
     }
   ],
   "pulls": [
@@ -48508,21 +48576,21 @@
       "id": "PR_kwDOBoyH6c43wEcG",
       "title": "Remove clause about verifying identity changes.",
       "url": "https://github.com/mlswg/mls-protocol/pull/660",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "Bren2010",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "I don't think the \"MUST\" clause here is really weight-bearing, especially given that we don't provide any specific way to do the verification. We already say that applications \"SHOULD require that a client present the same identifiers\" and going against the \"SHOULD\" means the implementer is taking responsibility for any problems.",
       "createdAt": "2022-05-12T23:11:41Z",
-      "updatedAt": "2022-05-24T06:48:09Z",
+      "updatedAt": "2022-05-28T18:39:15Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "f64c3ebb5ad2c5f1621e30fbf581c0e02246b1e5",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "brendan/no-verify",
       "headRefOid": "2eb6a831b6e11068638f64a087e99efd9e8d0794",
-      "closedAt": null,
+      "closedAt": "2022-05-28T18:39:15Z",
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
@@ -49109,24 +49177,26 @@
       "id": "PR_kwDOBoyH6c44MicV",
       "title": "Update external senders extension.",
       "url": "https://github.com/mlswg/mls-protocol/pull/682",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "Bren2010",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Closes #681 ",
       "createdAt": "2022-05-20T14:45:25Z",
-      "updatedAt": "2022-05-24T18:15:33Z",
+      "updatedAt": "2022-05-26T14:14:18Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "8a5d422f453ea4c7bd60d97a7fdae838573d58cd",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "brendan/external-senders",
       "headRefOid": "a34abce25aef2584c01e46755b18e1e803aec12f",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2022-05-26T14:14:18Z",
+      "mergedAt": "2022-05-26T14:14:18Z",
+      "mergedBy": "bifurcation",
+      "mergeCommit": {
+        "oid": "60b7fd205e51ffabbff079472e1ec3513475f661"
+      },
       "comments": [],
       "reviews": [
         {
@@ -49193,6 +49263,19 @@
           "body": "",
           "createdAt": "2022-05-24T18:15:33Z",
           "updatedAt": "2022-05-24T18:15:33Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOBoyH6c46yWLn",
+          "commit": {
+            "abbreviatedOid": "a34abce"
+          },
+          "author": "rohan-wire",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2022-05-26T14:11:49Z",
+          "updatedAt": "2022-05-26T14:11:49Z",
           "comments": []
         }
       ]
@@ -49332,27 +49415,44 @@
     {
       "number": 686,
       "id": "PR_kwDOBoyH6c44On4e",
-      "title": "Specify that group ids are generated randomly.",
+      "title": "Recommend that group ids are generated randomly.",
       "url": "https://github.com/mlswg/mls-protocol/pull/686",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "Bren2010",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Closes #661 ",
       "createdAt": "2022-05-21T05:22:05Z",
-      "updatedAt": "2022-05-23T21:18:59Z",
+      "updatedAt": "2022-05-28T18:56:41Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
-      "baseRefOid": "b209e1744abd6c4224c45069361a89e5d78d728b",
+      "baseRefOid": "76b3c4710bf926b9bceea995b746da5a70bf5f3f",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "brendan/group-id",
-      "headRefOid": "37447fb4b16d46bc4b918ef8c89e35829d28e86b",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
-      "comments": [],
+      "headRefOid": "16e6068f49c7f84022c376bfc20581ff40d2e827",
+      "closedAt": "2022-05-28T18:56:41Z",
+      "mergedAt": "2022-05-28T18:56:41Z",
+      "mergedBy": "bifurcation",
+      "mergeCommit": {
+        "oid": "69cba939aecd0c1265cc74f854539461b345f670"
+      },
+      "comments": [
+        {
+          "author": "seanturner",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Brendan to revise based on Rohan suggestion.",
+          "createdAt": "2022-05-26T14:26:05Z",
+          "updatedAt": "2022-05-26T14:26:05Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Interim 2022-05-26:\r\n\r\n* Concerns around making the group_id totally random\r\n    * Malicious group creator can choose it malicious\r\n    * Federated systems get worse randomness\r\n* Using AEAD.Nk depends on ciphersuite, could be awkward \r\n* @Bren2010  will revise to say:\r\n    * Here are the requirements that group ID must satisfy\r\n    * If you don\u2019t have an alternative plan, do it randomly",
+          "createdAt": "2022-05-26T14:26:36Z",
+          "updatedAt": "2022-05-26T14:26:36Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOBoyH6c46jZCs",
@@ -49373,6 +49473,79 @@
               "updatedAt": "2022-05-23T21:18:59Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c46weWY",
+          "commit": {
+            "abbreviatedOid": "37447fb"
+          },
+          "author": "rohan-wire",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "CHANGES_REQUESTED",
+          "body": "",
+          "createdAt": "2022-05-26T06:35:57Z",
+          "updatedAt": "2022-05-26T06:36:13Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "There was never a requirement before that the group id had to have a specific internal structure, format, or length. Why does the protocol suddenly care now? It just needs to be unique enough, and you have specified that in the rest of the diff below. \r\n\r\ns/fresh random value of size `AEAD.Nk`/a unique value set by the creator/\r\n",
+              "createdAt": "2022-05-26T06:35:58Z",
+              "updatedAt": "2022-05-26T06:36:13Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c46xovP",
+          "commit": {
+            "abbreviatedOid": "37447fb"
+          },
+          "author": "raphaelrobert",
+          "authorAssociation": "MEMBER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-26T11:35:30Z",
+          "updatedAt": "2022-05-26T11:35:30Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "I agree that it would be prohibitive to require a special structure for group IDs. This would potentially make it difficult to use MLS in existing environments, where group IDs already exist.\r\n\r\nIt's also not clear to me why `AEAD.Nk` is a good reference for entropy. It depends on the ciphersuite and is therefore orthogonal to the requirements of uniqueness in a system. Moreover, a system that supports several cipehrsuites would see a conflict here.",
+              "createdAt": "2022-05-26T11:35:30Z",
+              "updatedAt": "2022-05-26T11:35:30Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c46yX8c",
+          "commit": {
+            "abbreviatedOid": "37447fb"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-26T14:16:35Z",
+          "updatedAt": "2022-05-26T14:16:35Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "I would probably use `KDF.Nh`, since that's what we use for other unique values (e.g., PSK nonces).",
+              "createdAt": "2022-05-26T14:16:35Z",
+              "updatedAt": "2022-05-26T14:16:35Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c467Atk",
+          "commit": {
+            "abbreviatedOid": "16e6068"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2022-05-28T18:56:37Z",
+          "updatedAt": "2022-05-28T18:56:37Z",
+          "comments": []
         }
       ]
     },
@@ -49381,24 +49554,26 @@
       "id": "PR_kwDOBoyH6c44OoYC",
       "title": "Add a marker byte to tree hash input structs.",
       "url": "https://github.com/mlswg/mls-protocol/pull/687",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "Bren2010",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Closes #663. I'm not sure if this is actually necessary, but there usually seem to be issues in Merkle trees when the leaves are not explicitly distinct from the parents.",
       "createdAt": "2022-05-21T05:37:30Z",
-      "updatedAt": "2022-05-25T21:02:13Z",
+      "updatedAt": "2022-05-28T18:58:45Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "a662e60c3584eb3d7d5a94694ca719b515d88114",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "brendan/indicator-bit",
-      "headRefOid": "cb95dfcb169aee5d794956c092d9ffd43815d1ad",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "fcf19727be231d04e6aed46afffb8fa838cdca26",
+      "closedAt": "2022-05-28T18:58:45Z",
+      "mergedAt": "2022-05-28T18:58:45Z",
+      "mergedBy": "bifurcation",
+      "mergeCommit": {
+        "oid": "7565848da6480d54ba69523418aa0182abc14e71"
+      },
       "comments": [
         {
           "author": "TWal",
@@ -49406,6 +49581,20 @@
           "body": "I would find it nicer to describe things with a `select` like in other parts of the protocol:\r\n\r\n```\r\nstruct {\r\n  uint8 leaf_or_parent_marker;\r\n  select (leaf_or_parent_marker) {\r\n    case 0:\r\n      LeafNodeHashInput hash_input;\r\n    case 1:\r\n      ParentNodeHashInput hash_input;\r\n  }\r\n} TreeHashInput;\r\n```\r\n\r\nIt is equivalent to your modification. Stating things that way ensures there is no ambiguity: TreeHashInput is parseable, which is I think the property you want to ensure with this PR.",
           "createdAt": "2022-05-25T19:57:26Z",
           "updatedAt": "2022-05-25T19:57:26Z"
+        },
+        {
+          "author": "seanturner",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Use enum instead and then ready for merge.",
+          "createdAt": "2022-05-26T14:28:57Z",
+          "updatedAt": "2022-05-26T14:28:57Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Interim 2022-05-26:\r\n\r\n* Nicer with an `enum`\r\n* @Bren2010 to update to `enum`, then merge",
+          "createdAt": "2022-05-26T14:28:58Z",
+          "updatedAt": "2022-05-26T14:28:58Z"
         }
       ],
       "reviews": [
@@ -49428,6 +49617,39 @@
               "updatedAt": "2022-05-23T21:13:29Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c467Asm",
+          "commit": {
+            "abbreviatedOid": "1759f90"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-28T18:55:16Z",
+          "updatedAt": "2022-05-28T18:55:17Z",
+          "comments": [
+            {
+              "originalPosition": 19,
+              "body": "This is defined all the way down in the ratchet tree extension.  Please move it up to this section.",
+              "createdAt": "2022-05-28T18:55:17Z",
+              "updatedAt": "2022-05-28T18:55:17Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c467Ava",
+          "commit": {
+            "abbreviatedOid": "fcf1972"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2022-05-28T18:58:40Z",
+          "updatedAt": "2022-05-28T18:58:40Z",
+          "comments": []
         }
       ]
     },
@@ -49436,24 +49658,26 @@
       "id": "PR_kwDOBoyH6c44OpFR",
       "title": "Use a hash function for hash identifiers.",
       "url": "https://github.com/mlswg/mls-protocol/pull/688",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "Bren2010",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Closes #640.",
       "createdAt": "2022-05-21T05:59:55Z",
-      "updatedAt": "2022-05-25T17:24:25Z",
+      "updatedAt": "2022-05-26T14:32:52Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "b209e1744abd6c4224c45069361a89e5d78d728b",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "brendan/longer-refs",
       "headRefOid": "eaa874f21dd8b6837bb12270a71f8550f468c1a0",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2022-05-26T14:32:52Z",
+      "mergedAt": "2022-05-26T14:32:51Z",
+      "mergedBy": "bifurcation",
+      "mergeCommit": {
+        "oid": "b9ba20cd3b0cd7b3da052c25d720e10b5317cf58"
+      },
       "comments": [],
       "reviews": [
         {
@@ -49539,6 +49763,26 @@
               "body": "I lean towards using the hash. A hash function is \"the\" collision resistant primitive and since collision resistance is what we want here, hash would be the right primitive. The main purpose of extract is pseudo-randomness, which is unrelated to collision resistance. (Even if we have to assume collision resistance of extract for some property, using hash here makes it less ambiguous which property is needed.)",
               "createdAt": "2022-05-25T17:24:24Z",
               "updatedAt": "2022-05-25T17:24:25Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c46yc6f",
+          "commit": {
+            "abbreviatedOid": "eaa874f"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2022-05-26T14:30:01Z",
+          "updatedAt": "2022-05-26T14:30:05Z",
+          "comments": [
+            {
+              "originalPosition": 19,
+              "body": "Thanks @kkohbrok @mulmarta, clearing my objection.",
+              "createdAt": "2022-05-26T14:30:01Z",
+              "updatedAt": "2022-05-26T14:30:06Z"
             }
           ]
         }
@@ -49638,25 +49882,35 @@
       "id": "PR_kwDOBoyH6c44P_tk",
       "title": "Clean up PSK provisions",
       "url": "https://github.com/mlswg/mls-protocol/pull/691",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "bifurcation",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Closes #666 \r\n\r\nAlso covers the PSK part of #673 ",
       "createdAt": "2022-05-22T18:42:02Z",
-      "updatedAt": "2022-05-24T18:52:02Z",
+      "updatedAt": "2022-05-27T13:45:03Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
-      "baseRefOid": "b209e1744abd6c4224c45069361a89e5d78d728b",
+      "baseRefOid": "083f0fe42c12a14465f03c7096e01502c3a62bd7",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "psk-cleanup",
-      "headRefOid": "aeacff56f133217dbc9dbbdbbc933b0b6d6a00ce",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
-      "comments": [],
+      "headRefOid": "180d612182c82c5b5e9404ad45b49de9d0a1900e",
+      "closedAt": "2022-05-27T13:45:03Z",
+      "mergedAt": "2022-05-27T13:45:03Z",
+      "mergedBy": "bifurcation",
+      "mergeCommit": {
+        "oid": "76b3c4710bf926b9bceea995b746da5a70bf5f3f"
+      },
+      "comments": [
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Interim 2022-05-26:\r\n\r\n* Ready to go once merge conflicts are resolved.",
+          "createdAt": "2022-05-26T14:36:35Z",
+          "updatedAt": "2022-05-26T14:36:35Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOBoyH6c46inSd",
@@ -49750,24 +50004,26 @@
       "id": "PR_kwDOBoyH6c44XpPL",
       "title": "Use new tree for context in path secret encryption",
       "url": "https://github.com/mlswg/mls-protocol/pull/692",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "bifurcation",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Closes #648 via option (3)",
       "createdAt": "2022-05-24T14:36:28Z",
-      "updatedAt": "2022-05-24T20:28:15Z",
+      "updatedAt": "2022-05-26T14:47:46Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "b209e1744abd6c4224c45069361a89e5d78d728b",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "update-path-creation",
       "headRefOid": "9cbdc45bc976036bb214000d118c99a824ecad8b",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2022-05-26T14:47:46Z",
+      "mergedAt": "2022-05-26T14:47:46Z",
+      "mergedBy": "bifurcation",
+      "mergeCommit": {
+        "oid": "083f0fe42c12a14465f03c7096e01502c3a62bd7"
+      },
       "comments": [
         {
           "author": "mulmarta",
@@ -49784,7 +50040,28 @@
           "updatedAt": "2022-05-24T20:28:15Z"
         }
       ],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOBoyH6c46ylar",
+          "commit": {
+            "abbreviatedOid": "9cbdc45"
+          },
+          "author": "rohan-wire",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-26T14:46:18Z",
+          "updatedAt": "2022-05-26T14:46:19Z",
+          "comments": [
+            {
+              "originalPosition": 46,
+              "body": "If you want to keep the mental models, you could add:\r\n\"Conceptually, these three states could be thought of as three separate ratchet trees.\"",
+              "createdAt": "2022-05-26T14:46:18Z",
+              "updatedAt": "2022-05-26T14:46:36Z"
+            }
+          ]
+        }
+      ]
     },
     {
       "number": 694,
@@ -49798,18 +50075,33 @@
       "labels": [],
       "body": "Based on #689 \r\n\r\nCloses #645 ",
       "createdAt": "2022-05-24T18:46:47Z",
-      "updatedAt": "2022-05-25T20:54:57Z",
+      "updatedAt": "2022-05-28T18:57:49Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "b209e1744abd6c4224c45069361a89e5d78d728b",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "always-full",
-      "headRefOid": "3944507d4bc35c789721d69286e18dd252238578",
+      "headRefOid": "6d7c14d3df0384efe272270c827d78acf21f8a09",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Interim 2022-05-26:\r\n\r\n* This will require some optimized implementations\r\n* Have people done performance evaulations?\r\n    * @bifurcation and @TWal did evaluation on parent hash, this should be easier\r\n* How does this affect the secret tree?\r\n    * Would change the structure to be a full tree\r\n    * Always `log(N)` derivations to get to a leaf, instead of sometimes less\r\n* TODO: Hold this for next week, @bifurcation and @TWal to do performance evaluation",
+          "createdAt": "2022-05-26T15:04:00Z",
+          "updatedAt": "2022-05-26T15:04:00Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Mailing list post with performance metrics:\r\nhttps://mailarchive.ietf.org/arch/msg/mls/42tmYeZIJRAAZTxnSb6pzXKZGa0/",
+          "createdAt": "2022-05-28T18:57:49Z",
+          "updatedAt": "2022-05-28T18:57:49Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOBoyH6c46vF8b",
@@ -49834,6 +50126,26 @@
               "body": "```suggestion\r\n* Add: Append `N + 1` blank values to the end of the array.\r\n```\r\n\r\nI think it's N+1 because you need the new right tree of the root (N nodes) + 1 node for the root",
               "createdAt": "2022-05-25T20:46:25Z",
               "updatedAt": "2022-05-25T20:54:57Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c463IMB",
+          "commit": {
+            "abbreviatedOid": "3944507"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-27T13:43:23Z",
+          "updatedAt": "2022-05-27T13:43:23Z",
+          "comments": [
+            {
+              "originalPosition": 57,
+              "body": "The point of the \"depth-first, left-first\" language is to clarify the order in which the nodes in the resolution are listed.  As I read it, the language is correct, or maybe better as \"left-first, depth first\", in the sense that you visit the left child before the right child, and if you find a blank left child, you descend before going to the right child.  Following those rules, you do indeed end up at [A, B, Z] in your example -- though of course the resolution of Y should be [Y] ;)\r\n\r\nIn any case, I think the wording here could probably be improved a bit, but I will handle this in a follow-on, since this text is an effect of #689, not this PR.",
+              "createdAt": "2022-05-27T13:43:23Z",
+              "updatedAt": "2022-05-27T13:43:44Z"
             }
           ]
         }
@@ -49886,51 +50198,108 @@
       "id": "PR_kwDOBoyH6c44aPz_",
       "title": "More thorough discussion of sequencing solutions.",
       "url": "https://github.com/mlswg/mls-protocol/pull/697",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "Bren2010",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "This PR changes the \"client / server ordering\" distinction to more appropriate \"CP / AP ordering\".",
       "createdAt": "2022-05-25T03:51:18Z",
-      "updatedAt": "2022-05-25T03:51:18Z",
+      "updatedAt": "2022-05-26T15:11:38Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "bd56532ab26a586d1e951705c068f836a3960f51",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "brendan/sequencing",
       "headRefOid": "3fb562ea76f88a89202c2c9812cff84545fc2b56",
-      "closedAt": null,
+      "closedAt": "2022-05-26T15:11:37Z",
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
-      "reviews": []
+      "comments": [
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Interim 2022-05-26:\r\n\r\n* General feeling that the details here should go in the architecture document\r\n* @Bren2010 to make a new PR stripping the sequencing section down to minimal requirements, arch PR to add these details.",
+          "createdAt": "2022-05-26T15:11:37Z",
+          "updatedAt": "2022-05-26T15:11:37Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOBoyH6c46wgJz",
+          "commit": {
+            "abbreviatedOid": "3fb562e"
+          },
+          "author": "rohan-wire",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "CHANGES_REQUESTED",
+          "body": "",
+          "createdAt": "2022-05-26T06:45:11Z",
+          "updatedAt": "2022-05-26T06:53:52Z",
+          "comments": [
+            {
+              "originalPosition": 26,
+              "body": "This whole discussion belongs in the architecture document and not the protocol document.",
+              "createdAt": "2022-05-26T06:45:11Z",
+              "updatedAt": "2022-05-26T06:53:52Z"
+            },
+            {
+              "originalPosition": 58,
+              "body": "No thank you. Please do not a use a relatively rare acronym when the reading audience will understand \"Server-Enforced Ordering\" just fine.",
+              "createdAt": "2022-05-26T06:47:20Z",
+              "updatedAt": "2022-05-26T06:53:52Z"
+            },
+            {
+              "originalPosition": 105,
+              "body": "Likewise, using \"AP Ordering\" is going this document less clear.",
+              "createdAt": "2022-05-26T06:52:42Z",
+              "updatedAt": "2022-05-26T06:53:52Z"
+            },
+            {
+              "originalPosition": 131,
+              "body": "I propose we punt all this to the architecture document",
+              "createdAt": "2022-05-26T06:53:45Z",
+              "updatedAt": "2022-05-26T06:53:52Z"
+            }
+          ]
+        }
+      ]
     },
     {
       "number": 698,
       "id": "PR_kwDOBoyH6c44aQJT",
       "title": "Editorial",
       "url": "https://github.com/mlswg/mls-protocol/pull/698",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "Bren2010",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2022-05-25T03:53:47Z",
-      "updatedAt": "2022-05-25T21:06:00Z",
+      "updatedAt": "2022-05-28T19:08:23Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
-      "baseRefOid": "a662e60c3584eb3d7d5a94694ca719b515d88114",
+      "baseRefOid": "76b3c4710bf926b9bceea995b746da5a70bf5f3f",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "brendan/editorial4",
-      "headRefOid": "709aacaa6aa4e3a5fdd346175242cf5558ed29ad",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
-      "comments": [],
+      "headRefOid": "84e3bd914f21c4ad95506e9f4282ddaafe8afd0b",
+      "closedAt": "2022-05-28T19:08:23Z",
+      "mergedAt": "2022-05-28T19:08:23Z",
+      "mergedBy": "bifurcation",
+      "mergeCommit": {
+        "oid": "2976ea5b1e4d6de39bcbc6a969a9d85dd6c10602"
+      },
+      "comments": [
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Interim 2022-05-26:\r\n\r\n* @Bren2010 to revert the change that @raphaelrobert notes\r\n* Other changes to be handled as editorial.",
+          "createdAt": "2022-05-26T15:16:56Z",
+          "updatedAt": "2022-05-26T15:16:56Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOBoyH6c46udPv",
@@ -49977,6 +50346,79 @@
               "updatedAt": "2022-05-25T18:55:06Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c46yHIU",
+          "commit": {
+            "abbreviatedOid": "709aaca"
+          },
+          "author": "raphaelrobert",
+          "authorAssociation": "MEMBER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-26T13:28:21Z",
+          "updatedAt": "2022-05-26T13:28:21Z",
+          "comments": [
+            {
+              "originalPosition": 494,
+              "body": "Why remove this? It sounds like a viable strategy in some cases.",
+              "createdAt": "2022-05-26T13:28:21Z",
+              "updatedAt": "2022-05-26T13:28:21Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c466_0C",
+          "commit": {
+            "abbreviatedOid": "709aaca"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-28T17:58:50Z",
+          "updatedAt": "2022-05-28T17:58:51Z",
+          "comments": [
+            {
+              "originalPosition": 494,
+              "body": "I thought about this more and I still don't like this section:\r\n- It says you need one acknowledgement per node in the UpdatePath, but that's not really true. You would need one acknowledgement per *ciphertext* in the UpdatePath since the ciphertexts are independent.\r\n- That's assuming that everybody votes honestly. If the attacker colludes with someone to vote dishonestly, then the same attack still works. So I need acknowledgement from *everybody* in the group.",
+              "createdAt": "2022-05-28T17:58:51Z",
+              "updatedAt": "2022-05-28T17:58:51Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c466_1M",
+          "commit": {
+            "abbreviatedOid": "709aaca"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-28T18:00:01Z",
+          "updatedAt": "2022-05-28T18:00:02Z",
+          "comments": [
+            {
+              "originalPosition": 494,
+              "body": "There's really not a reasonable way to prevent this issue. Can only provide reporting mechanism and make it right when it happens",
+              "createdAt": "2022-05-28T18:00:01Z",
+              "updatedAt": "2022-05-28T18:00:02Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c467A2-",
+          "commit": {
+            "abbreviatedOid": "84e3bd9"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2022-05-28T19:08:02Z",
+          "updatedAt": "2022-05-28T19:08:02Z",
+          "comments": []
         }
       ]
     },
@@ -49992,18 +50434,26 @@
       "labels": [],
       "body": "Closes #679 ",
       "createdAt": "2022-05-25T17:14:50Z",
-      "updatedAt": "2022-05-25T21:00:34Z",
+      "updatedAt": "2022-05-28T18:13:04Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "bd56532ab26a586d1e951705c068f836a3960f51",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "brendan/app-messages",
-      "headRefOid": "8ff5dcdb04191a228f1515c2e1f4fdc9cc531a64",
+      "headRefOid": "17ac10466231481685a1e913ac4c5713abd5dc23",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Interim 2022-05-26:\r\n\r\n* Intended to be mostly editorial\r\n* Leaving open for now\r\n* Clear to merge in between meetings if folks are comfortable",
+          "createdAt": "2022-05-26T15:19:37Z",
+          "updatedAt": "2022-05-26T15:19:37Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOBoyH6c46uyc6",
@@ -50050,6 +50500,39 @@
               "updatedAt": "2022-05-25T21:00:30Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c46yI39",
+          "commit": {
+            "abbreviatedOid": "8ff5dcd"
+          },
+          "author": "raphaelrobert",
+          "authorAssociation": "MEMBER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-26T13:33:26Z",
+          "updatedAt": "2022-05-26T13:33:26Z",
+          "comments": [
+            {
+              "originalPosition": 118,
+              "body": "\"unusually high\" is a bit vague. Maybe we can be more specific here by saying that clients can enforce a maximum difference for the generation counter between two subsequent messages.",
+              "createdAt": "2022-05-26T13:33:26Z",
+              "updatedAt": "2022-05-26T13:33:26Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c46yJMV",
+          "commit": {
+            "abbreviatedOid": "8ff5dcd"
+          },
+          "author": "raphaelrobert",
+          "authorAssociation": "MEMBER",
+          "state": "APPROVED",
+          "body": "Thanks for picking this up! Just one nit, but looks good otherwise.",
+          "createdAt": "2022-05-26T13:34:26Z",
+          "updatedAt": "2022-05-26T13:34:26Z",
+          "comments": []
         }
       ]
     },
@@ -50058,25 +50541,35 @@
       "id": "PR_kwDOBoyH6c44fHMQ",
       "title": "Change KeyPackage identifier to be LeafNode identifier.",
       "url": "https://github.com/mlswg/mls-protocol/pull/701",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "Bren2010",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "At first I was going to make `external_key_id` an extension for both KeyPackages and LeafNodes. But I was thinking and couldn't come up with a reason for KeyPackages to need this extension, so did just LeafNode. Closes #696.",
       "createdAt": "2022-05-25T23:29:35Z",
-      "updatedAt": "2022-05-26T00:13:39Z",
+      "updatedAt": "2022-05-28T19:02:03Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "a662e60c3584eb3d7d5a94694ca719b515d88114",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "brendan/leaf-node-id",
-      "headRefOid": "00f941f90918694fc97fa610544e17c534158b8a",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
-      "comments": [],
+      "headRefOid": "ffb8c569997c3888bd3087f39e5c59f901bcaeca",
+      "closedAt": "2022-05-28T19:02:03Z",
+      "mergedAt": "2022-05-28T19:02:03Z",
+      "mergedBy": "bifurcation",
+      "mergeCommit": {
+        "oid": "bdacb41fff6bc44403023af4046251e199389168"
+      },
+      "comments": [
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Interim 2022-05-26:\r\n\r\n* Agreement to merge\r\n* `external` is getting used a lot, so maybe `application_id` or `client_id`?\r\n* @Bren2010 to change to `application_id`",
+          "createdAt": "2022-05-26T15:23:12Z",
+          "updatedAt": "2022-05-26T15:23:44Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOBoyH6c46vwoX",
@@ -50090,6 +50583,244 @@
           "createdAt": "2022-05-26T00:13:39Z",
           "updatedAt": "2022-05-26T00:13:39Z",
           "comments": []
+        },
+        {
+          "id": "PRR_kwDOBoyH6c467AyI",
+          "commit": {
+            "abbreviatedOid": "ffb8c56"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2022-05-28T19:01:59Z",
+          "updatedAt": "2022-05-28T19:01:59Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 702,
+      "id": "PR_kwDOBoyH6c44l7mV",
+      "title": "Update contributors",
+      "url": "https://github.com/mlswg/mls-protocol/pull/702",
+      "state": "OPEN",
+      "author": "bifurcation",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Updating some affiliations / email addresses and adding a few folks.\r\n\r\n@TWal @mulmarta @tomleavy @psyoptix -- please check for accuracy",
+      "createdAt": "2022-05-27T16:23:07Z",
+      "updatedAt": "2022-05-28T18:52:54Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "76b3c4710bf926b9bceea995b746da5a70bf5f3f",
+      "headRepository": "mlswg/mls-protocol",
+      "headRefName": "contributors",
+      "headRefOid": "03cd96c904da0ed3fe5c3000ffb84aee97c007f2",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOBoyH6c4669jt",
+          "commit": {
+            "abbreviatedOid": "a84a7be"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-28T16:08:10Z",
+          "updatedAt": "2022-05-28T16:08:30Z",
+          "comments": [
+            {
+              "originalPosition": 30,
+              "body": "```suggestion\r\nbrendanmcmillion@gmail.com\r\n```",
+              "createdAt": "2022-05-28T16:08:10Z",
+              "updatedAt": "2022-05-28T16:08:30Z"
+            },
+            {
+              "originalPosition": 29,
+              "body": "```suggestion\r\n```",
+              "createdAt": "2022-05-28T16:08:18Z",
+              "updatedAt": "2022-05-28T16:08:30Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c466_8S",
+          "commit": {
+            "abbreviatedOid": "a84a7be"
+          },
+          "author": "tomleavy",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2022-05-28T18:06:14Z",
+          "updatedAt": "2022-05-28T18:06:14Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOBoyH6c467AqI",
+          "commit": {
+            "abbreviatedOid": "707cebc"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-28T18:52:47Z",
+          "updatedAt": "2022-05-28T18:52:47Z",
+          "comments": [
+            {
+              "originalPosition": 31,
+              "body": "```suggestion\r\n  brendanmcmillion@gmail.com\r\n```",
+              "createdAt": "2022-05-28T18:52:47Z",
+              "updatedAt": "2022-05-28T18:52:48Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 703,
+      "id": "PR_kwDOBoyH6c44myWO",
+      "title": "Be more precise about credential validation",
+      "url": "https://github.com/mlswg/mls-protocol/pull/703",
+      "state": "OPEN",
+      "author": "bifurcation",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #678 \r\nReplaces #660 \r\n\r\nThis PR attempts to add precision to the credential validation requirements in the document, along the lines @raphaelrobert suggests in #678, in the spirit of what @Bren2010 wrote up in #660 and drawing inspiration from what RFC 6125 does in the context of TLS.  It seems like this gives a clearer definition of (a) what the AS's job is and (b) when it needs to be done.",
+      "createdAt": "2022-05-27T19:52:23Z",
+      "updatedAt": "2022-05-28T16:07:15Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "76b3c4710bf926b9bceea995b746da5a70bf5f3f",
+      "headRepository": "mlswg/mls-protocol",
+      "headRefName": "cred-val",
+      "headRefOid": "53ff186a0e7540de2988a2b708bfd682706e63f9",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOBoyH6c4669cH",
+          "commit": {
+            "abbreviatedOid": "53ff186"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2022-05-28T16:01:55Z",
+          "updatedAt": "2022-05-28T16:07:15Z",
+          "comments": [
+            {
+              "originalPosition": 33,
+              "body": "```suggestion\r\n\"presented identifiers\".  A member of a group is authenticated by first\r\n```",
+              "createdAt": "2022-05-28T16:01:55Z",
+              "updatedAt": "2022-05-28T16:07:15Z"
+            },
+            {
+              "originalPosition": 55,
+              "body": "In each of these cases, where does the reference identifier come from? The reference/presented identifier distinction makes sense in TLS because you have a domain the user has typed in. Not as clear in MLS.",
+              "createdAt": "2022-05-28T16:07:12Z",
+              "updatedAt": "2022-05-28T16:07:15Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 704,
+      "id": "PR_kwDOBoyH6c44oXth",
+      "title": "Minimize sequencing section.",
+      "url": "https://github.com/mlswg/mls-protocol/pull/704",
+      "state": "OPEN",
+      "author": "Bren2010",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2022-05-28T17:40:52Z",
+      "updatedAt": "2022-05-28T17:40:52Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "76b3c4710bf926b9bceea995b746da5a70bf5f3f",
+      "headRepository": "mlswg/mls-protocol",
+      "headRefName": "brendan/no-sequencing",
+      "headRefOid": "313dbcca657d3aa49a9517845c4cf8e03e95c56f",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 705,
+      "id": "PR_kwDOBoyH6c44oZ3D",
+      "title": "Clarify rules around Add proposals.",
+      "url": "https://github.com/mlswg/mls-protocol/pull/705",
+      "state": "OPEN",
+      "author": "Bren2010",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #700 ",
+      "createdAt": "2022-05-28T18:35:30Z",
+      "updatedAt": "2022-05-28T19:10:38Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "76b3c4710bf926b9bceea995b746da5a70bf5f3f",
+      "headRepository": "mlswg/mls-protocol",
+      "headRefName": "brendan/add-rules",
+      "headRefOid": "2c15b9dff7838ece14b2e7c453de270fc6ae052c",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOBoyH6c467A2j",
+          "commit": {
+            "abbreviatedOid": "2c15b9d"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2022-05-28T19:07:37Z",
+          "updatedAt": "2022-05-28T19:07:37Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOBoyH6c467A5z",
+          "commit": {
+            "abbreviatedOid": "2c15b9d"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-28T19:10:29Z",
+          "updatedAt": "2022-05-28T19:10:38Z",
+          "comments": [
+            {
+              "originalPosition": 25,
+              "body": "```suggestion\r\n  in the group according to the application, unless there is a Remove proposal\r\n  in the list removing the matching client from the group.\r\n```\r\n\r\nClarifies what it means for a client to be \"removed by another proposal\", and keeps it scoped to the proposal list.",
+              "createdAt": "2022-05-28T19:10:29Z",
+              "updatedAt": "2022-05-28T19:10:38Z"
+            }
+          ]
         }
       ]
     }
