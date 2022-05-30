@@ -5,7 +5,7 @@
 Network Working Group                                          R. Barnes
 Internet-Draft                                                     Cisco
 Intended status: Informational                             B. Beurdouche
-Expires: 30 November 2022                                Inria & Mozilla
+Expires: 1 December 2022                                 Inria & Mozilla
                                                                R. Robert
                                                                         
                                                              J. Millican
@@ -14,7 +14,7 @@ Expires: 30 November 2022                                Inria & Mozilla
                                                                   Google
                                                           K. Cohn-Gordon
                                                     University of Oxford
-                                                             29 May 2022
+                                                             30 May 2022
 
 
               The Messaging Layer Security (MLS) Protocol
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 30 November 2022.
+   This Internet-Draft will expire on 1 December 2022.
 
 Copyright Notice
 
@@ -141,15 +141,16 @@ Table of Contents
        13.1.7.  GroupContextExtensions
        13.1.8.  External Proposals
      13.2.  Proposal List Validation
-     13.3.  Commit
-       13.3.1.  Creating a Commit
-       13.3.2.  Processing a Commit
-       13.3.3.  Adding Members to the Group
-     13.4.  Ratchet Tree Extension
-     13.5.  Ciphersuites
-     13.6.  Proposals
-     13.7.  Credential Extensibility
-     13.8.  Extensions
+     13.3.  Applying a Proposal List
+     13.4.  Commit
+       13.4.1.  Creating a Commit
+       13.4.2.  Processing a Commit
+       13.4.3.  Adding Members to the Group
+     13.5.  Ratchet Tree Extension
+     13.6.  Ciphersuites
+     13.7.  Proposals
+     13.8.  Credential Extensibility
+     13.9.  Extensions
    14. Sequencing of State Changes
      14.1.  Server-Enforced Ordering
      14.2.  Client-Enforced Ordering
@@ -1710,7 +1711,7 @@ Welcome  KeyPackage  GroupInfo   MLSPlaintext      MLSCiphertext -'
       proposal.
 
    *  new_member: The signature key in the LeafNode in the Commit's path
-      (see Section 13.3.3.1).  The content_type of the message MUST be
+      (see Section 13.4.3.1).  The content_type of the message MUST be
       commit.
 
    Recipients of an MLSMessage MUST verify the signature with the key
@@ -2152,7 +2153,7 @@ Welcome  KeyPackage  GroupInfo   MLSPlaintext      MLSCiphertext -'
 8.4.  Ratchet Tree Evolution
 
    Whenever a member initiates an epoch change (i.e., commits; see
-   Section 13.3), they may need to refresh the key pairs of their leaf
+   Section 13.4), they may need to refresh the key pairs of their leaf
    and of the nodes on their leaf's direct path in order to maintain
    forward secrecy and post-compromise security.
 
@@ -2626,7 +2627,7 @@ Welcome  KeyPackage  GroupInfo   MLSPlaintext      MLSCiphertext -'
 
 8.9.  Update Paths
 
-   As described in Section 13.3, each Commit message may optionally
+   As described in Section 13.4, each Commit message may optionally
    contain an UpdatePath, with a new LeafNode and set of parent nodes
    for the sender's filtered direct path.  For each parent node, the
    UpdatePath contains a new public key and encrypted path secret.  The
@@ -3381,7 +3382,7 @@ psk_secret (or 0) --> KDF.Extract
    other members are added when the creator effectively sends itself Add
    proposals, commits them, and then sends the corresponding Welcome
    message to the new participants.  These processes are described in
-   detail in Section 13.1.1, Section 13.3, and Section 13.3.3.2.
+   detail in Section 13.1.1, Section 13.4, and Section 13.4.3.2.
 
    The creator of a group MUST take the following steps to initialize
    the group:
@@ -3416,7 +3417,7 @@ psk_secret (or 0) --> KDF.Extract
       that member (see Section 13.1.1)
 
    *  Construct a Commit message that commits all of the Add proposals,
-      in any order chosen by the creator (see Section 13.3)
+      in any order chosen by the creator (see Section 13.4)
 
    *  Process the Commit message to obtain a new group state (for the
       epoch in which the new members are added) and a Welcome message
@@ -3432,7 +3433,7 @@ psk_secret (or 0) --> KDF.Extract
    with a previously used ID.
 
    The recipient of a Welcome message processes it as described in
-   Section 13.3.3.2.
+   Section 13.4.3.2.
 
    In principle, the above process could be streamlined by having the
    creator directly create a tree and choose a random value for first
@@ -3670,7 +3671,7 @@ psk_secret (or 0) --> KDF.Extract
 
    *  Identify a leaf node matching removed.  This lookup MUST be done
       on the tree before any non-Remove proposals have been applied (the
-      "old" tree in the terminology of Section 13.3), since proposals
+      "old" tree in the terminology of Section 13.4), since proposals
       such as Update can change the LeafNode stored at a leaf.  Let L be
       this leaf node.
 
@@ -3805,8 +3806,8 @@ psk_secret (or 0) --> KDF.Extract
    using one of the following procedures, depending on whether the
    commit is external or not.
 
-   For a regular, i.e. not external, commit the list is invalid if any
-   of the following occurs:
+   For a regular commit (not an external commit) the list is invalid if
+   any of the following occurs:
 
    *  It contains an individual proposal that is invalid as specified in
       Section 13.1.
@@ -3867,7 +3868,44 @@ psk_secret (or 0) --> KDF.Extract
 
    *  No other proposals.
 
-13.3.  Commit
+   Proposal type defined in the future may make updates to the above
+   validation logic to incorporate considerations related to proposals
+   of the new type.
+
+13.3.  Applying a Proposal List
+
+   The sections above defining each proposal type describe how each
+   individual proposals are applied.  When creating or processing a
+   Commit, a client applies a list of proposals to the ratchet tree and
+   GroupContext.  The client MUST apply the proposals in the list in the
+   following order:
+
+   *  If there is a GroupContextExtensions proposal, replace the
+      extensions field of the GroupContext for the group with the
+      contents of the extension.
+
+   *  Apply any Update proposals to the ratchet tree, in any order.
+
+   *  Apply any Remove proposals to the ratceht tree, in any order.
+
+   *  Apply any Add proposals to the ratchet tree, in the order they
+      appear in the list.
+
+   *  Look up the PSK secrets for any PreSharedKey proposals, in the
+      order they appear in the list.  These secrets are then used to
+      advance the key schedule later in Commit processing.
+
+   *  If there is an ExternalInit proposal, use it to derive the
+      init_secret for usee later in Commit processing.
+
+   *  If there is a ReInit proposal, note its parameters for application
+      later in Commit processing.
+
+   Proposal types defined in the future MUST specify how the above steps
+   are to be adjusted to accommodate the application of proposals of the
+   new type.
+
+13.4.  Commit
 
    A Commit message initiates a new epoch for the group, based on a
    collection of Proposals.  It instructs group members to update their
@@ -3996,7 +4034,7 @@ psk_secret (or 0) --> KDF.Extract
        provides FS with regard to any removed members and PCS for the
        committer and any updated members.
 
-13.3.1.  Creating a Commit
+13.4.1.  Creating a Commit
 
    When creating or processing a Commit, a client updates the ratchet
    tree and GroupContext for the group.  These values advance from an
@@ -4016,20 +4054,9 @@ psk_secret (or 0) --> KDF.Extract
       populated from Proposals received during the current epoch, and an
       empty path field.
 
-   *  Initialize the new ratchet tree and GroupContext by applying the
-      proposals referenced in the initial Commit object, as described in
-      Section 13.1.  Update proposals are applied first, followed by
-      Remove proposals, and then finally Add proposals.  Add proposals
-      are applied in the order listed in the proposals vector, and
-      always to the leftmost unoccupied leaf in the tree, or the right
-      edge of the tree if all leaves are occupied.
-
-      -  Note that the order in which different types of proposals are
-         applied should be updated by the implementation to include any
-         new proposals added by negotiated group extensions.
-
-      -  PreSharedKey proposals are processed later when deriving the
-         psk_secret for the Key Schedule.
+   *  Create the new ratchet tree and GroupContext by applying the list
+      of proposals to the old ratchet tree and GroupContext, as defined
+      in Section 13.3
 
    *  Decide whether to populate the path field: If the path field is
       required based on the proposals that are in the commit (see
@@ -4128,12 +4155,12 @@ psk_secret (or 0) --> KDF.Extract
       -  Other extensions as defined by the application
 
       -  Optionally derive an external keypair as described in Section 9
-         (required for External Commits, see Section 13.3.3.1)
+         (required for External Commits, see Section 13.4.3.1)
 
       -  Sign the GroupInfo using the member's private signing key
 
       -  Encrypt the GroupInfo using the key and nonce derived from the
-         joiner_secret for the new epoch (see Section 13.3.3.2)
+         joiner_secret for the new epoch (see Section 13.4.3.2)
 
    *  For each new member in the group:
 
@@ -4166,7 +4193,7 @@ psk_secret (or 0) --> KDF.Extract
 
       -  epoch: The epoch that the group will be in after this Commit
 
-13.3.2.  Processing a Commit
+13.4.2.  Processing a Commit
 
    A member of the group applies a Commit message by taking the
    following steps:
@@ -4183,17 +4210,9 @@ psk_secret (or 0) --> KDF.Extract
    *  Verify that all PreSharedKey proposals in the proposals vector are
       available.
 
-   *  Initialize the new ratchet tree and GroupContext by applying the
-      proposals referenced in the initial Commit object, as described in
-      Section 13.1.  Update proposals are applied first, followed by
-      Remove proposals, and then finally Add proposals.  Add proposals
-      are applied in the order listed in the proposals vector, and
-      always to the leftmost unoccupied leaf in the tree, or the right
-      edge of the tree if all leaves are occupied.
-
-      -  Note that the order in which different types of proposals are
-         applied should be updated by the implementation to include any
-         new proposals added by negotiated group extensions.
+   *  Create the new ratchet tree and GroupContext by applying the list
+      of proposals to the old ratchet tree and GroupContext, as defined
+      in Section 13.3
 
    *  Verify that the path value is populated if the proposals vector
       contains any Update or Remove proposals, or if it's empty.
@@ -4268,7 +4287,7 @@ psk_secret (or 0) --> KDF.Extract
       Welcome message from the committer meeting the requirements of
       Section 12.2.
 
-13.3.3.  Adding Members to the Group
+13.4.3.  Adding Members to the Group
 
    New members can join the group in two ways.  Either by being added by
    a group member, or by adding themselves through an external Commit.
@@ -4309,7 +4328,7 @@ psk_secret (or 0) --> KDF.Extract
        uint32 signer;
    } GroupInfoTBS;
 
-13.3.3.1.  Joining via External Commits
+13.4.3.1.  Joining via External Commits
 
    External Commits are a mechanism for new members (external parties
    that want to become members of the group) to add themselves to a
@@ -4356,7 +4375,7 @@ psk_secret (or 0) --> KDF.Extract
 
    Note that the tree_hash field is used the same way as in the Welcome
    message.  The full tree can be included via the ratchet_tree
-   extension Section 13.4.
+   extension Section 13.5.
 
    The information in a GroupInfo is not generally public information,
    but applications can choose to make it available to new members in
@@ -4402,7 +4421,7 @@ psk_secret (or 0) --> KDF.Extract
    but the application will need to ensure that continuing, non-
    resynchronizing members have the required PSK.
 
-13.3.3.2.  Joining via Welcome Message
+13.4.3.2.  Joining via Welcome Message
 
    The sender of a Commit message is responsible for sending a single
    Welcome message to all the new members added via Add proposals.  The
@@ -4546,7 +4565,7 @@ psk_secret (or 0) --> KDF.Extract
    *  Use the confirmed transcript hash and confirmation tag to compute
       the interim transcript hash in the new state.
 
-13.4.  Ratchet Tree Extension
+13.5.  Ratchet Tree Extension
 
    By default, a GroupInfo message only provides the joiner with a hash
    of the group's ratchet tree.  In order to process or generate
@@ -4658,7 +4677,7 @@ psk_secret (or 0) --> KDF.Extract
    some constraints on these extensibility mechanisms that are necessary
    to ensure broad interoperability.
 
-13.5.  Ciphersuites
+13.6.  Ciphersuites
 
    As discussed in Section 6.1, MLS allows the participants in a group
    to negotiate the cryptographic algorithms used within the group.
@@ -4685,15 +4704,15 @@ psk_secret (or 0) --> KDF.Extract
    HTTP/2, which restricted the set of allowed TLS ciphers (see
    Section 9.2.2 of [RFC7540].
 
-13.6.  Proposals
+13.7.  Proposals
 
    Commit messages do not have an extension field because the set of
-   proposals is extensible.  As discussed in Section 13.3, Proposals
+   proposals is extensible.  As discussed in Section 13.4, Proposals
    with a non-default proposal type MUST NOT be included in a commit
    unless the proposal type is supported by all the members of the group
    that will process the Commit.
 
-13.7.  Credential Extensibility
+13.8.  Credential Extensibility
 
    In order to ensure that MLS provides meaningful authentication it is
    important that each member is able to authenticate some identity
@@ -4725,7 +4744,7 @@ psk_secret (or 0) --> KDF.Extract
    each pair of members (Alice, Bob), Alice would need to present at
    least one credential of a type that Bob supports.
 
-13.8.  Extensions
+13.9.  Extensions
 
    This protocol includes a mechanism for negotiating extension
    parameters similar to the one in TLS [RFC8446].  In TLS, extension
@@ -5318,7 +5337,7 @@ psk_secret (or 0) --> KDF.Extract
       transition.
 
    *  Path Required: Whether a Commit covering a proposal of this type
-      is required to have its path field populated (see Section 13.3).
+      is required to have its path field populated (see Section 13.4).
 
    *  Reference: The document where this extension is defined
 
