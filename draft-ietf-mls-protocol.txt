@@ -5,7 +5,7 @@
 Network Working Group                                          R. Barnes
 Internet-Draft                                                     Cisco
 Intended status: Informational                             B. Beurdouche
-Expires: 29 November 2022                                Inria & Mozilla
+Expires: 1 December 2022                                 Inria & Mozilla
                                                                R. Robert
                                                                         
                                                              J. Millican
@@ -14,7 +14,7 @@ Expires: 29 November 2022                                Inria & Mozilla
                                                                   Google
                                                           K. Cohn-Gordon
                                                     University of Oxford
-                                                             28 May 2022
+                                                             30 May 2022
 
 
               The Messaging Layer Security (MLS) Protocol
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 29 November 2022.
+   This Internet-Draft will expire on 1 December 2022.
 
 Copyright Notice
 
@@ -5462,15 +5462,15 @@ psk_secret (or 0) --> KDF.Extract
 19.  Contributors
 
    *  Joel Alwen
-      Wickr
-      joel.alwen@wickr.com
+      Amazon
+      alwenjo@amazon.com
 
    *  Karthikeyan Bhargavan
-      INRIA
+      Inria
       karthikeyan.bhargavan@inria.fr
 
    *  Cas Cremers
-      University of Oxford
+      CISPA
       cremers@cispa.de
 
    *  Alan Duric
@@ -5493,9 +5493,16 @@ psk_secret (or 0) --> KDF.Extract
       MIT
       kwonal@mit.edu
 
+   *  Tom Leavy
+      Amazon
+      tomleavy@amazon.com
+
    *  Brendan McMillion
-      Cloudflare
-      brendan@cloudflare.com
+      brendanmcmillion@gmail.com
+
+   *  Marta Mularczyk
+      Amazon
+      mulmarta@amazon.com
 
    *  Eric Rescorla
       Mozilla
@@ -5504,6 +5511,10 @@ psk_secret (or 0) --> KDF.Extract
    *  Michael Rosenberg
       Trail of Bits
       michael.rosenberg@trailofbits.com
+
+   *  Theophile Wallez
+      Inria
+      theophile.wallez@inria.fr
 
    *  Thyla van der Merwe
       Royal Holloway, University of London
