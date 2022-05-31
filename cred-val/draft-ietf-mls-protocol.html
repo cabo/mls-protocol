@@ -1335,9 +1335,6 @@ in size ranging from two to thousands.<a href="#section-abstract-1" class="pilcr
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.1">
                 <p id="section-toc.1-1.11.2.1.1"><a href="#section-11.1" class="xref">11.1</a>.  <a href="#name-keypackage-validation" class="xref">KeyPackage Validation</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.2">
-                <p id="section-toc.1-1.11.2.2.1"><a href="#section-11.2" class="xref">11.2</a>.  <a href="#name-keypackage-identifiers" class="xref">KeyPackage Identifiers</a></p>
-</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
@@ -1350,7 +1347,7 @@ in size ranging from two to thousands.<a href="#section-abstract-1" class="pilcr
                 <p id="section-toc.1-1.12.2.2.1"><a href="#section-12.2" class="xref">12.2</a>.  <a href="#name-reinitialization" class="xref">Reinitialization</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.3">
-                <p id="section-toc.1-1.12.2.3.1"><a href="#section-12.3" class="xref">12.3</a>.  <a href="#name-sub-group-branching" class="xref">Sub-group Branching</a></p>
+                <p id="section-toc.1-1.12.2.3.1"><a href="#section-12.3" class="xref">12.3</a>.  <a href="#name-subgroup-branching" class="xref">Subgroup Branching</a></p>
 </li>
             </ul>
 </li>
@@ -1419,6 +1416,9 @@ in size ranging from two to thousands.<a href="#section-abstract-1" class="pilcr
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.3">
                 <p id="section-toc.1-1.14.2.3.1"><a href="#section-14.3" class="xref">14.3</a>.  <a href="#name-credential-extensibility" class="xref">Credential Extensibility</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.4">
+                <p id="section-toc.1-1.14.2.4.1"><a href="#section-14.4" class="xref">14.4</a>.  <a href="#name-extensions" class="xref">Extensions</a></p>
 </li>
             </ul>
 </li>
@@ -2107,7 +2107,7 @@ ReadVarint(data):
 <p id="section-2.1.2-11">The use of variable-size integers for vector lengths allows vectors to grow
 very large, up to 2^30 bytes.  Implementations should take care not to allow
 vectors to overflow available storage.  To facilitate debugging of potential
-interoperability problems, implementations should provide a clear error when
+interoperability problems, implementations SHOULD provide a clear error when
 such an overflow condition occurs.<a href="#section-2.1.2-11" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2440,8 +2440,8 @@ does this by sending a Commit (possibly with no proposals), or by sending an
 Update message that is committed by another member.  Once the other members of
 the group have processed these messages, the group's secrets will be unknown to
 an attacker that had compromised the sender's prior leaf secret.<a href="#section-4.2-10" class="pilcrow">¶</a></p>
-<p id="section-4.2-11">Update messages should be sent at regular intervals of time as long as the group
-is active, and members that don't update should eventually be removed from the
+<p id="section-4.2-11">Update messages SHOULD be sent at regular intervals of time as long as the group
+is active, and members that don't update SHOULD eventually be removed from the
 group. It's left to the application to determine an appropriate amount of time
 between Updates.<a href="#section-4.2-11" class="pilcrow">¶</a></p>
 <span id="name-client-b-proposes-to-update"></span><figure id="figure-4">
@@ -2560,7 +2560,7 @@ resumption pre-shared key (PSK) from each epoch to allow entropy extracted from
 one epoch to be injected into a future epoch. This link guarantees that members
 entering the new epoch agree on a key if and only if they were members of the group
 during the epoch from which the resumption key was extracted.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
-<p id="section-4.3-2">MLS supports two ways to tie a new group to an existing group. Re-initialization
+<p id="section-4.3-2">MLS supports two ways to tie a new group to an existing group. Reinitialization
 closes one group and creates a new group comprising the same members with
 different parameters. Branching starts a new group with a subset of the original
 group's participants (with no effect on the original group).  In both cases,
@@ -3214,8 +3214,16 @@ application-level identifiers for the clients.  However, these identifiers may n
 uniquely identify clients.  For example, if a user has multiple devices that are
 all present in an MLS group, then those devices' clients could all present the
 user's application-layer identifiers.<a href="#section-6.3.2-3" class="pilcrow">¶</a></p>
-<p id="section-6.3.2-4">If needed, applications may add application-specific unique identifiers to the
-<code>extensions</code> field of KeyPackage or LeafNode objects.<a href="#section-6.3.2-4" class="pilcrow">¶</a></p>
+<p id="section-6.3.2-4">If needed, applications may add application-specific identifiers to the
+<code>extensions</code> field of a LeafNode object with the <code>application_id</code> extension.<a href="#section-6.3.2-4" class="pilcrow">¶</a></p>
+<div id="section-6.3.2-5">
+<pre class="lang-tls sourcecode">
+opaque application_id&lt;V&gt;;
+</pre><a href="#section-6.3.2-5" class="pilcrow">¶</a>
+</div>
+<p id="section-6.3.2-6">However, applications SHOULD NOT rely on the data in an <code>application_id</code> extension
+as if it were authenticated by the Authentication Service, and SHOULD gracefully
+handle cases where the identifier presented is not unique.<a href="#section-6.3.2-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -3581,7 +3589,7 @@ depending on the content type of the message. This generation of the ratchet is
 used to derive a provisional nonce and key.<a href="#section-7.3.1-4" class="pilcrow">¶</a></p>
 <p id="section-7.3.1-5">Before use in the encryption operation, the nonce is XORed with a fresh random
 value to guard against reuse.  Because the key schedule generates nonces
-deterministically, a client must keep persistent state as to where in the key
+deterministically, a client MUST keep persistent state as to where in the key
 schedule it is; if this persistent state is lost or corrupted, a client might
 reuse a generation that has already been used, causing reuse of a key/nonce pair.<a href="#section-7.3.1-5" class="pilcrow">¶</a></p>
 <p id="section-7.3.1-6">To avoid this situation, the sender of a message MUST generate a fresh random
@@ -4162,7 +4170,7 @@ produces the correct tree in its internal representation.<a href="#section-8.5-7
         </h3>
 <p id="section-8.6-1">After generating fresh key material and applying it to ratchet forward their
 local tree state as described in the <a href="#ratchet-tree-evolution" class="xref">Section 8.4</a>, the
-generator must broadcast
+generator broadcasts
 this update to other members of the group in a Commit message, who
 apply it to keep their local views of the tree in
 sync with the sender's.  More specifically, when a member commits a change to
@@ -4279,32 +4287,44 @@ specifically:<a href="#section-8.6-10" class="pilcrow">¶</a></p>
 <p id="section-8.7-1">To allow group members to verify that they agree on the public cryptographic state
 of the group, this section defines a scheme for generating a hash value (called
 the "tree hash") that represents the contents of the group's ratchet tree and the
-members' leaf nodes. The tree hash of a tree is the tree hash of its root node,
-which we define recursively, starting with the leaves.<a href="#section-8.7-1" class="pilcrow">¶</a></p>
-<p id="section-8.7-2">The tree hash of a leaf node is the hash of leaf's <code>LeafNodeHashInput</code> object which
-might include a <code>LeafNode</code> object depending on whether or not it is blank.<a href="#section-8.7-2" class="pilcrow">¶</a></p>
+members' leaf nodes.<a href="#section-8.7-1" class="pilcrow">¶</a></p>
+<p id="section-8.7-2">The tree hash of an individual node is the hash of the node's <code>TreeHashInput</code>
+object, which may contain either a <code>LeafNodeHashInput</code> or a
+<code>ParentNodeHashInput</code> depending on the type of node. <code>LeafNodeHashInput</code> objects
+contain the <code>leaf_index</code> and the <code>LeafNode</code> (if any). <code>ParentNodeHashInput</code>
+objects contain the <code>ParentNode</code> (if any) and the tree hash of the node's left
+and right children.<a href="#section-8.7-2" class="pilcrow">¶</a></p>
 <div id="section-8.7-3">
 <pre class="lang-tls sourcecode">
+enum {
+    reserved(0),
+    leaf(1),
+    parent(2),
+    (255)
+} NodeType;
+
+struct {
+  NodeType node_type;
+  select (TreeHashInput.node_type) {
+    case leaf:   LeafNodeHashInput leaf_node;
+    case parent: ParentNodeHashInput parent_node;
+  }
+} TreeHashInput;
+
 struct {
     uint32 leaf_index;
     optional&lt;LeafNode&gt; leaf_node;
 } LeafNodeHashInput;
-</pre><a href="#section-8.7-3" class="pilcrow">¶</a>
-</div>
-<p id="section-8.7-4">Now the tree hash of any non-leaf node is recursively defined to be the hash of
-its <code>ParentNodeHashInput</code>. This includes an optional <code>ParentNode</code>
-object depending on whether the node is blank or not.<a href="#section-8.7-4" class="pilcrow">¶</a></p>
-<div id="section-8.7-5">
-<pre class="lang-tls sourcecode">
+
 struct {
     optional&lt;ParentNode&gt; parent_node;
     opaque left_hash&lt;V&gt;;
     opaque right_hash&lt;V&gt;;
 } ParentNodeHashInput;
-</pre><a href="#section-8.7-5" class="pilcrow">¶</a>
+</pre><a href="#section-8.7-3" class="pilcrow">¶</a>
 </div>
-<p id="section-8.7-6">The <code>left_hash</code> and <code>right_hash</code> fields hold the tree hashes of the node's
-left and right children, respectively.<a href="#section-8.7-6" class="pilcrow">¶</a></p>
+<p id="section-8.7-4">The tree hash of an entire tree corresponds to the tree hash of the root node,
+which is computed recursively by starting at the leaf nodes and building up.<a href="#section-8.7-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="parent-hash">
@@ -4912,10 +4932,10 @@ previous epoch, encoded using the TLS serialization.<a href="#section-9.3-6" cla
 shared group secrets can inject those into the MLS key schedule to seed
 the MLS group secrets computations by this external entropy.<a href="#section-9.4-1" class="pilcrow">¶</a></p>
 <p id="section-9.4-2">Injecting an external PSK can improve security in the case
-where having a full run of updates across members is too expensive, or if
+where having a full run of Updates across members is too expensive, or if
 the external group key establishment mechanism provides
 stronger security against classical or quantum adversaries.<a href="#section-9.4-2" class="pilcrow">¶</a></p>
-<p id="section-9.4-3">Note that, as a PSK may have a different lifetime than an update, it does not
+<p id="section-9.4-3">Note that, as a PSK may have a different lifetime than an Update, it does not
 necessarily provide the same Forward Secrecy (FS) or Post-Compromise Security
 (PCS) guarantees as a Commit message.  Unlike the key pairs populated in the
 tree by an Update or Commit, which are always freshly generated, PSKs may be
@@ -4930,7 +4950,7 @@ are derived from the MLS key schedule and used in cases where it is
 necessary to authenticate a member's participation in a prior epoch.<a href="#section-9.4-4" class="pilcrow">¶</a></p>
 <p id="section-9.4-5">The injection of one or more PSKs into the key schedule is signaled in two ways:
 Existing members are informed via PreSharedKey proposals covered by a Commit,
-and new members added in the Commit are informed via GroupSecrets object in the
+and new members added in the Commit are informed by the GroupSecrets object in the
 Welcome message corresponding to the Commit.  To ensure that existing and new
 members compute the same PSK input to the key schedule, the Commit and
 GroupSecrets objects MUST indicate the same set of PSKs, in the same order.<a href="#section-9.4-5" class="pilcrow">¶</a></p>
@@ -4970,7 +4990,7 @@ PreSharedKeyID MUST be set to a fresh random value of length <code>KDF.Nh</code>
 <code>KDF</code> is the KDF for the ciphersuite of the group into which the PSK is being
 injected. This ensures that even when a PSK is used multiple times, the value
 used as an input into the key schedule is different each time.<a href="#section-9.4-7" class="pilcrow">¶</a></p>
-<p id="section-9.4-8">On receiving a Commit with a <code>PreSharedKey</code> proposal or a GroupSecrets object
+<p id="section-9.4-8">Upon receiving a Commit with a <code>PreSharedKey</code> proposal or a GroupSecrets object
 with the <code>psks</code> field set, the receiving Client includes them in the key
 schedule in the order listed in the Commit, or in the <code>psks</code> field respectively.
 For resumption PSKs, the PSK is defined as the <code>resumption_psk</code> of the group and
@@ -5072,21 +5092,19 @@ the resulting <code>psk_secret</code> is <code>psk_secret_[0]</code>, the all-ze
 <a href="#section-9.5" class="section-number selfRef">9.5. </a><a href="#name-exporters" class="section-name selfRef">Exporters</a>
         </h3>
 <p id="section-9.5-1">The main MLS key schedule provides an <code>exporter_secret</code> which can
-be used by an application as the basis to derive new secrets called
-<code>exported_value</code> outside the MLS layer.<a href="#section-9.5-1" class="pilcrow">¶</a></p>
+be used by an application to derive new secrets for use outside of MLS.<a href="#section-9.5-1" class="pilcrow">¶</a></p>
 <div id="section-9.5-2">
 <pre class="lang-pseudocode sourcecode">
-MLS-Exporter(Label, Context, key_length) =
+MLS-Exporter(Label, Context, Length) =
        ExpandWithLabel(DeriveSecret(exporter_secret, Label),
-                         "exporter", Hash(Context), key_length)
+                         "exporter", Hash(Context), Length)
 </pre><a href="#section-9.5-2" class="pilcrow">¶</a>
 </div>
-<p id="section-9.5-3">Each application SHOULD provide a unique label to <code>MLS-Exporter</code> that
-identifies its use case. This is to prevent two
-exported outputs from being generated with the same values and used
-for different functionalities.<a href="#section-9.5-3" class="pilcrow">¶</a></p>
+<p id="section-9.5-3">Applications SHOULD provide a unique label to <code>MLS-Exporter</code> that
+identifies the secret's intended purpose. This is to help prevent the same
+secret from being generated and used in two different places.<a href="#section-9.5-3" class="pilcrow">¶</a></p>
 <p id="section-9.5-4">The exported values are bound to the group epoch from which the
-<code>exporter_secret</code> is derived, hence reflects a particular state of
+<code>exporter_secret</code> is derived, and hence reflect a particular state of
 the group.<a href="#section-9.5-4" class="pilcrow">¶</a></p>
 <p id="section-9.5-5">It is RECOMMENDED for the application generating exported values
 to refresh those values after a Commit is processed.<a href="#section-9.5-5" class="pilcrow">¶</a></p>
@@ -5100,7 +5118,7 @@ to refresh those values after a Commit is processed.<a href="#section-9.5-5" cla
 <p id="section-9.6-1">The main MLS key schedule provides a <code>resumption_psk</code> that is used as a PSK
 to inject entropy from one epoch into another.  This functionality is used in the
 reinitialization and branching processes described in <a href="#reinitialization" class="xref">Section 12.2</a> and
-<a href="#sub-group-branching" class="xref">Section 12.3</a>, but may be used by applications for other purposes.<a href="#section-9.6-1" class="pilcrow">¶</a></p>
+<a href="#subgroup-branching" class="xref">Section 12.3</a>, but may be used by applications for other purposes.<a href="#section-9.6-1" class="pilcrow">¶</a></p>
 <p id="section-9.6-2">Some uses of resumption PSKs might call for the use of PSKs from historical
 epochs. The application SHOULD specify an upper limit on the number of past
 epochs for which the <code>resumption_psk</code> may be stored.<a href="#section-9.6-2" class="pilcrow">¶</a></p>
@@ -5284,12 +5302,11 @@ in the ratchet.<a href="#section-10.1-8" class="pilcrow">¶</a></p>
 <pre class="lang-pseudocode sourcecode">
 DeriveTreeSecret(Secret, Label, Generation, Length) =
     ExpandWithLabel(Secret, Label, Generation, Length)
-
-Where Generation is encoded as a uint32.
 </pre><a href="#section-10.1-9" class="pilcrow">¶</a>
 </div>
-<div id="section-10.1-10">
-          <div class="alignLeft art-svg artwork" id="section-10.1-10.1">
+<p id="section-10.1-10">Where <code>Generation</code> is encoded as a big endian uint32.<a href="#section-10.1-10" class="pilcrow">¶</a></p>
+<div id="section-10.1-11">
+          <div class="alignLeft art-svg artwork" id="section-10.1-11.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="208" width="416" viewBox="0 0 416 208" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
               <path d="M 56,40 L 56,160" fill="none" stroke="black"></path>
               <path d="M 56,64 L 80,64" fill="none" stroke="black"></path>
@@ -5318,12 +5335,12 @@ Where Generation is encoded as a uint32.
                 <text x="8" y="196">=</text>
                 <text x="116" y="196">ratchet_secret_[N]_[j+1]</text>
               </g>
-            </svg><a href="#section-10.1-10.1" class="pilcrow">¶</a>
+            </svg><a href="#section-10.1-11.1" class="pilcrow">¶</a>
 </div>
 </div>
-<p id="section-10.1-11">Here, AEAD.Nn and AEAD.Nk denote the lengths
+<p id="section-10.1-12">Here, <code>AEAD.Nn</code> and <code>AEAD.Nk</code> denote the lengths
 in bytes of the nonce and key for the AEAD scheme defined by
-the ciphersuite.<a href="#section-10.1-11" class="pilcrow">¶</a></p>
+the ciphersuite.<a href="#section-10.1-12" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="deletion-schedule">
@@ -5407,15 +5424,15 @@ provide some public information about a user. A KeyPackage object specifies:<a h
 <ol start="1" type="1" class="normal type-1" id="section-11-2">
 <li id="section-11-2.1">A protocol version and ciphersuite that the client supports,<a href="#section-11-2.1" class="pilcrow">¶</a>
 </li>
-        <li id="section-11-2.2">a public key that others can use to encrypt a Welcome message to this client,
-(an "init key") and<a href="#section-11-2.2" class="pilcrow">¶</a>
+        <li id="section-11-2.2">a public key that others can use to encrypt a Welcome message to this client
+(an "init key"), and<a href="#section-11-2.2" class="pilcrow">¶</a>
 </li>
         <li id="section-11-2.3">the content of the leaf node that should be added to the tree to represent
 this client.<a href="#section-11-2.3" class="pilcrow">¶</a>
 </li>
       </ol>
 <p id="section-11-3">KeyPackages are intended to be used only once and SHOULD NOT
-be reused except in the case of last resort. (See <a href="#keypackage-reuse" class="xref">Section 17.4</a>).
+be reused except in the case of last resort (see <a href="#keypackage-reuse" class="xref">Section 17.4</a>).
 Clients MAY generate and publish multiple KeyPackages to
 support multiple ciphersuites.<a href="#section-11-3" class="pilcrow">¶</a></p>
 <p id="section-11-4">The value for <code>init_key</code> MUST be a public key for the asymmetric encryption
@@ -5426,7 +5443,7 @@ valid for the ciphersuite, including both the <code>encryption_key</code> and
 signature key. A KeyPackage object with an invalid signature field MUST be
 considered malformed.<a href="#section-11-4" class="pilcrow">¶</a></p>
 <p id="section-11-5">The signature is computed by the function <code>SignWithLabel</code> with a label
-<code>KeyPackage</code> and a content comprising of all of the fields except for the
+<code>KeyPackageTBS</code> and a content comprising of all of the fields except for the
 signature field.<a href="#section-11-5" class="pilcrow">¶</a></p>
 <div id="section-11-6">
 <pre class="lang-tls sourcecode">
@@ -5495,21 +5512,6 @@ the <code>init_key</code> field.<a href="#section-11.1-4.4" class="pilcrow">¶</
         </ul>
 </section>
 </div>
-<div id="keypackage-identifiers">
-<section id="section-11.2">
-        <h3 id="name-keypackage-identifiers">
-<a href="#section-11.2" class="section-number selfRef">11.2. </a><a href="#name-keypackage-identifiers" class="section-name selfRef">KeyPackage Identifiers</a>
-        </h3>
-<p id="section-11.2-1">Within MLS, a KeyPackage is identified by its hash (see, e.g.,
-<a href="#joining-via-welcome-message" class="xref">Section 13.2.3.2</a>).  The <code>external_key_id</code> extension allows
-applications to add an explicit, application-defined identifier to a KeyPackage.<a href="#section-11.2-1" class="pilcrow">¶</a></p>
-<div id="section-11.2-2">
-<pre class="lang-tls sourcecode">
-opaque external_key_id&lt;V&gt;;
-</pre><a href="#section-11.2-2" class="pilcrow">¶</a>
-</div>
-</section>
-</div>
 </section>
 </div>
 <div id="group-creation">
@@ -5518,8 +5520,8 @@ opaque external_key_id&lt;V&gt;;
 <a href="#section-12" class="section-number selfRef">12. </a><a href="#name-group-creation" class="section-name selfRef">Group Creation</a>
       </h2>
 <p id="section-12-1">A group is always created with a single member, the "creator".  The other
-members are added when the creator effectively sends itself an Add proposal and
-commits it, then sends the corresponding Welcome message to the new
+members are added when the creator effectively sends itself Add proposals,
+commits them, and then sends the corresponding Welcome message to the new
 participants.  These processes are described in detail in <a href="#add" class="xref">Section 13.1.1</a>, <a href="#commit" class="xref">Section 13.2</a>,
 and <a href="#joining-via-welcome-message" class="xref">Section 13.2.3.2</a>.<a href="#section-12-1" class="pilcrow">¶</a></p>
 <p id="section-12-2">The creator of a group MUST take the following steps to initialize the group:<a href="#section-12-2" class="pilcrow">¶</a></p>
@@ -5564,17 +5566,20 @@ the new members are added) and a Welcome message<a href="#section-12-3.5" class=
         <li class="normal" id="section-12-3.6">Transmit the Welcome message to the other new members<a href="#section-12-3.6" class="pilcrow">¶</a>
 </li>
       </ul>
-<p id="section-12-4">The recipient of a Welcome message processes it as described in
-<a href="#joining-via-welcome-message" class="xref">Section 13.2.3.2</a>.  If application context informs the recipient that
-the Welcome should reflect the creation of a new group (for example, due to a
-branch or reinitialization), then the recipient MUST verify that the epoch value
-in the GroupInfo is equal to 1.<a href="#section-12-4" class="pilcrow">¶</a></p>
-<p id="section-12-5">In principle, the above process could be streamlined by having the
+<p id="section-12-4">Group IDs SHOULD be constructed in such a way that there's an overwhelmingly low
+probability of honest group creators generating the same group ID, even without
+assistance from the Delivery Service. For example, by making the group ID a
+freshly generated random value of size <code>KDF.Nh</code>. The Delivery Service MAY
+attempt to ensure that group IDs are globally unique by rejecting the creation
+of new groups with a previously used ID.<a href="#section-12-4" class="pilcrow">¶</a></p>
+<p id="section-12-5">The recipient of a Welcome message processes it as described in
+<a href="#joining-via-welcome-message" class="xref">Section 13.2.3.2</a>.<a href="#section-12-5" class="pilcrow">¶</a></p>
+<p id="section-12-6">In principle, the above process could be streamlined by having the
 creator directly create a tree and choose a random value for first
 epoch's epoch secret.  We follow the steps above because it removes
 unnecessary choices, by which, for example, bad randomness could be
 introduced.  The only choices the creator makes here are its own
-KeyPackage and the leaf secret from which the Commit is built.<a href="#section-12-5" class="pilcrow">¶</a></p>
+KeyPackage and the leaf secret from which the Commit is built.<a href="#section-12-6" class="pilcrow">¶</a></p>
 <div id="required-capabilities">
 <section id="section-12.1">
         <h3 id="name-required-capabilities">
@@ -5596,12 +5601,13 @@ struct {
 <p id="section-12.1-3">This extension lists the extensions, proposals, and credential types that must be supported by
 all members of the group. The "default" proposal and extension types defined in this
 document are assumed to be implemented by all clients, and need not be listed in
-RequiredCapabilities in order to be safely used.<a href="#section-12.1-3" class="pilcrow">¶</a></p>
+RequiredCapabilities in order to be safely used. Note that this is not true for
+credential types.<a href="#section-12.1-3" class="pilcrow">¶</a></p>
 <p id="section-12.1-4">For new members, support for required capabilities is enforced by existing
 members during the application of Add commits.  Existing members should of
 course be in compliance already.  In order to ensure this continues to be the
-case even as the group's extensions can be updated, a GroupContextExtensions
-proposal is invalid if it contains a <code>required_capabilities</code> extension that
+case even as the group's extensions are updated, a GroupContextExtensions
+proposal is deemed invalid if it contains a <code>required_capabilities</code> extension that
 requires non-default capabilities not supported by all current members.<a href="#section-12.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -5619,53 +5625,55 @@ The members of a group reinitialize it using the following steps:<a href="#secti
           <li id="section-12.2-2.2">A member of the old group sends a Commit covering the ReInit proposal<a href="#section-12.2-2.2" class="pilcrow">¶</a>
 </li>
           <li id="section-12.2-2.3">
-            <p id="section-12.2-2.3.1">A member of the old group sends a Welcome message for the new group that
-matches the ReInit<a href="#section-12.2-2.3.1" class="pilcrow">¶</a></p>
+            <p id="section-12.2-2.3.1">A member of the old group creates an initial Commit setting up a new group
+that matches the ReInit and sends a Welcome message<a href="#section-12.2-2.3.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-12.2-2.3.2.1">The <code>group_id</code>, <code>version</code>, and <code>cipher_suite</code> fields in the Welcome
 message MUST be the same as the corresponding fields in the ReInit
 proposal.<a href="#section-12.2-2.3.2.1" class="pilcrow">¶</a>
 </li>
               <li class="normal" id="section-12.2-2.3.2.2">The Welcome MUST specify a PreSharedKey of type <code>resumption</code> with usage
-<code>reinit</code>.  The <code>group_id</code> must match the old group, and the <code>epoch</code> must
+<code>reinit</code>.  The <code>group_id</code> MUST match the old group, and the <code>epoch</code> MUST
 indicate the epoch after the Commit covering the ReInit.<a href="#section-12.2-2.3.2.2" class="pilcrow">¶</a>
 </li>
             </ul>
 </li>
         </ol>
 <p id="section-12.2-3">Note that these three steps may be done by the same group member or different
-members.  For example, if a group member sends a commit with an inline ReInit
-proposal (steps 1 and 2), but then goes offline, another group member may send
-the corresponding Welcome.  This flexibility avoids situations where a group
+members.  For example, if a group member sends a Commit with an inline ReInit
+proposal (steps 1 and 2) but then goes offline, another group member may
+recreate the group instead.  This flexibility avoids situations where a group
 gets stuck between steps 2 and 3.<a href="#section-12.2-3" class="pilcrow">¶</a></p>
 <p id="section-12.2-4">Resumption PSKs with usage <code>reinit</code> MUST NOT be used in other contexts.  A
 PreSharedKey proposal with type <code>resumption</code> and usage <code>reinit</code> MUST be
 considered invalid.<a href="#section-12.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="sub-group-branching">
+<div id="subgroup-branching">
 <section id="section-12.3">
-        <h3 id="name-sub-group-branching">
-<a href="#section-12.3" class="section-number selfRef">12.3. </a><a href="#name-sub-group-branching" class="section-name selfRef">Sub-group Branching</a>
+        <h3 id="name-subgroup-branching">
+<a href="#section-12.3" class="section-number selfRef">12.3. </a><a href="#name-subgroup-branching" class="section-name selfRef">Subgroup Branching</a>
         </h3>
 <p id="section-12.3-1">A new group can be formed from a subset of an existing group's members, using
 the same parameters as the old group.<a href="#section-12.3-1" class="pilcrow">¶</a></p>
-<p id="section-12.3-2">A member can create a sub-group by performing the following steps:<a href="#section-12.3-2" class="pilcrow">¶</a></p>
+<p id="section-12.3-2">A member can create a subgroup by performing the following steps:<a href="#section-12.3-2" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-12.3-3">
-<li id="section-12.3-3.1">Determine a subset of existing members that should be a part of the sub-group.<a href="#section-12.3-3.1" class="pilcrow">¶</a>
+<li id="section-12.3-3.1">Fetch a new KeyPackage for each group member that should be included in the
+subgroup.<a href="#section-12.3-3.1" class="pilcrow">¶</a>
 </li>
-          <li id="section-12.3-3.2">Create a new tree for the sub-group by fetching a new KeyPackage for each
-existing member that should be included in the sub-group.<a href="#section-12.3-3.2" class="pilcrow">¶</a>
+          <li id="section-12.3-3.2">Create an initial Commit message that sets up the new group and contains a
+PreSharedKey proposal of type <code>resumption</code> with usage <code>branch</code>. To avoid key
+re-use, the <code>psk_nonce</code> included in the <code>PreSharedKeyID</code> object MUST be a
+randomly sampled nonce of length <code>KDF.Nh</code>.<a href="#section-12.3-3.2" class="pilcrow">¶</a>
 </li>
-          <li id="section-12.3-3.3">Create a Welcome message that includes a PreSharedKey of type <code>resumption</code> with
-usage <code>branch</code>.<a href="#section-12.3-3.3" class="pilcrow">¶</a>
+          <li id="section-12.3-3.3">Send the corresponding Welcome message to the subgroup members.<a href="#section-12.3-3.3" class="pilcrow">¶</a>
 </li>
         </ol>
 <p id="section-12.3-4">A client receiving a Welcome including a PreSharedKey of type <code>resumption</code> with
 usage <code>branch</code> MUST verify that the new group reflects a subgroup branched from
-the referenced group.<a href="#section-12.3-4" class="pilcrow">¶</a></p>
+the referenced group by checking:<a href="#section-12.3-4" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-12.3-5.1">The <code>version</code> and <code>ciphersuite</code> values in the Welcome MUST be the same as
+<li class="normal" id="section-12.3-5.1">The <code>version</code> and <code>ciphersuite</code> values in the Welcome are the same as
 those used by the old group.<a href="#section-12.3-5.1" class="pilcrow">¶</a>
 </li>
           <li class="normal" id="section-12.3-5.2">The <code>epoch</code> in the Welcome message MUST be 1.<a href="#section-12.3-5.2" class="pilcrow">¶</a>
@@ -6437,11 +6445,13 @@ struct {
 } GroupInfo;
 </pre><a href="#section-13.2.3-2" class="pilcrow">¶</a>
 </div>
-<p id="section-13.2.3-3">New members MUST verify the <code>signature</code> using the public key taken from the
-credential in the leaf node of the ratchet tree with leaf index <code>signer</code>. The
+<p id="section-13.2.3-3">New members MUST verify that <code>group_id</code> is unique among the groups they're
+currently participating in.<a href="#section-13.2.3-3" class="pilcrow">¶</a></p>
+<p id="section-13.2.3-4">New members also MUST verify the <code>signature</code> using the public key taken from the
+leaf node of the ratchet tree with leaf index <code>signer</code>. The
 signature covers the following structure, comprising all the fields in the
-GroupInfo above <code>signature</code>:<a href="#section-13.2.3-3" class="pilcrow">¶</a></p>
-<div id="section-13.2.3-4">
+GroupInfo above <code>signature</code>:<a href="#section-13.2.3-4" class="pilcrow">¶</a></p>
+<div id="section-13.2.3-5">
 <pre class="lang-tls sourcecode">
 struct {
     CipherSuite cipher_suite;
@@ -6454,7 +6464,7 @@ struct {
     MAC confirmation_tag;
     uint32 signer;
 } GroupInfoTBS;
-</pre><a href="#section-13.2.3-4" class="pilcrow">¶</a>
+</pre><a href="#section-13.2.3-5" class="pilcrow">¶</a>
 </div>
 <div id="joining-via-external-commits">
 <section id="section-13.2.3.1">
@@ -6605,15 +6615,17 @@ indicated by the <code>cipher_suite</code> field. If no such field exists, or if
 ciphersuite indicated in the KeyPackage does not match the one in the
 Welcome message, return an error.<a href="#section-13.2.3.2-7.1" class="pilcrow">¶</a>
 </li>
-              <li class="normal" id="section-13.2.3.2-7.2">Decrypt the <code>encrypted_group_secrets</code> using HPKE with the algorithms indicated
-by the ciphersuite and the HPKE private key corresponding to the GroupSecrets.
-If a <code>PreSharedKeyID</code> is part of the GroupSecrets and the client is not in
-possession of the corresponding PSK, return an error.<a href="#section-13.2.3.2-7.2" class="pilcrow">¶</a>
+              <li class="normal" id="section-13.2.3.2-7.2">Decrypt the <code>encrypted_group_secrets</code> value with the algorithms indicated
+by the ciphersuite and the private key corresponding to <code>init_key</code> in the
+referenced KeyPackage.<a href="#section-13.2.3.2-7.2" class="pilcrow">¶</a>
 </li>
-              <li class="normal" id="section-13.2.3.2-7.3">From the <code>joiner_secret</code> in the decrypted GroupSecrets object and the PSKs
+              <li class="normal" id="section-13.2.3.2-7.3">If a <code>PreSharedKeyID</code> is part of the GroupSecrets and the client is not in
+possession of the corresponding PSK, return an error.<a href="#section-13.2.3.2-7.3" class="pilcrow">¶</a>
+</li>
+              <li class="normal" id="section-13.2.3.2-7.4">From the <code>joiner_secret</code> in the decrypted GroupSecrets object and the PSKs
 specified in the <code>GroupSecrets</code>, derive the <code>welcome_secret</code> and using that
 the <code>welcome_key</code> and <code>welcome_nonce</code>. Use the key and nonce to decrypt the
-<code>encrypted_group_info</code> field.<a href="#section-13.2.3.2-7.3" class="pilcrow">¶</a>
+<code>encrypted_group_info</code> field.<a href="#section-13.2.3.2-7.4" class="pilcrow">¶</a>
 </li>
             </ul>
 <div id="section-13.2.3.2-8">
@@ -6625,69 +6637,72 @@ welcome_key = KDF.Expand(welcome_secret, "key", AEAD.Nk)
 <ul class="normal">
 <li class="normal" id="section-13.2.3.2-9.1">Verify the signature on the GroupInfo object. The signature input comprises
 all of the fields in the GroupInfo object except the signature field. The
-public key and algorithm are taken from the credential in the leaf node of the
+public key is taken from the LeafNode of the
 ratchet tree with leaf index <code>signer</code>. If the node is blank or if
 signature verification fails, return an error.<a href="#section-13.2.3.2-9.1" class="pilcrow">¶</a>
 </li>
-              <li class="normal" id="section-13.2.3.2-9.2">
-                <p id="section-13.2.3.2-9.2.1">Verify the integrity of the ratchet tree.<a href="#section-13.2.3.2-9.2.1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-13.2.3.2-9.2.2.1">Verify that the tree hash of the ratchet tree matches the <code>tree_hash</code> field
-in the GroupInfo.<a href="#section-13.2.3.2-9.2.2.1" class="pilcrow">¶</a>
+              <li class="normal" id="section-13.2.3.2-9.2">Verify that the <code>group_id</code> is unique among the groups that the client is
+currently participating in.<a href="#section-13.2.3.2-9.2" class="pilcrow">¶</a>
 </li>
-                  <li class="normal" id="section-13.2.3.2-9.2.2.2">For each non-empty parent node, verify that exactly one of the node's
+              <li class="normal" id="section-13.2.3.2-9.3">
+                <p id="section-13.2.3.2-9.3.1">Verify the integrity of the ratchet tree.<a href="#section-13.2.3.2-9.3.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-13.2.3.2-9.3.2.1">Verify that the tree hash of the ratchet tree matches the <code>tree_hash</code> field
+in GroupInfo.<a href="#section-13.2.3.2-9.3.2.1" class="pilcrow">¶</a>
+</li>
+                  <li class="normal" id="section-13.2.3.2-9.3.2.2">For each non-empty parent node, verify that exactly one of the node's
 children are non-empty and have the hash of this node set as their
 <code>parent_hash</code> value (if the child is another parent) or has a <code>parent_hash</code>
 field in the LeafNode containing the same value (if the child is a
 leaf). If either of the node's children is empty, and in particular does not
 have a parent hash, then its respective children's <code>parent_hash</code> values have
-to be considered instead.<a href="#section-13.2.3.2-9.2.2.2" class="pilcrow">¶</a>
+to be considered instead.<a href="#section-13.2.3.2-9.3.2.2" class="pilcrow">¶</a>
 </li>
-                  <li class="normal" id="section-13.2.3.2-9.2.2.3">For each non-empty leaf node, validate the LeafNode as described in
-<a href="#leaf-node-validation" class="xref">Section 8.3</a>.<a href="#section-13.2.3.2-9.2.2.3" class="pilcrow">¶</a>
+                  <li class="normal" id="section-13.2.3.2-9.3.2.3">For each non-empty leaf node, validate the LeafNode as described in
+<a href="#leaf-node-validation" class="xref">Section 8.3</a>.<a href="#section-13.2.3.2-9.3.2.3" class="pilcrow">¶</a>
 </li>
                 </ul>
 </li>
-              <li class="normal" id="section-13.2.3.2-9.3">Identify a leaf in the <code>tree</code> array (any even-numbered node) whose LeafNode is
+              <li class="normal" id="section-13.2.3.2-9.4">Identify a leaf whose LeafNode is
 identical to the one in the KeyPackage.  If no such field exists, return an
-error.  Let <code>my_leaf</code> represent this leaf in the tree.<a href="#section-13.2.3.2-9.3" class="pilcrow">¶</a>
+error.  Let <code>my_leaf</code> represent this leaf in the tree.<a href="#section-13.2.3.2-9.4" class="pilcrow">¶</a>
 </li>
-              <li class="normal" id="section-13.2.3.2-9.4">
-                <p id="section-13.2.3.2-9.4.1">Construct a new group state using the information in the GroupInfo object.<a href="#section-13.2.3.2-9.4.1" class="pilcrow">¶</a></p>
+              <li class="normal" id="section-13.2.3.2-9.5">
+                <p id="section-13.2.3.2-9.5.1">Construct a new group state using the information in the GroupInfo object.<a href="#section-13.2.3.2-9.5.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-13.2.3.2-9.4.2.1">The GroupContext contains the <code>group_id</code>, <code>epoch</code>, <code>tree_hash</code>,
+<li class="normal" id="section-13.2.3.2-9.5.2.1">The GroupContext contains the <code>group_id</code>, <code>epoch</code>, <code>tree_hash</code>,
 <code>confirmed_transcript_hash</code>, and <code>group_context_extensions</code> fields from
-the GroupInfo object.<a href="#section-13.2.3.2-9.4.2.1" class="pilcrow">¶</a>
+the GroupInfo object.<a href="#section-13.2.3.2-9.5.2.1" class="pilcrow">¶</a>
 </li>
-                  <li class="normal" id="section-13.2.3.2-9.4.2.2">The new member's position in the tree is at the leaf <code>my_leaf</code>, as defined
-above.<a href="#section-13.2.3.2-9.4.2.2" class="pilcrow">¶</a>
+                  <li class="normal" id="section-13.2.3.2-9.5.2.2">The new member's position in the tree is at the leaf <code>my_leaf</code>, as defined
+above.<a href="#section-13.2.3.2-9.5.2.2" class="pilcrow">¶</a>
 </li>
-                  <li class="normal" id="section-13.2.3.2-9.4.2.3">Update the leaf <code>my_leaf</code> with the private key corresponding to the
-public key in the node.<a href="#section-13.2.3.2-9.4.2.3" class="pilcrow">¶</a>
+                  <li class="normal" id="section-13.2.3.2-9.5.2.3">Update the leaf <code>my_leaf</code> with the private key corresponding to the
+public key in the node.<a href="#section-13.2.3.2-9.5.2.3" class="pilcrow">¶</a>
 </li>
-                  <li class="normal" id="section-13.2.3.2-9.4.2.4">If the <code>path_secret</code> value is set in the GroupSecrets object: Identify the
+                  <li class="normal" id="section-13.2.3.2-9.5.2.4">If the <code>path_secret</code> value is set in the GroupSecrets object: Identify the
 lowest common ancestor of the leaf node <code>my_leaf</code> and of the node of
 the member with leaf index <code>GroupInfo.signer</code>. Set the private key for
-this node to the private key derived from the <code>path_secret</code>.<a href="#section-13.2.3.2-9.4.2.4" class="pilcrow">¶</a>
+this node to the private key derived from the <code>path_secret</code>.<a href="#section-13.2.3.2-9.5.2.4" class="pilcrow">¶</a>
 </li>
-                  <li class="normal" id="section-13.2.3.2-9.4.2.5">For each parent of the common ancestor, up to the root of the tree, derive
+                  <li class="normal" id="section-13.2.3.2-9.5.2.5">For each parent of the common ancestor, up to the root of the tree, derive
 a new path secret and set the private key for the node to the private key
 derived from the path secret.  The private key MUST be the private key
-that corresponds to the public key in the node.<a href="#section-13.2.3.2-9.4.2.5" class="pilcrow">¶</a>
+that corresponds to the public key in the node.<a href="#section-13.2.3.2-9.5.2.5" class="pilcrow">¶</a>
 </li>
                 </ul>
 </li>
-              <li class="normal" id="section-13.2.3.2-9.5">Use the <code>joiner_secret</code> from the GroupSecrets object to generate the epoch secret
-and other derived secrets for the current epoch.<a href="#section-13.2.3.2-9.5" class="pilcrow">¶</a>
+              <li class="normal" id="section-13.2.3.2-9.6">Use the <code>joiner_secret</code> from the GroupSecrets object to generate the epoch secret
+and other derived secrets for the current epoch.<a href="#section-13.2.3.2-9.6" class="pilcrow">¶</a>
 </li>
-              <li class="normal" id="section-13.2.3.2-9.6">Set the confirmed transcript hash in the new state to the value of the
-<code>confirmed_transcript_hash</code> in the GroupInfo.<a href="#section-13.2.3.2-9.6" class="pilcrow">¶</a>
+              <li class="normal" id="section-13.2.3.2-9.7">Set the confirmed transcript hash in the new state to the value of the
+<code>confirmed_transcript_hash</code> in the GroupInfo.<a href="#section-13.2.3.2-9.7" class="pilcrow">¶</a>
 </li>
-              <li class="normal" id="section-13.2.3.2-9.7">Verify the confirmation tag in the GroupInfo using the derived confirmation
-key and the <code>confirmed_transcript_hash</code> from the GroupInfo.<a href="#section-13.2.3.2-9.7" class="pilcrow">¶</a>
+              <li class="normal" id="section-13.2.3.2-9.8">Verify the confirmation tag in the GroupInfo using the derived confirmation
+key and the <code>confirmed_transcript_hash</code> from the GroupInfo.<a href="#section-13.2.3.2-9.8" class="pilcrow">¶</a>
 </li>
-              <li class="normal" id="section-13.2.3.2-9.8">Use the confirmed transcript hash and confirmation tag to compute the interim
-transcript hash in the new state.<a href="#section-13.2.3.2-9.8" class="pilcrow">¶</a>
+              <li class="normal" id="section-13.2.3.2-9.9">Use the confirmed transcript hash and confirmation tag to compute the interim
+transcript hash in the new state.<a href="#section-13.2.3.2-9.9" class="pilcrow">¶</a>
 </li>
             </ul>
 </section>
@@ -6701,8 +6716,8 @@ transcript hash in the new state.<a href="#section-13.2.3.2-9.8" class="pilcrow"
         <h3 id="name-ratchet-tree-extension">
 <a href="#section-13.3" class="section-number selfRef">13.3. </a><a href="#name-ratchet-tree-extension" class="section-name selfRef">Ratchet Tree Extension</a>
         </h3>
-<p id="section-13.3-1">By default, a GroupInfo message only provides the joiner with a commitment
-to the group's ratchet tree.  In order to process or generate handshake
+<p id="section-13.3-1">By default, a GroupInfo message only provides the joiner with a hash of
+the group's ratchet tree.  In order to process or generate handshake
 messages, the joiner will need to get a copy of the ratchet tree from some other
 source.  (For example, the DS might provide a cached copy.)  The inclusion of
 the tree hash in the GroupInfo message means that the source of the ratchet
@@ -6712,13 +6727,6 @@ the whole public state of the ratchet tree can be provided in an extension of
 type <code>ratchet_tree</code>, containing a <code>ratchet_tree</code> object of the following form:<a href="#section-13.3-2" class="pilcrow">¶</a></p>
 <div id="section-13.3-3">
 <pre class="lang-tls sourcecode">
-enum {
-    reserved(0),
-    leaf(1),
-    parent(2),
-    (255)
-} NodeType;
-
 struct {
     NodeType node_type;
     select (Node.node_type) {
@@ -6978,7 +6986,7 @@ HTTP/2, which restricted the set of allowed TLS ciphers (see Section 9.2.2 of
         <h3 id="name-proposals-2">
 <a href="#section-14.2" class="section-number selfRef">14.2. </a><a href="#name-proposals-2" class="section-name selfRef">Proposals</a>
         </h3>
-<p id="section-14.2-1">Commit messages do not have an extension field because the set of protocols is
+<p id="section-14.2-1">Commit messages do not have an extension field because the set of proposals is
 extensible.  As discussed in <a href="#commit" class="xref">Section 13.2</a>, Proposals with a non-default proposal
 type MUST NOT be included in a commit unless the proposal type is supported by
 all the members of the group that will process the Commit.<a href="#section-14.2-1" class="pilcrow">¶</a></p>
@@ -6992,10 +7000,10 @@ all the members of the group that will process the Commit.<a href="#section-14.2
 <p id="section-14.3-1">In order to ensure that MLS provides meaningful authentication it is important
 that each member is able to authenticate some identity information for each
 other member.  Identity information is encoded in Credentials, so this property
-is assured by ensuring that members use compatible credential types.<a href="#section-14.3-1" class="pilcrow">¶</a></p>
+is provided by ensuring that members use compatible credential types.<a href="#section-14.3-1" class="pilcrow">¶</a></p>
 <p id="section-14.3-2">The types of credential that may be used in a group is restricted to what all
 members of the group support, as specified by the <code>capabilities</code> field of each
-LeafNode in the RatchetTree. An application can introduce new credential types
+LeafNode in the ratchet tree. An application can introduce new credential types
 by choosing an unallocated identifier from the registry in
 <a href="#mls-credential-types" class="xref">Section 18.4</a> and indicating support for the credential type in
 published LeafNodes, whether in Update proposals to existing groups or
@@ -7011,66 +7019,70 @@ attributes attested by different authorities.  To be consistent with the general
 principle stated at the beginning of this section, such an extension would need
 to ensure that each member can authenticate some identity for each other member.
 For each pair of members (Alice, Bob), Alice would need to present at least one
-credential of a type that Bob supports.
-## Extensions<a href="#section-14.3-3" class="pilcrow">¶</a></p>
-<p id="section-14.3-4">This protocol includes a mechanism for negotiating extension parameters similar
+credential of a type that Bob supports.<a href="#section-14.3-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="extensions">
+<section id="section-14.4">
+        <h3 id="name-extensions">
+<a href="#section-14.4" class="section-number selfRef">14.4. </a><a href="#name-extensions" class="section-name selfRef">Extensions</a>
+        </h3>
+<p id="section-14.4-1">This protocol includes a mechanism for negotiating extension parameters similar
 to the one in TLS <span>[<a href="#RFC8446" class="xref">RFC8446</a>]</span>.  In TLS, extension negotiation is one-to-one: The
 client offers extensions in its ClientHello message, and the server expresses
 its choices for the session with extensions in its ServerHello and
 EncryptedExtensions messages.  In MLS, extensions appear in the following
-places:<a href="#section-14.3-4" class="pilcrow">¶</a></p>
+places:<a href="#section-14.4-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-14.3-5.1">In KeyPackages, to describe additional information related to the client<a href="#section-14.3-5.1" class="pilcrow">¶</a>
+<li class="normal" id="section-14.4-2.1">In KeyPackages, to describe additional information related to the client<a href="#section-14.4-2.1" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-14.3-5.2">In LeafNodes, to describe additional information about the client or its
-participation in the group (once in the ratchet tree)<a href="#section-14.3-5.2" class="pilcrow">¶</a>
+          <li class="normal" id="section-14.4-2.2">In LeafNodes, to describe additional information about the client or its
+participation in the group (once in the ratchet tree)<a href="#section-14.4-2.2" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-14.3-5.3">In the GroupInfo, to tell new members of a group what parameters are
+          <li class="normal" id="section-14.4-2.3">In the GroupInfo, to tell new members of a group what parameters are
 being used by the group, and to provide any additional details required to
-join the group<a href="#section-14.3-5.3" class="pilcrow">¶</a>
+join the group<a href="#section-14.4-2.3" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-14.3-5.4">In the GroupContext object, to ensure that all members of the group have the
-same view of the parameters in use<a href="#section-14.3-5.4" class="pilcrow">¶</a>
+          <li class="normal" id="section-14.4-2.4">In the GroupContext object, to ensure that all members of the group have the
+same view of the parameters in use<a href="#section-14.4-2.4" class="pilcrow">¶</a>
 </li>
         </ul>
-<p id="section-14.3-6">In other words, an application can use GroupContext extensions to ensure that
+<p id="section-14.4-3">In other words, an application can use GroupContext extensions to ensure that
 all members of the group agree on a set of parameters. Clients indicate their
 support for parameters in the <code>capabilities</code> field of their LeafNode. New
 members of a group are informed of the group's GroupContext extensions via the
 <code>group_context_extensions</code> field in the GroupInfo object. The <code>other_extensions</code>
 field in a GroupInfo object can be used to provide additional parameters to new
-joiners that are used to join the group.<a href="#section-14.3-6" class="pilcrow">¶</a></p>
-<p id="section-14.3-7">This extension mechanism is designed to allow for secure and forward-compatible
+joiners that are used to join the group.<a href="#section-14.4-3" class="pilcrow">¶</a></p>
+<p id="section-14.4-4">This extension mechanism is designed to allow for the secure and forward-compatible
 negotiation of extensions.  For this to work, implementations MUST correctly
-handle extensible fields:<a href="#section-14.3-7" class="pilcrow">¶</a></p>
+handle extensible fields:<a href="#section-14.4-4" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-14.3-8.1">A client that posts a KeyPackage MUST support all parameters advertised in
+<li class="normal" id="section-14.4-5.1">A client that posts a KeyPackage MUST support all parameters advertised in
 it.  Otherwise, another client might fail to interoperate by selecting one of
-those parameters.<a href="#section-14.3-8.1" class="pilcrow">¶</a>
+those parameters.<a href="#section-14.4-5.1" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-14.3-8.2">A client initiating a group MUST ignore all unrecognized ciphersuites,
+          <li class="normal" id="section-14.4-5.2">A client initiating a group MUST ignore all unrecognized ciphersuites,
 extensions, and other parameters.  Otherwise, it may fail to interoperate with
-newer clients.<a href="#section-14.3-8.2" class="pilcrow">¶</a>
+newer clients.<a href="#section-14.4-5.2" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-14.3-8.3">A client adding a new member to a group MUST verify that the LeafNode for the
+          <li class="normal" id="section-14.4-5.3">Any field containing a list of extensions MUST NOT have more than one extension of any given type.<a href="#section-14.4-5.3" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-14.4-5.4">A client adding a new member to a group MUST verify that the LeafNode for the
 new member is compatible with the group's extensions.  The <code>capabilities</code>
-field MUST indicate support for each extension in the GroupContext.<a href="#section-14.3-8.3" class="pilcrow">¶</a>
+field MUST indicate support for each extension in the GroupContext.<a href="#section-14.4-5.4" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-14.3-8.4">If any extension in a GroupInfo message is unrecognized (i.e., not contained
+          <li class="normal" id="section-14.4-5.5">If any extension in a GroupInfo message is unrecognized (i.e., not contained
 in the <code>capabilities</code> of the corresponding KeyPackage), then the client MUST
-reject the Welcome message and not join the group.<a href="#section-14.3-8.4" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-14.3-8.5">The extensions populated into a GroupContext object are drawn from those in
-the GroupInfo object, according to the definitions of those extensions.<a href="#section-14.3-8.5" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-14.3-8.6">Any field containing a list of extensions MUST NOT have more than one extension of any given type.<a href="#section-14.3-8.6" class="pilcrow">¶</a>
+reject the Welcome message and not join the group.<a href="#section-14.4-5.5" class="pilcrow">¶</a>
 </li>
         </ul>
-<p id="section-14.3-9">Note that the latter two requirements mean that all MLS extensions are
+<p id="section-14.4-6">Note that the latter two requirements mean that all MLS extensions are
 mandatory, in the sense that an extension in use by the group MUST be supported
-by all members of the group.<a href="#section-14.3-9" class="pilcrow">¶</a></p>
-<p id="section-14.3-10">This document does not define any way for the parameters of the group to change
-once it has been created; such a behavior could be implemented as an extension.<a href="#section-14.3-10" class="pilcrow">¶</a></p>
+by all members of the group.<a href="#section-14.4-6" class="pilcrow">¶</a></p>
+<p id="section-14.4-7">The parameters of a group may be changed by sending a GroupContextExtensions
+proposal to enable additional extensions, or by reinitializing the group as
+described in <a href="#reinitialization" class="xref">Section 12.2</a>.<a href="#section-14.4-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -7082,12 +7094,12 @@ once it has been created; such a behavior could be implemented as an extension.<
       </h2>
 <p id="section-15-1">Each Commit message is premised on a given starting state,
 indicated by the <code>epoch</code> field of the enclosing MLSMessageContent.
-If the changes implied by a Commit messages are made
+If the changes implied by a Commit message are made
 starting from a different state, the results will be incorrect.<a href="#section-15-1" class="pilcrow">¶</a></p>
 <p id="section-15-2">This need for sequencing is not a problem as long as each time a
 group member sends a Commit message, it is based on the most
 current state of the group.  In practice, however, there is a risk
-that two members will generate Commit messages simultaneously,
+that two members will generate Commit messages simultaneously
 based on the same state.<a href="#section-15-2" class="pilcrow">¶</a></p>
 <p id="section-15-3">When this happens, there is a need for the members of the group to
 deconflict the simultaneous Commit messages.  There are two
@@ -7319,7 +7331,7 @@ updating their leaf key in the ratchet tree. Updating their leaf key prevents
 group secrets from continuing to be encrypted to previously compromised public
 keys.<a href="#section-17.3-1" class="pilcrow">¶</a></p>
 <p id="section-17.3-2">Forward-secrecy between epochs is provided by deleting private keys from past
-version of the ratchet tree, as this prevents old group secrets from being
+versions of the ratchet tree, as this prevents old group secrets from being
 re-derived. Forward secrecy <em>within</em> an epoch is provided by deleting message
 encryption keys once they've been used to encrypt or decrypt a message.<a href="#section-17.3-2" class="pilcrow">¶</a></p>
 <p id="section-17.3-3">Post-compromise security is also provided for new groups by members regularly
@@ -7337,10 +7349,10 @@ has been used to introduce the corresponding client to a group, it SHOULD be
 deleted from the KeyPackage publication system.  Reuse of KeyPackages can lead
 to replay attacks.<a href="#section-17.4-1" class="pilcrow">¶</a></p>
 <p id="section-17.4-2">An application MAY allow for reuse of a "last resort" KeyPackage in order to
-prevent denial of service attacks.  Since a KeyPackage is needed to add a
+prevent denial-of-service attacks.  Since a KeyPackage is needed to add a
 client to a new group, an attacker could prevent a client being added to new
-groups by exhausting all available KeyPackages. To prevent such a denial of
-service attack, the KeyPackage publication system SHOULD rate limit KeyPackage
+groups by exhausting all available KeyPackages. To prevent such a denial-of-service
+attack, the KeyPackage publication system SHOULD rate-limit KeyPackage
 requests, especially if not authenticated.<a href="#section-17.4-2" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -7355,7 +7367,7 @@ of path secrets to different subtrees of the group's ratchet trees.  These path
 secrets should be derived in a sequence as described in
 <a href="#ratchet-tree-evolution" class="xref">Section 8.4</a>, but the UpdatePath syntax allows the sender to
 encrypt arbitrary, unrelated secrets.  The syntax also does not guarantee that
-the encrypted path secret encrypted for a given node corresponds to the public
+the encrypted path secret for a given node corresponds to the public
 key provided for that node.<a href="#section-17.5-1" class="pilcrow">¶</a></p>
 <p id="section-17.5-2">Both of these types of corruption will cause processing of a Commit to fail for
 some members of the group.  If the public key for a node does not match the path
@@ -7365,8 +7377,7 @@ then members that can decrypt nodes before that point will compute a different
 public key for the mismatched node than the one in the UpdatePath, which also
 causes the Commit to fail.  Applications SHOULD provide mechanisms for failed
 commits to be reported, so that group members who were not able to recognize the
-error themselves can reject the commit and roll back to a previous state if
-necessary.<a href="#section-17.5-2" class="pilcrow">¶</a></p>
+error themselves can reinitialize the group if necessary.<a href="#section-17.5-2" class="pilcrow">¶</a></p>
 <p id="section-17.5-3">Even with such an error reporting mechanism in place, however, it is still
 possible for members to get locked out of the group by a malformed commit.
 Since malformed Commits can only be recognized by certain members of the group,
@@ -7374,7 +7385,9 @@ in an asynchronous application, it may be the case that all members that could
 detect a fault in a Commit are offline.  In such a case, the Commit will be
 accepted by the group, and the resulting state possibly used as the basis for
 further Commits.  When the affected members come back online, they will reject
-the first commit, and thus be unable to catch up with the group.<a href="#section-17.5-3" class="pilcrow">¶</a></p>
+the first commit, and thus be unable to catch up with the group. These members
+will either need to add themselves back with an external Commit, or reinitialize
+the group from scratch.<a href="#section-17.5-3" class="pilcrow">¶</a></p>
 <p id="section-17.5-4">Applications can address this risk by requiring certain members of the group to
 acknowledge successful processing of a Commit before the group regards the
 Commit as accepted.  The minimum set of acknowledgements necessary to verify
@@ -7697,8 +7710,8 @@ is REQUIRED for a Y-&gt;N transition.<a href="#section-18.2-3.4" class="pilcrow"
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">0x0001</td>
-              <td class="text-left" rowspan="1" colspan="1">external_key_id</td>
-              <td class="text-left" rowspan="1" colspan="1">KP</td>
+              <td class="text-left" rowspan="1" colspan="1">application_id</td>
+              <td class="text-left" rowspan="1" colspan="1">LN</td>
               <td class="text-left" rowspan="1" colspan="1">Y</td>
               <td class="text-left" rowspan="1" colspan="1">RFC XXXX</td>
             </tr>
@@ -8010,15 +8023,15 @@ treated as binary data.<a href="#section-18.6-2.10.1" class="pilcrow">¶</a></p>
       </h2>
 <ul class="normal">
 <li class="normal" id="section-19-1.1">Joel Alwen <br>
-Wickr <br>
-joel.alwen@wickr.com<a href="#section-19-1.1" class="pilcrow">¶</a>
+Amazon <br>
+alwenjo@amazon.com<a href="#section-19-1.1" class="pilcrow">¶</a>
 </li>
         <li class="normal" id="section-19-1.2">Karthikeyan Bhargavan <br>
-INRIA <br>
+Inria <br>
 karthikeyan.bhargavan@inria.fr<a href="#section-19-1.2" class="pilcrow">¶</a>
 </li>
         <li class="normal" id="section-19-1.3">Cas Cremers <br>
-University of Oxford <br>
+CISPA <br>
 cremers@cispa.de<a href="#section-19-1.3" class="pilcrow">¶</a>
 </li>
         <li class="normal" id="section-19-1.4">Alan Duric <br>
@@ -8041,21 +8054,32 @@ konrad.kohbrok@datashrine.de<a href="#section-19-1.7" class="pilcrow">¶</a>
 MIT <br>
 kwonal@mit.edu<a href="#section-19-1.8" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-19-1.9">Brendan McMillion <br>
-Cloudflare <br>
-brendan@cloudflare.com<a href="#section-19-1.9" class="pilcrow">¶</a>
+        <li class="normal" id="section-19-1.9">Tom Leavy <br>
+Amazon <br>
+tomleavy@amazon.com<a href="#section-19-1.9" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-19-1.10">Eric Rescorla <br>
+        <li class="normal" id="section-19-1.10">Brendan McMillion <br>
+brendanmcmillion@gmail.com<a href="#section-19-1.10" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-19-1.11">Marta Mularczyk <br>
+Amazon <br>
+mulmarta@amazon.com<a href="#section-19-1.11" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-19-1.12">Eric Rescorla <br>
 Mozilla <br>
-ekr@rtfm.com<a href="#section-19-1.10" class="pilcrow">¶</a>
+ekr@rtfm.com<a href="#section-19-1.12" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-19-1.11">Michael Rosenberg <br>
+        <li class="normal" id="section-19-1.13">Michael Rosenberg <br>
 Trail of Bits <br>
-michael.rosenberg@trailofbits.com<a href="#section-19-1.11" class="pilcrow">¶</a>
+michael.rosenberg@trailofbits.com<a href="#section-19-1.13" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-19-1.12">Thyla van der Merwe <br>
+        <li class="normal" id="section-19-1.14">Theophile Wallez <br>
+Inria <br>
+theophile.wallez@inria.fr<a href="#section-19-1.14" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="section-19-1.15">Thyla van der Merwe <br>
 Royal Holloway, University of London <br>
-thyla.van.der@merwe.tech<a href="#section-19-1.12" class="pilcrow">¶</a>
+thyla.van.der@merwe.tech<a href="#section-19-1.15" class="pilcrow">¶</a>
 </li>
       </ul>
 </section>

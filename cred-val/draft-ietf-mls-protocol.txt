@@ -127,11 +127,10 @@ Table of Contents
      10.2.  Deletion Schedule
    11. Key Packages
      11.1.  KeyPackage Validation
-     11.2.  KeyPackage Identifiers
    12. Group Creation
      12.1.  Required Capabilities
      12.2.  Reinitialization
-     12.3.  Sub-group Branching
+     12.3.  Subgroup Branching
    13. Group Evolution
      13.1.  Proposals
        13.1.1.  Add
@@ -152,6 +151,7 @@ Table of Contents
      14.1.  Ciphersuites
      14.2.  Proposals
      14.3.  Credential Extensibility
+     14.4.  Extensions
    15. Sequencing of State Changes
      15.1.  Server-Enforced Ordering
      15.2.  Client-Enforced Ordering
@@ -694,7 +694,7 @@ Table of Contents
    to grow very large, up to 2^30 bytes.  Implementations should take
    care not to allow vectors to overflow available storage.  To
    facilitate debugging of potential interoperability problems,
-   implementations should provide a clear error when such an overflow
+   implementations SHOULD provide a clear error when such an overflow
    condition occurs.
 
 3.  Operating Context
@@ -942,8 +942,8 @@ Table of Contents
    processed these messages, the group's secrets will be unknown to an
    attacker that had compromised the sender's prior leaf secret.
 
-   Update messages should be sent at regular intervals of time as long
-   as the group is active, and members that don't update should
+   Update messages SHOULD be sent at regular intervals of time as long
+   as the group is active, and members that don't update SHOULD
    eventually be removed from the group.  It's left to the application
    to determine an appropriate amount of time between Updates.
 
@@ -1005,8 +1005,8 @@ Table of Contents
    new epoch agree on a key if and only if they were members of the
    group during the epoch from which the resumption key was extracted.
 
-   MLS supports two ways to tie a new group to an existing group.  Re-
-   initialization closes one group and creates a new group comprising
+   MLS supports two ways to tie a new group to an existing group.
+   Reinitialization closes one group and creates a new group comprising
    the same members with different parameters.  Branching starts a new
    group with a subset of the original group's participants (with no
    effect on the original group).  In both cases, the new group is
@@ -1538,9 +1538,16 @@ Table of Contents
    those devices' clients could all present the user's application-layer
    identifiers.
 
-   If needed, applications may add application-specific unique
-   identifiers to the extensions field of KeyPackage or LeafNode
-   objects.
+   If needed, applications may add application-specific identifiers to
+   the extensions field of a LeafNode object with the application_id
+   extension.
+
+   opaque application_id<V>;
+
+   However, applications SHOULD NOT rely on the data in an
+   application_id extension as if it were authenticated by the
+   Authentication Service, and SHOULD gracefully handle cases where the
+   identifier presented is not unique.
 
 7.  Message Framing
 
@@ -1843,7 +1850,7 @@ Welcome  KeyPackage  GroupInfo   MLSPlaintext      MLSCiphertext -'
 
    Before use in the encryption operation, the nonce is XORed with a
    fresh random value to guard against reuse.  Because the key schedule
-   generates nonces deterministically, a client must keep persistent
+   generates nonces deterministically, a client MUST keep persistent
    state as to where in the key schedule it is; if this persistent state
    is lost or corrupted, a client might reuse a generation that has
    already been used, causing reuse of a key/nonce pair.
@@ -2315,15 +2322,14 @@ Welcome  KeyPackage  GroupInfo   MLSPlaintext      MLSCiphertext -'
 
    After generating fresh key material and applying it to ratchet
    forward their local tree state as described in the Section 8.4, the
-   generator must broadcast this update to other members of the group in
-   a Commit message, who apply it to keep their local views of the tree
-   in sync with the sender's.  More specifically, when a member commits
-   a change to the tree (e.g., to add or remove a member), it transmits
-   an UpdatePath containing a set of public keys and encrypted path
-   secrets for intermediate nodes in the filtered direct path of its
-   leaf.  The other members of the group use these values to update
-   their view of the tree, aligning their copy of the tree to the
-   sender's.
+   generator broadcasts this update to other members of the group in a
+   Commit message, who apply it to keep their local views of the tree in
+   sync with the sender's.  More specifically, when a member commits a
+   change to the tree (e.g., to add or remove a member), it transmits an
+   UpdatePath containing a set of public keys and encrypted path secrets
+   for intermediate nodes in the filtered direct path of its leaf.  The
+   other members of the group use these values to update their view of
+   the tree, aligning their copy of the tree to the sender's.
 
    An UpdatePath contains the following information for each node in the
    filtered direct path of the sender's leaf, including the root:
@@ -2411,21 +2417,33 @@ Welcome  KeyPackage  GroupInfo   MLSPlaintext      MLSCiphertext -'
    cryptographic state of the group, this section defines a scheme for
    generating a hash value (called the "tree hash") that represents the
    contents of the group's ratchet tree and the members' leaf nodes.
-   The tree hash of a tree is the tree hash of its root node, which we
-   define recursively, starting with the leaves.
 
-   The tree hash of a leaf node is the hash of leaf's LeafNodeHashInput
-   object which might include a LeafNode object depending on whether or
-   not it is blank.
+   The tree hash of an individual node is the hash of the node's
+   TreeHashInput object, which may contain either a LeafNodeHashInput or
+   a ParentNodeHashInput depending on the type of node.
+   LeafNodeHashInput objects contain the leaf_index and the LeafNode (if
+   any).  ParentNodeHashInput objects contain the ParentNode (if any)
+   and the tree hash of the node's left and right children.
+
+   enum {
+       reserved(0),
+       leaf(1),
+       parent(2),
+       (255)
+   } NodeType;
+
+   struct {
+     NodeType node_type;
+     select (TreeHashInput.node_type) {
+       case leaf:   LeafNodeHashInput leaf_node;
+       case parent: ParentNodeHashInput parent_node;
+     }
+   } TreeHashInput;
 
    struct {
        uint32 leaf_index;
        optional<LeafNode> leaf_node;
    } LeafNodeHashInput;
-
-   Now the tree hash of any non-leaf node is recursively defined to be
-   the hash of its ParentNodeHashInput.  This includes an optional
-   ParentNode object depending on whether the node is blank or not.
 
    struct {
        optional<ParentNode> parent_node;
@@ -2433,8 +2451,9 @@ Welcome  KeyPackage  GroupInfo   MLSPlaintext      MLSCiphertext -'
        opaque right_hash<V>;
    } ParentNodeHashInput;
 
-   The left_hash and right_hash fields hold the tree hashes of the
-   node's left and right children, respectively.
+   The tree hash of an entire tree corresponds to the tree hash of the
+   root node, which is computed recursively by starting at the leaf
+   nodes and building up.
 
 8.8.  Parent Hash
 
@@ -2943,11 +2962,11 @@ psk_secret (or 0) --> KDF.Extract
    MLS group secrets computations by this external entropy.
 
    Injecting an external PSK can improve security in the case where
-   having a full run of updates across members is too expensive, or if
+   having a full run of Updates across members is too expensive, or if
    the external group key establishment mechanism provides stronger
    security against classical or quantum adversaries.
 
-   Note that, as a PSK may have a different lifetime than an update, it
+   Note that, as a PSK may have a different lifetime than an Update, it
    does not necessarily provide the same Forward Secrecy (FS) or Post-
    Compromise Security (PCS) guarantees as a Commit message.  Unlike the
    key pairs populated in the tree by an Update or Commit, which are
@@ -2967,10 +2986,10 @@ psk_secret (or 0) --> KDF.Extract
    The injection of one or more PSKs into the key schedule is signaled
    in two ways: Existing members are informed via PreSharedKey proposals
    covered by a Commit, and new members added in the Commit are informed
-   via GroupSecrets object in the Welcome message corresponding to the
-   Commit.  To ensure that existing and new members compute the same PSK
-   input to the key schedule, the Commit and GroupSecrets objects MUST
-   indicate the same set of PSKs, in the same order.
+   by the GroupSecrets object in the Welcome message corresponding to
+   the Commit.  To ensure that existing and new members compute the same
+   PSK input to the key schedule, the Commit and GroupSecrets objects
+   MUST indicate the same set of PSKs, in the same order.
 
    enum {
      reserved(0),
@@ -3007,12 +3026,13 @@ psk_secret (or 0) --> KDF.Extract
    multiple times, the value used as an input into the key schedule is
    different each time.
 
-   On receiving a Commit with a PreSharedKey proposal or a GroupSecrets
-   object with the psks field set, the receiving Client includes them in
-   the key schedule in the order listed in the Commit, or in the psks
-   field respectively.  For resumption PSKs, the PSK is defined as the
-   resumption_psk of the group and epoch specified in the PreSharedKeyID
-   object.  Specifically, psk_secret is computed as follows:
+   Upon receiving a Commit with a PreSharedKey proposal or a
+   GroupSecrets object with the psks field set, the receiving Client
+   includes them in the key schedule in the order listed in the Commit,
+   or in the psks field respectively.  For resumption PSKs, the PSK is
+   defined as the resumption_psk of the group and epoch specified in the
+   PreSharedKeyID object.  Specifically, psk_secret is computed as
+   follows:
 
    struct {
        PreSharedKeyID id;
@@ -3057,21 +3077,20 @@ psk_secret (or 0) --> KDF.Extract
 9.5.  Exporters
 
    The main MLS key schedule provides an exporter_secret which can be
-   used by an application as the basis to derive new secrets called
-   exported_value outside the MLS layer.
+   used by an application to derive new secrets for use outside of MLS.
 
-   MLS-Exporter(Label, Context, key_length) =
+   MLS-Exporter(Label, Context, Length) =
           ExpandWithLabel(DeriveSecret(exporter_secret, Label),
-                            "exporter", Hash(Context), key_length)
+                            "exporter", Hash(Context), Length)
 
-   Each application SHOULD provide a unique label to MLS-Exporter that
-   identifies its use case.  This is to prevent two exported outputs
-   from being generated with the same values and used for different
-   functionalities.
+   Applications SHOULD provide a unique label to MLS-Exporter that
+   identifies the secret's intended purpose.  This is to help prevent
+   the same secret from being generated and used in two different
+   places.
 
    The exported values are bound to the group epoch from which the
-   exporter_secret is derived, hence reflects a particular state of the
-   group.
+   exporter_secret is derived, and hence reflect a particular state of
+   the group.
 
    It is RECOMMENDED for the application generating exported values to
    refresh those values after a Commit is processed.
@@ -3206,7 +3225,7 @@ psk_secret (or 0) --> KDF.Extract
    DeriveTreeSecret(Secret, Label, Generation, Length) =
        ExpandWithLabel(Secret, Label, Generation, Length)
 
-   Where Generation is encoded as a uint32.
+   Where Generation is encoded as a big endian uint32.
 
    ratchet_secret_[N]_[j]
          |
@@ -3297,15 +3316,15 @@ psk_secret (or 0) --> KDF.Extract
    1.  A protocol version and ciphersuite that the client supports,
 
    2.  a public key that others can use to encrypt a Welcome message to
-       this client, (an "init key") and
+       this client (an "init key"), and
 
    3.  the content of the leaf node that should be added to the tree to
        represent this client.
 
    KeyPackages are intended to be used only once and SHOULD NOT be
-   reused except in the case of last resort.  (See Section 17.4).
-   Clients MAY generate and publish multiple KeyPackages to support
-   multiple ciphersuites.
+   reused except in the case of last resort (see Section 17.4).  Clients
+   MAY generate and publish multiple KeyPackages to support multiple
+   ciphersuites.
 
    The value for init_key MUST be a public key for the asymmetric
    encryption scheme defined by cipher_suite, and it MUST be unique
@@ -3316,8 +3335,8 @@ psk_secret (or 0) --> KDF.Extract
    invalid signature field MUST be considered malformed.
 
    The signature is computed by the function SignWithLabel with a label
-   KeyPackage and a content comprising of all of the fields except for
-   the signature field.
+   KeyPackageTBS and a content comprising of all of the fields except
+   for the signature field.
 
    struct {
        ProtocolVersion version;
@@ -3383,19 +3402,11 @@ psk_secret (or 0) --> KDF.Extract
    *  Verify that the value of leaf_node.encryption_key is different
       from the value of the init_key field.
 
-11.2.  KeyPackage Identifiers
-
-   Within MLS, a KeyPackage is identified by its hash (see, e.g.,
-   Section 13.2.3.2).  The external_key_id extension allows applications
-   to add an explicit, application-defined identifier to a KeyPackage.
-
-   opaque external_key_id<V>;
-
 12.  Group Creation
 
    A group is always created with a single member, the "creator".  The
-   other members are added when the creator effectively sends itself an
-   Add proposal and commits it, then sends the corresponding Welcome
+   other members are added when the creator effectively sends itself Add
+   proposals, commits them, and then sends the corresponding Welcome
    message to the new participants.  These processes are described in
    detail in Section 13.1.1, Section 13.2, and Section 13.2.3.2.
 
@@ -3439,11 +3450,16 @@ psk_secret (or 0) --> KDF.Extract
 
    *  Transmit the Welcome message to the other new members
 
+   Group IDs SHOULD be constructed in such a way that there's an
+   overwhelmingly low probability of honest group creators generating
+   the same group ID, even without assistance from the Delivery Service.
+   For example, by making the group ID a freshly generated random value
+   of size KDF.Nh.  The Delivery Service MAY attempt to ensure that
+   group IDs are globally unique by rejecting the creation of new groups
+   with a previously used ID.
+
    The recipient of a Welcome message processes it as described in
-   Section 13.2.3.2.  If application context informs the recipient that
-   the Welcome should reflect the creation of a new group (for example,
-   due to a branch or reinitialization), then the recipient MUST verify
-   that the epoch value in the GroupInfo is equal to 1.
+   Section 13.2.3.2.
 
    In principle, the above process could be streamlined by having the
    creator directly create a tree and choose a random value for first
@@ -3470,15 +3486,16 @@ psk_secret (or 0) --> KDF.Extract
    that must be supported by all members of the group.  The "default"
    proposal and extension types defined in this document are assumed to
    be implemented by all clients, and need not be listed in
-   RequiredCapabilities in order to be safely used.
+   RequiredCapabilities in order to be safely used.  Note that this is
+   not true for credential types.
 
    For new members, support for required capabilities is enforced by
    existing members during the application of Add commits.  Existing
    members should of course be in compliance already.  In order to
    ensure this continues to be the case even as the group's extensions
-   can be updated, a GroupContextExtensions proposal is invalid if it
-   contains a required_capabilities extension that requires non-default
-   capabilities not supported by all current members.
+   are updated, a GroupContextExtensions proposal is deemed invalid if
+   it contains a required_capabilities extension that requires non-
+   default capabilities not supported by all current members.
 
 12.2.  Reinitialization
 
@@ -3493,52 +3510,53 @@ psk_secret (or 0) --> KDF.Extract
    2.  A member of the old group sends a Commit covering the ReInit
        proposal
 
-   3.  A member of the old group sends a Welcome message for the new
-       group that matches the ReInit
+   3.  A member of the old group creates an initial Commit setting up a
+       new group that matches the ReInit and sends a Welcome message
 
        *  The group_id, version, and cipher_suite fields in the Welcome
           message MUST be the same as the corresponding fields in the
           ReInit proposal.
 
        *  The Welcome MUST specify a PreSharedKey of type resumption
-          with usage reinit.  The group_id must match the old group, and
-          the epoch must indicate the epoch after the Commit covering
+          with usage reinit.  The group_id MUST match the old group, and
+          the epoch MUST indicate the epoch after the Commit covering
           the ReInit.
 
    Note that these three steps may be done by the same group member or
-   different members.  For example, if a group member sends a commit
-   with an inline ReInit proposal (steps 1 and 2), but then goes
-   offline, another group member may send the corresponding Welcome.
-   This flexibility avoids situations where a group gets stuck between
-   steps 2 and 3.
+   different members.  For example, if a group member sends a Commit
+   with an inline ReInit proposal (steps 1 and 2) but then goes offline,
+   another group member may recreate the group instead.  This
+   flexibility avoids situations where a group gets stuck between steps
+   2 and 3.
 
    Resumption PSKs with usage reinit MUST NOT be used in other contexts.
    A PreSharedKey proposal with type resumption and usage reinit MUST be
    considered invalid.
 
-12.3.  Sub-group Branching
+12.3.  Subgroup Branching
 
    A new group can be formed from a subset of an existing group's
    members, using the same parameters as the old group.
 
-   A member can create a sub-group by performing the following steps:
+   A member can create a subgroup by performing the following steps:
 
-   1.  Determine a subset of existing members that should be a part of
-       the sub-group.
+   1.  Fetch a new KeyPackage for each group member that should be
+       included in the subgroup.
 
-   2.  Create a new tree for the sub-group by fetching a new KeyPackage
-       for each existing member that should be included in the sub-
-       group.
+   2.  Create an initial Commit message that sets up the new group and
+       contains a PreSharedKey proposal of type resumption with usage
+       branch.  To avoid key re-use, the psk_nonce included in the
+       PreSharedKeyID object MUST be a randomly sampled nonce of length
+       KDF.Nh.
 
-   3.  Create a Welcome message that includes a PreSharedKey of type
-       resumption with usage branch.
+   3.  Send the corresponding Welcome message to the subgroup members.
 
    A client receiving a Welcome including a PreSharedKey of type
    resumption with usage branch MUST verify that the new group reflects
-   a subgroup branched from the referenced group.
+   a subgroup branched from the referenced group by checking:
 
-   *  The version and ciphersuite values in the Welcome MUST be the same
-      as those used by the old group.
+   *  The version and ciphersuite values in the Welcome are the same as
+      those used by the old group.
 
    *  The epoch in the Welcome message MUST be 1.
 
@@ -4229,10 +4247,13 @@ psk_secret (or 0) --> KDF.Extract
        opaque signature<V>;
    } GroupInfo;
 
-   New members MUST verify the signature using the public key taken from
-   the credential in the leaf node of the ratchet tree with leaf index
-   signer.  The signature covers the following structure, comprising all
-   the fields in the GroupInfo above signature:
+   New members MUST verify that group_id is unique among the groups
+   they're currently participating in.
+
+   New members also MUST verify the signature using the public key taken
+   from the leaf node of the ratchet tree with leaf index signer.  The
+   signature covers the following structure, comprising all the fields
+   in the GroupInfo above signature:
 
    struct {
        CipherSuite cipher_suite;
@@ -4400,11 +4421,12 @@ psk_secret (or 0) --> KDF.Extract
       if the ciphersuite indicated in the KeyPackage does not match the
       one in the Welcome message, return an error.
 
-   *  Decrypt the encrypted_group_secrets using HPKE with the algorithms
-      indicated by the ciphersuite and the HPKE private key
-      corresponding to the GroupSecrets.  If a PreSharedKeyID is part of
-      the GroupSecrets and the client is not in possession of the
-      corresponding PSK, return an error.
+   *  Decrypt the encrypted_group_secrets value with the algorithms
+      indicated by the ciphersuite and the private key corresponding to
+      init_key in the referenced KeyPackage.
+
+   *  If a PreSharedKeyID is part of the GroupSecrets and the client is
+      not in possession of the corresponding PSK, return an error.
 
    *  From the joiner_secret in the decrypted GroupSecrets object and
       the PSKs specified in the GroupSecrets, derive the welcome_secret
@@ -4416,15 +4438,17 @@ psk_secret (or 0) --> KDF.Extract
 
    *  Verify the signature on the GroupInfo object.  The signature input
       comprises all of the fields in the GroupInfo object except the
-      signature field.  The public key and algorithm are taken from the
-      credential in the leaf node of the ratchet tree with leaf index
-      signer.  If the node is blank or if signature verification fails,
-      return an error.
+      signature field.  The public key is taken from the LeafNode of the
+      ratchet tree with leaf index signer.  If the node is blank or if
+      signature verification fails, return an error.
+
+   *  Verify that the group_id is unique among the groups that the
+      client is currently participating in.
 
    *  Verify the integrity of the ratchet tree.
 
       -  Verify that the tree hash of the ratchet tree matches the
-         tree_hash field in the GroupInfo.
+         tree_hash field in GroupInfo.
 
       -  For each non-empty parent node, verify that exactly one of the
          node's children are non-empty and have the hash of this node
@@ -4438,10 +4462,9 @@ psk_secret (or 0) --> KDF.Extract
       -  For each non-empty leaf node, validate the LeafNode as
          described in Section 8.3.
 
-   *  Identify a leaf in the tree array (any even-numbered node) whose
-      LeafNode is identical to the one in the KeyPackage.  If no such
-      field exists, return an error.  Let my_leaf represent this leaf in
-      the tree.
+   *  Identify a leaf whose LeafNode is identical to the one in the
+      KeyPackage.  If no such field exists, return an error.  Let
+      my_leaf represent this leaf in the tree.
 
    *  Construct a new group state using the information in the GroupInfo
       object.
@@ -4483,25 +4506,18 @@ psk_secret (or 0) --> KDF.Extract
 
 13.3.  Ratchet Tree Extension
 
-   By default, a GroupInfo message only provides the joiner with a
-   commitment to the group's ratchet tree.  In order to process or
-   generate handshake messages, the joiner will need to get a copy of
-   the ratchet tree from some other source.  (For example, the DS might
-   provide a cached copy.)  The inclusion of the tree hash in the
-   GroupInfo message means that the source of the ratchet tree need not
-   be trusted to maintain the integrity of tree.
+   By default, a GroupInfo message only provides the joiner with a hash
+   of the group's ratchet tree.  In order to process or generate
+   handshake messages, the joiner will need to get a copy of the ratchet
+   tree from some other source.  (For example, the DS might provide a
+   cached copy.)  The inclusion of the tree hash in the GroupInfo
+   message means that the source of the ratchet tree need not be trusted
+   to maintain the integrity of tree.
 
    In cases where the application does not wish to provide such an
    external source, the whole public state of the ratchet tree can be
    provided in an extension of type ratchet_tree, containing a
    ratchet_tree object of the following form:
-
-   enum {
-       reserved(0),
-       leaf(1),
-       parent(2),
-       (255)
-   } NodeType;
 
    struct {
        NodeType node_type;
@@ -4700,7 +4716,7 @@ psk_secret (or 0) --> KDF.Extract
 14.2.  Proposals
 
    Commit messages do not have an extension field because the set of
-   protocols is extensible.  As discussed in Section 13.2, Proposals
+   proposals is extensible.  As discussed in Section 13.2, Proposals
    with a non-default proposal type MUST NOT be included in a commit
    unless the proposal type is supported by all the members of the group
    that will process the Commit.
@@ -4710,12 +4726,12 @@ psk_secret (or 0) --> KDF.Extract
    In order to ensure that MLS provides meaningful authentication it is
    important that each member is able to authenticate some identity
    information for each other member.  Identity information is encoded
-   in Credentials, so this property is assured by ensuring that members
+   in Credentials, so this property is provided by ensuring that members
    use compatible credential types.
 
    The types of credential that may be used in a group is restricted to
    what all members of the group support, as specified by the
-   capabilities field of each LeafNode in the RatchetTree.  An
+   capabilities field of each LeafNode in the ratchet tree.  An
    application can introduce new credential types by choosing an
    unallocated identifier from the registry in Section 18.4 and
    indicating support for the credential type in published LeafNodes,
@@ -4735,7 +4751,9 @@ psk_secret (or 0) --> KDF.Extract
    of this section, such an extension would need to ensure that each
    member can authenticate some identity for each other member.  For
    each pair of members (Alice, Bob), Alice would need to present at
-   least one credential of a type that Bob supports. ## Extensions
+   least one credential of a type that Bob supports.
+
+14.4.  Extensions
 
    This protocol includes a mechanism for negotiating extension
    parameters similar to the one in TLS [RFC8446].  In TLS, extension
@@ -4766,8 +4784,8 @@ psk_secret (or 0) --> KDF.Extract
    GroupInfo object can be used to provide additional parameters to new
    joiners that are used to join the group.
 
-   This extension mechanism is designed to allow for secure and forward-
-   compatible negotiation of extensions.  For this to work,
+   This extension mechanism is designed to allow for the secure and
+   forward-compatible negotiation of extensions.  For this to work,
    implementations MUST correctly handle extensible fields:
 
    *  A client that posts a KeyPackage MUST support all parameters
@@ -4777,6 +4795,9 @@ psk_secret (or 0) --> KDF.Extract
    *  A client initiating a group MUST ignore all unrecognized
       ciphersuites, extensions, and other parameters.  Otherwise, it may
       fail to interoperate with newer clients.
+
+   *  Any field containing a list of extensions MUST NOT have more than
+      one extension of any given type.
 
    *  A client adding a new member to a group MUST verify that the
       LeafNode for the new member is compatible with the group's
@@ -4788,32 +4809,25 @@ psk_secret (or 0) --> KDF.Extract
       then the client MUST reject the Welcome message and not join the
       group.
 
-   *  The extensions populated into a GroupContext object are drawn from
-      those in the GroupInfo object, according to the definitions of
-      those extensions.
-
-   *  Any field containing a list of extensions MUST NOT have more than
-      one extension of any given type.
-
    Note that the latter two requirements mean that all MLS extensions
    are mandatory, in the sense that an extension in use by the group
    MUST be supported by all members of the group.
 
-   This document does not define any way for the parameters of the group
-   to change once it has been created; such a behavior could be
-   implemented as an extension.
+   The parameters of a group may be changed by sending a
+   GroupContextExtensions proposal to enable additional extensions, or
+   by reinitializing the group as described in Section 12.2.
 
 15.  Sequencing of State Changes
 
    Each Commit message is premised on a given starting state, indicated
    by the epoch field of the enclosing MLSMessageContent.  If the
-   changes implied by a Commit messages are made starting from a
+   changes implied by a Commit message are made starting from a
    different state, the results will be incorrect.
 
    This need for sequencing is not a problem as long as each time a
    group member sends a Commit message, it is based on the most current
    state of the group.  In practice, however, there is a risk that two
-   members will generate Commit messages simultaneously, based on the
+   members will generate Commit messages simultaneously based on the
    same state.
 
    When this happens, there is a need for the members of the group to
@@ -5028,7 +5042,7 @@ psk_secret (or 0) --> KDF.Extract
    to previously compromised public keys.
 
    Forward-secrecy between epochs is provided by deleting private keys
-   from past version of the ratchet tree, as this prevents old group
+   from past versions of the ratchet tree, as this prevents old group
    secrets from being re-derived.  Forward secrecy _within_ an epoch is
    provided by deleting message encryption keys once they've been used
    to encrypt or decrypt a message.
@@ -5046,11 +5060,11 @@ psk_secret (or 0) --> KDF.Extract
    Reuse of KeyPackages can lead to replay attacks.
 
    An application MAY allow for reuse of a "last resort" KeyPackage in
-   order to prevent denial of service attacks.  Since a KeyPackage is
+   order to prevent denial-of-service attacks.  Since a KeyPackage is
    needed to add a client to a new group, an attacker could prevent a
    client being added to new groups by exhausting all available
-   KeyPackages.  To prevent such a denial of service attack, the
-   KeyPackage publication system SHOULD rate limit KeyPackage requests,
+   KeyPackages.  To prevent such a denial-of-service attack, the
+   KeyPackage publication system SHOULD rate-limit KeyPackage requests,
    especially if not authenticated.
 
 17.5.  Group Fragmentation by Malicious Insiders
@@ -5061,9 +5075,8 @@ psk_secret (or 0) --> KDF.Extract
    group's ratchet trees.  These path secrets should be derived in a
    sequence as described in Section 8.4, but the UpdatePath syntax
    allows the sender to encrypt arbitrary, unrelated secrets.  The
-   syntax also does not guarantee that the encrypted path secret
-   encrypted for a given node corresponds to the public key provided for
-   that node.
+   syntax also does not guarantee that the encrypted path secret for a
+   given node corresponds to the public key provided for that node.
 
    Both of these types of corruption will cause processing of a Commit
    to fail for some members of the group.  If the public key for a node
@@ -5074,8 +5087,8 @@ psk_secret (or 0) --> KDF.Extract
    key for the mismatched node than the one in the UpdatePath, which
    also causes the Commit to fail.  Applications SHOULD provide
    mechanisms for failed commits to be reported, so that group members
-   who were not able to recognize the error themselves can reject the
-   commit and roll back to a previous state if necessary.
+   who were not able to recognize the error themselves can reinitialize
+   the group if necessary.
 
    Even with such an error reporting mechanism in place, however, it is
    still possible for members to get locked out of the group by a
@@ -5086,7 +5099,8 @@ psk_secret (or 0) --> KDF.Extract
    group, and the resulting state possibly used as the basis for further
    Commits.  When the affected members come back online, they will
    reject the first commit, and thus be unable to catch up with the
-   group.
+   group.  These members will either need to add themselves back with an
+   external Commit, or reinitialize the group from scratch.
 
    Applications can address this risk by requiring certain members of
    the group to acknowledge successful processing of a Commit before the
@@ -5296,7 +5310,7 @@ psk_secret (or 0) --> KDF.Extract
    +======+=======================+============+=============+=========+
    |0x0000| RESERVED              | N/A        | N/A         |RFC XXXX |
    +------+-----------------------+------------+-------------+---------+
-   |0x0001| external_key_id       | KP         | Y           |RFC XXXX |
+   |0x0001| application_id        | LN         | Y           |RFC XXXX |
    +------+-----------------------+------------+-------------+---------+
    |0x0002| ratchet_tree          | GI         | Y           |RFC XXXX |
    +------+-----------------------+------------+-------------+---------+
@@ -5474,15 +5488,15 @@ psk_secret (or 0) --> KDF.Extract
 19.  Contributors
 
    *  Joel Alwen
-      Wickr
-      joel.alwen@wickr.com
+      Amazon
+      alwenjo@amazon.com
 
    *  Karthikeyan Bhargavan
-      INRIA
+      Inria
       karthikeyan.bhargavan@inria.fr
 
    *  Cas Cremers
-      University of Oxford
+      CISPA
       cremers@cispa.de
 
    *  Alan Duric
@@ -5505,9 +5519,16 @@ psk_secret (or 0) --> KDF.Extract
       MIT
       kwonal@mit.edu
 
+   *  Tom Leavy
+      Amazon
+      tomleavy@amazon.com
+
    *  Brendan McMillion
-      Cloudflare
-      brendan@cloudflare.com
+      brendanmcmillion@gmail.com
+
+   *  Marta Mularczyk
+      Amazon
+      mulmarta@amazon.com
 
    *  Eric Rescorla
       Mozilla
@@ -5516,6 +5537,10 @@ psk_secret (or 0) --> KDF.Extract
    *  Michael Rosenberg
       Trail of Bits
       michael.rosenberg@trailofbits.com
+
+   *  Theophile Wallez
+      Inria
+      theophile.wallez@inria.fr
 
    *  Thyla van der Merwe
       Royal Holloway, University of London
