@@ -5,7 +5,7 @@
 Network Working Group                                          R. Barnes
 Internet-Draft                                                     Cisco
 Intended status: Informational                             B. Beurdouche
-Expires: 28 November 2022                                Inria & Mozilla
+Expires: 2 December 2022                                 Inria & Mozilla
                                                                R. Robert
                                                                         
                                                              J. Millican
@@ -14,7 +14,7 @@ Expires: 28 November 2022                                Inria & Mozilla
                                                                   Google
                                                           K. Cohn-Gordon
                                                     University of Oxford
-                                                             27 May 2022
+                                                             31 May 2022
 
 
               The Messaging Layer Security (MLS) Protocol
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 28 November 2022.
+   This Internet-Draft will expire on 2 December 2022.
 
 Copyright Notice
 
@@ -1477,7 +1477,7 @@ Table of Contents
    words, following the model that [RFC6125] describes for TLS, the
    application maintains a list of "reference identifiers" for the
    members of a group, and the credentials provide "presented
-   identifiers".  A member of a group are authenticated by first
+   identifiers".  A member of a group is authenticated by first
    validating that the member's credential legitimately represents some
    presented identifiers, and then ensuring that the reference
    identifiers for the member are authenticated by those presented
@@ -1498,7 +1498,7 @@ Table of Contents
       proposal to add a new member to the group.
 
    *  When a member receives a GroupInfo object that it will use to join
-      a group, either via a Welcome or via an external Commit
+      a group, either via a Welcome or via an External Commit
 
    *  When a member receives an Add proposal adding a member to the
       group.
