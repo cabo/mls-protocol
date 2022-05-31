@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-05-29T02:03:37.458307+00:00",
+  "timestamp": "2022-05-31T01:57:29.075317+00:00",
   "repo": "mlswg/mls-protocol",
   "labels": [
     {
@@ -6980,7 +6980,7 @@
     {
       "number": 665,
       "id": "I_kwDOBoyH6c5JxuJP",
-      "title": "Clarify Commit creation and processing",
+      "title": "Consolidate Proposal application into its own subsection",
       "url": "https://github.com/mlswg/mls-protocol/issues/665",
       "state": "OPEN",
       "author": "bifurcation",
@@ -6989,9 +6989,9 @@
         "bifurcation"
       ],
       "labels": [],
-      "body": "* Specify inputs and outputs for creation\r\n    * Inputs: Group state, proposals, wire format (pt/ct)\r\n    * Outputs: New group state, MLSMessageContentAuth(Commit), Welcome\r\n* Clarify that the \u201cProvisional\u201d GroupContext includes the extensions specified in any GroupContextExtensions proposal, if any\r\n* Expand the rules on applying proposals to clearly address how each proposal type is processed\r\n    * Maybe pull into a separate subsection?  \u201cApplying Proposals\u201d after \"External Proposals\"\r\n* In Commit processing, remove text on applying proposals and just refer to creation steps",
+      "body": "* ~Specify inputs and outputs for creation~\r\n    * ~Inputs: Group state, proposals, wire format (pt/ct)~\r\n    * ~Outputs: New group state, MLSMessageContentAuth(Commit), Welcome~\r\n* ~Clarify that the \u201cProvisional\u201d GroupContext includes the extensions specified in any GroupContextExtensions proposal, if any~\r\n* Expand the rules on applying proposals to clearly address how each proposal type is processed\r\n    * Maybe pull into a separate subsection?  \u201cApplying Proposals\u201d after \"External Proposals\"\r\n* In Commit processing, remove text on applying proposals and just refer to creation steps\r\n\r\n(The ~strikethrough~ items above have been fixed by more recent PRs.  Renaming for clearer focus.)",
       "createdAt": "2022-05-16T21:55:02Z",
-      "updatedAt": "2022-05-20T18:00:16Z",
+      "updatedAt": "2022-05-29T19:09:10Z",
       "closedAt": null,
       "comments": []
     },
@@ -7235,9 +7235,17 @@
       ],
       "body": "* The `MLSMessage*` collection of structs could be less chatty.  Suggest\r\n    * `MLSMessageContent => MessageContent`\r\n    * `MLSMessageContentAuth => AuthenticatedContent`\r\n    * `MLSMessageCommitContent => CommitContent`\r\n    * `MLSMessageCommitAuthData => CommitAuthData`\r\n* PreSharedKeys is only used once, can be inlined in GroupSecrets\r\n* Use GroupContext for the internals of GroupInfo",
       "createdAt": "2022-05-16T22:12:50Z",
-      "updatedAt": "2022-05-20T18:01:54Z",
+      "updatedAt": "2022-05-29T18:05:51Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Note:\r\n* `PreSharedKeys` was fixed in #691 \r\n* In #695, we did:\r\n    * `MLSMessageCommitContent => ConfirmedTranscriptHashInput`\r\n    * `MLSMessageAuthData => InterimTranscriptHashInput`\r\n\r\nSo only the following remain:\r\n* `MLSMessageContent => MessageContent`\r\n* `MLSMessageContentAuth => AuthenticatedContent`\r\n* Use GroupContext for the internals of GroupInfo",
+          "createdAt": "2022-05-29T18:05:27Z",
+          "updatedAt": "2022-05-29T18:05:51Z"
+        }
+      ]
     },
     {
       "number": 674,
@@ -50604,25 +50612,35 @@
       "id": "PR_kwDOBoyH6c44l7mV",
       "title": "Update contributors",
       "url": "https://github.com/mlswg/mls-protocol/pull/702",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "bifurcation",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Updating some affiliations / email addresses and adding a few folks.\r\n\r\n@TWal @mulmarta @tomleavy @psyoptix -- please check for accuracy",
       "createdAt": "2022-05-27T16:23:07Z",
-      "updatedAt": "2022-05-28T18:52:54Z",
+      "updatedAt": "2022-05-30T17:18:12Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "76b3c4710bf926b9bceea995b746da5a70bf5f3f",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "contributors",
       "headRefOid": "03cd96c904da0ed3fe5c3000ffb84aee97c007f2",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
-      "comments": [],
+      "closedAt": "2022-05-30T17:18:12Z",
+      "mergedAt": "2022-05-30T17:18:12Z",
+      "mergedBy": "bifurcation",
+      "mergeCommit": {
+        "oid": "6526db8781ab70cf5e21aa5d8c994d26c0bebaea"
+      },
+      "comments": [
+        {
+          "author": "mulmarta",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Looks good to me.",
+          "createdAt": "2022-05-30T06:00:34Z",
+          "updatedAt": "2022-05-30T06:00:34Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOBoyH6c4669jt",
@@ -50697,7 +50715,7 @@
       "labels": [],
       "body": "Closes #678 \r\nReplaces #660 \r\n\r\nThis PR attempts to add precision to the credential validation requirements in the document, along the lines @raphaelrobert suggests in #678, in the spirit of what @Bren2010 wrote up in #660 and drawing inspiration from what RFC 6125 does in the context of TLS.  It seems like this gives a clearer definition of (a) what the AS's job is and (b) when it needs to be done.",
       "createdAt": "2022-05-27T19:52:23Z",
-      "updatedAt": "2022-05-28T16:07:15Z",
+      "updatedAt": "2022-05-30T06:20:30Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "76b3c4710bf926b9bceea995b746da5a70bf5f3f",
@@ -50733,6 +50751,59 @@
               "body": "In each of these cases, where does the reference identifier come from? The reference/presented identifier distinction makes sense in TLS because you have a domain the user has typed in. Not as clear in MLS.",
               "createdAt": "2022-05-28T16:07:12Z",
               "updatedAt": "2022-05-28T16:07:15Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c467Zz-",
+          "commit": {
+            "abbreviatedOid": "53ff186"
+          },
+          "author": "raphaelrobert",
+          "authorAssociation": "MEMBER",
+          "state": "APPROVED",
+          "body": "Thanks for picking it up!",
+          "createdAt": "2022-05-29T18:19:42Z",
+          "updatedAt": "2022-05-29T18:20:19Z",
+          "comments": [
+            {
+              "originalPosition": 50,
+              "body": "```suggestion\r\n  either via a Welcome or via an External Commit\r\n```",
+              "createdAt": "2022-05-29T18:19:42Z",
+              "updatedAt": "2022-05-29T18:20:19Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c468FvJ",
+          "commit": {
+            "abbreviatedOid": "53ff186"
+          },
+          "author": "kkohbrok",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "Looks good in general, thanks for the PR!",
+          "createdAt": "2022-05-30T06:18:54Z",
+          "updatedAt": "2022-05-30T06:18:54Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOBoyH6c468GDA",
+          "commit": {
+            "abbreviatedOid": "53ff186"
+          },
+          "author": "kkohbrok",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-30T06:20:30Z",
+          "updatedAt": "2022-05-30T06:20:30Z",
+          "comments": [
+            {
+              "originalPosition": 55,
+              "body": "We might want to also do this check whenever a new credential shows up in the External Senders extension. ",
+              "createdAt": "2022-05-30T06:20:30Z",
+              "updatedAt": "2022-05-30T06:20:30Z"
             }
           ]
         }
@@ -50776,13 +50847,13 @@
       "labels": [],
       "body": "Closes #700 ",
       "createdAt": "2022-05-28T18:35:30Z",
-      "updatedAt": "2022-05-28T19:10:38Z",
+      "updatedAt": "2022-05-30T16:08:17Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "76b3c4710bf926b9bceea995b746da5a70bf5f3f",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "brendan/add-rules",
-      "headRefOid": "2c15b9dff7838ece14b2e7c453de270fc6ae052c",
+      "headRefOid": "571585fb0265bf34b16abf269a320da6ad3622d4",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -50823,6 +50894,291 @@
           ]
         }
       ]
+    },
+    {
+      "number": 706,
+      "id": "PR_kwDOBoyH6c44pMGK",
+      "title": "Clean up struct names and references to them",
+      "url": "https://github.com/mlswg/mls-protocol/pull/706",
+      "state": "OPEN",
+      "author": "bifurcation",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #673 \r\nCloses #674 \r\n\r\nWith regard to #674: I searched for references to MLSPlaintext and Credential that were obsolete in light of the change to the MLSMessage framework.  (In particular, we used to have the idea that you would encode things as MLSPlaintext, then tranform them to MLSCiphertext if needed; now you encode to AuthenticatedContent and then convert that to MLSPlaintext/MLSCiphertext before sending.)  There were a few fixes for MLSPlaintext; I didn't find anything that needed fixing for Credentia, largely thanks to some PRs that have landed since I did the review that resulted in #674.",
+      "createdAt": "2022-05-29T18:35:53Z",
+      "updatedAt": "2022-05-30T16:22:31Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "2976ea5b1e4d6de39bcbc6a969a9d85dd6c10602",
+      "headRepository": "mlswg/mls-protocol",
+      "headRefName": "streamline-structs",
+      "headRefOid": "6936c4d01db30f1722dc329f4d5811a692ed9edc",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOBoyH6c46-y4o",
+          "commit": {
+            "abbreviatedOid": "6936c4d"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-30T16:13:41Z",
+          "updatedAt": "2022-05-30T16:21:20Z",
+          "comments": [
+            {
+              "originalPosition": 160,
+              "body": "```suggestion\r\nat the same state of the group. A ContentAuthData is said to be valid when both\r\n```",
+              "createdAt": "2022-05-30T16:13:41Z",
+              "updatedAt": "2022-05-30T16:21:20Z"
+            },
+            {
+              "originalPosition": 65,
+              "body": "```suggestion\r\nMessages from senders that aren't in the group are sent as MLSPlaintext. See\r\n```",
+              "createdAt": "2022-05-30T16:14:06Z",
+              "updatedAt": "2022-05-30T16:21:21Z"
+            },
+            {
+              "originalPosition": 66,
+              "body": "```suggestion\r\n{{external-proposals}} and {{joining-via-external-commits}} for more details.\r\n```",
+              "createdAt": "2022-05-30T16:15:08Z",
+              "updatedAt": "2022-05-30T16:21:21Z"
+            },
+            {
+              "originalPosition": 261,
+              "body": "```suggestion\r\nProposals are included in a MessageContent by way of a Proposal structure\r\n```",
+              "createdAt": "2022-05-30T16:16:29Z",
+              "updatedAt": "2022-05-30T16:21:21Z"
+            },
+            {
+              "originalPosition": 272,
+              "body": "```suggestion\r\nOn receiving a MessageContent containing a Proposal, a client MUST verify the\r\n```",
+              "createdAt": "2022-05-30T16:16:40Z",
+              "updatedAt": "2022-05-30T16:21:21Z"
+            },
+            {
+              "originalPosition": 294,
+              "body": "```suggestion\r\n* Construct a MessageContent object containing the Commit object. Sign the\r\n```",
+              "createdAt": "2022-05-30T16:17:07Z",
+              "updatedAt": "2022-05-30T16:21:21Z"
+            },
+            {
+              "originalPosition": 364,
+              "body": "```suggestion\r\n    Extension extensions<V>;\r\n```",
+              "createdAt": "2022-05-30T16:18:54Z",
+              "updatedAt": "2022-05-30T16:21:21Z"
+            },
+            {
+              "originalPosition": 362,
+              "body": "- [ ] Please also update GroupInfoTBS below.\r\n- [ ] Three references to `group_context_extensions` in text",
+              "createdAt": "2022-05-30T16:20:55Z",
+              "updatedAt": "2022-05-30T16:21:21Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c46-0cx",
+          "commit": {
+            "abbreviatedOid": "6936c4d"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-30T16:22:31Z",
+          "updatedAt": "2022-05-30T16:22:31Z",
+          "comments": [
+            {
+              "originalPosition": 364,
+              "body": "Also will need to update three references to `other_extensions` in text",
+              "createdAt": "2022-05-30T16:22:31Z",
+              "updatedAt": "2022-05-30T16:22:31Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 707,
+      "id": "PR_kwDOBoyH6c44pMP_",
+      "title": "Derive the commit secret from the end of the UpdatePath, not the root",
+      "url": "https://github.com/mlswg/mls-protocol/pull/707",
+      "state": "OPEN",
+      "author": "bifurcation",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Fixes #690 ",
+      "createdAt": "2022-05-29T18:40:00Z",
+      "updatedAt": "2022-05-30T16:23:08Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "2976ea5b1e4d6de39bcbc6a969a9d85dd6c10602",
+      "headRepository": "mlswg/mls-protocol",
+      "headRefName": "commit-secret-next",
+      "headRefOid": "847f05cd92d5e371208df63b1f955887bf3fe786",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOBoyH6c46-0kY",
+          "commit": {
+            "abbreviatedOid": "847f05c"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2022-05-30T16:23:08Z",
+          "updatedAt": "2022-05-30T16:23:08Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 708,
+      "id": "PR_kwDOBoyH6c44pNNi",
+      "title": "Describe requests to join and directed KeyPackages",
+      "url": "https://github.com/mlswg/mls-protocol/pull/708",
+      "state": "OPEN",
+      "author": "bifurcation",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #693 \r\n\r\n(At least, this is one approach to closing #693)\r\n\r\nThis PR implements the \"directed KeyPackage\" approach discussed in #693.\r\n\r\nIt uses a KeyPackage extension to carry the target group ID.  This could also be an optional field on KeyPackage. I mainly shied away from that because the mechanics of the TLS presentation syntax would require us to define something like `struct { opaque group_id<V>; } GroupID;` (so that we could have `optional<GroupID>`), which seemed ugly.\r\n\r\nI've also added a subsection to the protocol overview that discusses requests to be added.  I would suggest we add such a subsection regardless of how we resolve #693, to make sure we provide good context  for how the mechanism we define is used.",
+      "createdAt": "2022-05-29T19:05:47Z",
+      "updatedAt": "2022-05-30T17:17:01Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "2976ea5b1e4d6de39bcbc6a969a9d85dd6c10602",
+      "headRepository": "mlswg/mls-protocol",
+      "headRefName": "directed-key-package",
+      "headRefOid": "28959270063afbd8d8698d4138017ff377818b2b",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "raphaelrobert",
+          "authorAssociation": "MEMBER",
+          "body": "I think that's an excellent candidate for the MLS Extensions document, given that it's a pretty niche feature and that it is written as an extension.",
+          "createdAt": "2022-05-30T16:29:39Z",
+          "updatedAt": "2022-05-30T16:29:39Z"
+        },
+        {
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Making this peer-to-peer (B requests a join from A) seems like an anti-pattern given that MLS is supposed to be async. Might make more sense to have the dominant example be: B requests a join from pre-configured external sender service. Phrasing it that way actually answers my question from before about why we need this extension. The pre-configured external sender service needs the group_id extension, while normal members of the group don't.\r\n\r\nEdit: Agreed that this is a good candidate to just be an extension",
+          "createdAt": "2022-05-30T16:39:01Z",
+          "updatedAt": "2022-05-30T16:40:11Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Replying to two points from @Bren2010 \r\n\r\n* Re: The value of this extension - The way you get a security property here is if the application knows which channel (prepublished or proactive) the KeyPackage came through, and rejects non-directed KeyPackages in the proactive channe.  It also give the client posting the KeyPackage some control: If my client only ever joins proactively, I can make it so that my KeyPackages can't be replayed from one group to another.\r\n\r\n* Re: Async - This pattern doesn't break the async property any more than prepublication does.  The overall message flow is the same as the prepublicaiton case; the only difference is whether the KeyPackage is pulled or pushed.",
+          "createdAt": "2022-05-30T17:17:00Z",
+          "updatedAt": "2022-05-30T17:17:00Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOBoyH6c46-160",
+          "commit": {
+            "abbreviatedOid": "2895927"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-30T16:31:28Z",
+          "updatedAt": "2022-05-30T16:35:27Z",
+          "comments": [
+            {
+              "originalPosition": 49,
+              "body": "```suggestion\r\nKeyPackage by including an extension of type `group_id`, of the following\r\n```",
+              "createdAt": "2022-05-30T16:31:28Z",
+              "updatedAt": "2022-05-30T16:35:27Z"
+            },
+            {
+              "originalPosition": 73,
+              "body": "```suggestion\r\n* If the `extensions` field contains an extension of type `group_id`,\r\n```",
+              "createdAt": "2022-05-30T16:33:33Z",
+              "updatedAt": "2022-05-30T16:35:27Z"
+            },
+            {
+              "originalPosition": 64,
+              "body": "I don't understand the value of having this extension. If pre-published KeyPackages already exist without this extension, then I can just use them to do whatever nefarious thing you're trying to stop from happening with the directed KeyPackages.",
+              "createdAt": "2022-05-30T16:35:15Z",
+              "updatedAt": "2022-05-30T16:35:27Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 709,
+      "id": "PR_kwDOBoyH6c44pOQq",
+      "title": "Add a subsection on applying a proposal list",
+      "url": "https://github.com/mlswg/mls-protocol/pull/709",
+      "state": "OPEN",
+      "author": "bifurcation",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #665 \r\n\r\nFollowing the pattern of #675, this PR introduces a new section describing how a list of proposals is applied to make a new RatchetTree and GroupContext.  It also moves the validation section introduced in that PR forward so that the sections on validating and applying proposal lists are within the Proposals subsection.",
+      "createdAt": "2022-05-29T19:31:03Z",
+      "updatedAt": "2022-05-30T17:10:13Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "2976ea5b1e4d6de39bcbc6a969a9d85dd6c10602",
+      "headRepository": "mlswg/mls-protocol",
+      "headRefName": "apply-proposals",
+      "headRefOid": "b3b3f4133a9c12200faeaefdc1c25326d699a448",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "One thing I'm not sure about, would like feedback on: When should GroupContextExtensions be applied?  It seems like you could do it either at the front or the back.  I put it at the front so that it could set context for the remaining proposals.  For example, if the GroupContextExtensions introduces a `required_capabilities` extension, then the Adds would be evaluated against it.",
+          "createdAt": "2022-05-29T19:36:45Z",
+          "updatedAt": "2022-05-29T19:36:45Z"
+        },
+        {
+          "author": "tomleavy",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Yes agreed, you sort of need to apply it first so that you can use the RequiredCapabilities to check the other proposals ",
+          "createdAt": "2022-05-29T20:25:46Z",
+          "updatedAt": "2022-05-29T20:25:46Z"
+        },
+        {
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Fwiw all that's in this PR currently is moving the validation section",
+          "createdAt": "2022-05-30T17:03:54Z",
+          "updatedAt": "2022-05-30T17:03:54Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Thanks @Bren2010, forgot to push.  Latest commit should have all the changes.\r\n",
+          "createdAt": "2022-05-30T17:10:13Z",
+          "updatedAt": "2022-05-30T17:10:13Z"
+        }
+      ],
+      "reviews": []
     }
   ]
 }
