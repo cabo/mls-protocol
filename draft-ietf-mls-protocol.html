@@ -3732,7 +3732,8 @@ struct {
 by the members at the leaves among its descendants.  The <code>parent_hash</code> field
 contains a hash of this node's parent node, as described in <a href="#parent-hash" class="xref">Section 8.8</a>.
 The <code>unmerged_leaves</code> field lists the leaves under this parent node that are
-unmerged, according to their indices among all the leaves in the tree.<a href="#section-8.1-3" class="pilcrow">¶</a></p>
+unmerged, according to their indices among all the leaves in the tree.  The
+entries in the <code>unmerged_leaves</code> vector MUST be sorted in increasing order.<a href="#section-8.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="leaf-node-contents">
