@@ -5641,13 +5641,13 @@ The members of a group reinitialize it using the following steps:<a href="#secti
             <p id="section-12.2-2.3.1">A member of the old group creates an initial Commit setting up a new group
 that matches the ReInit and sends a Welcome message<a href="#section-12.2-2.3.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-12.2-2.3.2.1">The <code>group_id</code>, <code>version</code>, and <code>cipher_suite</code> fields in the Welcome
+<li class="normal" id="section-12.2-2.3.2.1">The <code>group_id</code>, <code>version</code>, <code>cipher_suite</code>, and <code>extensions</code> fields in the Welcome
 message MUST be the same as the corresponding fields in the ReInit
-proposal.<a href="#section-12.2-2.3.2.1" class="pilcrow">¶</a>
+proposal. The <code>epoch</code> in the Welcome message MUST be 1.<a href="#section-12.2-2.3.2.1" class="pilcrow">¶</a>
 </li>
-              <li class="normal" id="section-12.2-2.3.2.2">The Welcome MUST specify a PreSharedKey of type <code>resumption</code> with usage
-<code>reinit</code>.  The <code>group_id</code> MUST match the old group, and the <code>epoch</code> MUST
-indicate the epoch after the Commit covering the ReInit.<a href="#section-12.2-2.3.2.2" class="pilcrow">¶</a>
+              <li class="normal" id="section-12.2-2.3.2.2">The Welcome MUST specify a PreSharedKeyID of type <code>resumption</code> with usage
+<code>reinit</code>, where the <code>group_id</code> field matches the old group and the <code>epoch</code>
+field indicates the epoch after the Commit covering the ReInit.<a href="#section-12.2-2.3.2.2" class="pilcrow">¶</a>
 </li>
             </ul>
 </li>
@@ -5868,7 +5868,7 @@ struct {
 </div>
 <p id="section-13.1.4-3">A PreSharedKey proposal is invalid if any of the following is true:<a href="#section-13.1.4-3" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-13.1.4-4.1">The <code>psktype</code> in the PreSharedKeyID struct is not set to <code>resumption</code> and
+<li class="normal" id="section-13.1.4-4.1">The <code>psktype</code> in the PreSharedKeyID struct is set to <code>resumption</code> and
 the <code>usage</code> is <code>reinit</code> or <code>branch</code>.<a href="#section-13.1.4-4.1" class="pilcrow">¶</a>
 </li>
             <li class="normal" id="section-13.1.4-4.2">The <code>psk_nonce</code> is not of length <code>KDF.Nh</code>.<a href="#section-13.1.4-4.2" class="pilcrow">¶</a>
@@ -6569,7 +6569,7 @@ continuing, non-resynchronizing members have the required PSK.<a href="#section-
             </h5>
 <p id="section-13.2.3.2-1">The sender of a Commit message is responsible for sending a single Welcome message to
 all the new members added via Add proposals.  The Welcome message provides the new
-members with the current state of the group, after the application of the Commit
+members with the current state of the group after the application of the Commit
 message.  The new members will not be able to decrypt or verify the Commit
 message, but will have the secrets they need to participate in the epoch
 initiated by the Commit message.<a href="#section-13.2.3.2-1" class="pilcrow">¶</a></p>
@@ -6627,7 +6627,9 @@ by the ciphersuite and the private key corresponding to <code>init_key</code> in
 referenced KeyPackage.<a href="#section-13.2.3.2-7.2" class="pilcrow">¶</a>
 </li>
               <li class="normal" id="section-13.2.3.2-7.3">If a <code>PreSharedKeyID</code> is part of the GroupSecrets and the client is not in
-possession of the corresponding PSK, return an error.<a href="#section-13.2.3.2-7.3" class="pilcrow">¶</a>
+possession of the corresponding PSK, return an error. Additionally, if a
+<code>PreSharedKeyID</code> has type <code>resumption</code> with usage <code>reinit</code> or <code>branch</code>, verify
+that it is the only such PSK.<a href="#section-13.2.3.2-7.3" class="pilcrow">¶</a>
 </li>
               <li class="normal" id="section-13.2.3.2-7.4">From the <code>joiner_secret</code> in the decrypted GroupSecrets object and the PSKs
 specified in the <code>GroupSecrets</code>, derive the <code>welcome_secret</code> and using that
@@ -6710,6 +6712,23 @@ key and the <code>confirmed_transcript_hash</code> from the GroupInfo.<a href="#
 </li>
               <li class="normal" id="section-13.2.3.2-9.9">Use the confirmed transcript hash and confirmation tag to compute the interim
 transcript hash in the new state.<a href="#section-13.2.3.2-9.9" class="pilcrow">¶</a>
+</li>
+              <li class="normal" id="section-13.2.3.2-9.10">
+                <p id="section-13.2.3.2-9.10.1">If a <code>PreSharedKeyID</code> was used that has type <code>resumption</code> with usage <code>reinit</code>
+or <code>branch</code>, verify that the <code>epoch</code> field in the GroupInfo is equal to 1.<a href="#section-13.2.3.2-9.10.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-13.2.3.2-9.10.2.1">For usage <code>reinit</code>, verify that the last Commit to the referenced group
+contains a ReInit proposal and that the <code>group_id</code>, <code>version</code>,
+<code>cipher_suite</code>, and <code>group_context.extensions</code> fields of the GroupInfo match
+the ReInit proposal. Additionally, verify that all the members of the old
+group are also members of the new group, according to the application.<a href="#section-13.2.3.2-9.10.2.1" class="pilcrow">¶</a>
+</li>
+                  <li class="normal" id="section-13.2.3.2-9.10.2.2">For usage <code>branch</code>, verify that the <code>version</code> and <code>cipher_suite</code> of the new
+group match those of the old group, and that the members of the new group
+compose a subset of the members of the old group, according to the
+application.<a href="#section-13.2.3.2-9.10.2.2" class="pilcrow">¶</a>
+</li>
+                </ul>
 </li>
             </ul>
 </section>
