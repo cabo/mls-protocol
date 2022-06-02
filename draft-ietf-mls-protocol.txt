@@ -1589,7 +1589,8 @@ Table of Contents
        reserved(0),
        member(1),
        external(2),
-       new_member(3),
+       new_member_proposal(3),
+       new_member_commit(4),
        (255)
    } SenderType;
 
@@ -1600,7 +1601,8 @@ Table of Contents
                uint32 leaf_index;
            case external:
                uint32 sender_index;
-           case new_member:
+           case new_member_commit:
+           case new_member_proposal:
                struct{};
        }
    } Sender;
@@ -1707,10 +1709,10 @@ Welcome  KeyPackage  GroupInfo   MLSPlaintext      MLSCiphertext -'
        MLSMessageContent content;
        select (MLSMessageContentTBS.content.sender.sender_type) {
            case member:
-           case new_member:
+           case new_member_commit:
                GroupContext context;
-
            case external:
+           case new_member_proposal:
                struct{};
        }
    } MLSMessageContentTBS;
@@ -1749,9 +1751,14 @@ Welcome  KeyPackage  GroupInfo   MLSPlaintext      MLSCiphertext -'
       Section 13.1.8.1).  The content_type of the message MUST be
       proposal.
 
-   *  new_member: The signature key in the LeafNode in the Commit's path
-      (see Section 13.2.3.1).  The content_type of the message MUST be
-      commit.
+   *  new_member_commit: The signature key in the LeafNode in the
+      Commit's path (see Section 13.2.3.1).  The content_type of the
+      message MUST be commit.
+
+   *  new_member_proposal: The signature key in the LeafNode in the
+      KeyPackage embedded in an External Add Proposal.  The content_type
+      of the message MUST be proposaland the proposal_type of the
+      Proposal MUST be add.
 
    Recipients of an MLSMessage MUST verify the signature with the key
    depending on the sender_type of the sender as described above.
@@ -1772,7 +1779,8 @@ Welcome  KeyPackage  GroupInfo   MLSPlaintext      MLSCiphertext -'
            case member:
                MAC membership_tag;
            case external:
-           case new_member:
+           case new_member_commit:
+           case new_member_proposal:
                struct{};
        }
    } MLSPlaintext;
@@ -3792,10 +3800,10 @@ psk_secret (or 0) --> KDF.Extract
 13.1.8.  External Proposals
 
    Add and Remove proposals can be constructed and sent to the group by
-   a party that is outside the group, indicated by an external
-   SenderType.  This is useful in cases where, for example, an automated
-   service might propose to remove a member of a group who has been
-   inactive for a long time, or propose adding a newly-hired staff
+   a party that is outside the group in two cases.  One case, indicated
+   by an external SenderType is useful in cases where, for example, an
+   automated service might propose to remove a member of a group who has
+   been inactive for a long time, or propose adding a newly-hired staff
    member to a group representing a real-world team.
 
    ReInit proposals can also be sent to the group by an external sender,
@@ -3805,6 +3813,11 @@ psk_secret (or 0) --> KDF.Extract
    The external SenderType requires that signers are pre-provisioned to
    the clients within a group and can only be used if the
    external_senders extension is present in the group's GroupContext.
+
+   The other case, indicated by a new_member_proposal SenderType is
+   useful when existing members of the group can independently authorize
+   the addition of an MLS client proposing it be added to the group.
+   External proposals which are not authorized are considered invalid.
 
    An external proposal MUST be sent as an MLSPlaintext object, since
    the sender will not have the keys necessary to construct an
@@ -4340,7 +4353,7 @@ psk_secret (or 0) --> KDF.Extract
       the external init secret as described in Section 9.3.
 
    *  The sender type for the MLSPlaintext encapsulating the External
-      Commit MUST be new_member
+      Commit MUST be new_member_commit
 
    External Commits come in two "flavors" -- a "join" commit that adds
    the sender to the group or a "resync" commit that replaces a member's
