@@ -2707,36 +2707,27 @@ subtree) and its descendants. The <em>size</em> of a tree or subtree is the
 number of leaf nodes it contains.  For a given parent node, its <em>left
 subtree</em> is the subtree with its left child as head (respectively
 <em>right subtree</em>).<a href="#section-5.1-2" class="pilcrow">¶</a></p>
-<p id="section-5.1-3">All trees used in this protocol are left-balanced binary trees. A
-binary tree is <em>full</em> (and <em>balanced</em>) if its size is a power of
-two and for any parent node in the tree, its left and right subtrees
-have the same size.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
-<p id="section-5.1-4">A binary tree is <em>left-balanced</em> if for every
-parent, either the parent is balanced, or the left subtree of that
-parent is the largest full subtree that could be constructed from
-the leaves present in the parent's own subtree.
-Given a list of <code>n</code> items, there is a unique left-balanced
-binary tree structure with these elements as leaves.<a href="#section-5.1-4" class="pilcrow">¶</a></p>
-<p id="section-5.1-5">(Note that left-balanced binary trees are the same structure that is
-used for the Merkle trees in the Certificate Transparency protocol
-<span>[<a href="#I-D.ietf-trans-rfc6962-bis" class="xref">I-D.ietf-trans-rfc6962-bis</a>]</span>.)<a href="#section-5.1-5" class="pilcrow">¶</a></p>
-<p id="section-5.1-6">There are multiple ways that an implementation might represent a ratchet tree in
-memory.  For example, left-balanced binary trees can be represented as an array
-of nodes, with node relationships computed based on nodes' indices in the array.
-Or a more traditional representation of linked node objects may be used.
+<p id="section-5.1-3">Every tree used in this protocol is a perfect binary tree, that is, a complete
+balanced binary tree with <code>2^d</code> leaves all at the same depth <code>d</code>.  This
+structure is unique for a given depth <code>d</code>.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
+<p id="section-5.1-4">There are multiple ways that an implementation might represent a ratchet tree in
+memory.  A convenient property of left-balanced binary trees (including the
+complete trees used here) is that they can be represented as an array of nodes,
+with node relationships computed based on the nodes' indices in the array.  A
+more traditional representation based on linked node objects may also be used.
 <a href="#array-based-trees" class="xref">Appendix B</a> and <a href="#link-based-trees" class="xref">Appendix C</a> provide some details on how to
-implement the tree operations required for MLS in these representations.
-MLS places no requirements on implementations' internal representations
-of ratchet trees.  An implementation MAY use any tree representation and
-associated algorithms, as long as they produce correct protocol messages.<a href="#section-5.1-6" class="pilcrow">¶</a></p>
+implement the tree operations required for MLS in these representations.  MLS
+places no requirements on implementations' internal representations of ratchet
+trees.  An implementation MAY use any tree representation and associated
+algorithms, as long as they produce correct protocol messages.<a href="#section-5.1-4" class="pilcrow">¶</a></p>
 <div id="ratchet-tree-nodes">
 <section id="section-5.1.1">
           <h4 id="name-ratchet-tree-nodes">
 <a href="#section-5.1.1" class="section-number selfRef">5.1.1. </a><a href="#name-ratchet-tree-nodes" class="section-name selfRef">Ratchet Tree Nodes</a>
           </h4>
 <p id="section-5.1.1-1">Each leaf node in a ratchet tree is given an <em>index</em> (or <em>leaf index</em>), starting
-at <code>0</code> from the left to <code>n-1</code> at the right (for a tree with <code>n</code> leaves). A tree
-with <code>n</code> leaves has <code>2*n - 1</code> nodes, including parent nodes.<a href="#section-5.1.1-1" class="pilcrow">¶</a></p>
+at <code>0</code> from the left to <code>2^d - 1</code> at the right (for a tree with <code>2^d</code> leaves). A tree
+with <code>2^d</code> leaves has <code>2^(d+1) - 1</code> nodes, including parent nodes.<a href="#section-5.1.1-1" class="pilcrow">¶</a></p>
 <p id="section-5.1.1-2">Each node in a ratchet tree is either <em>blank</em> (containing no value) or it holds
 an asymmetric key pair with some associated data:<a href="#section-5.1.1-2" class="pilcrow">¶</a></p>
 <ul class="normal">
@@ -2819,38 +2810,40 @@ siblings of all the nodes in its direct path, excluding the root.<a href="#secti
 node removed whose child on the copath of L has an empty resolution (keeping in
 mind that any unmerged leaves of the copath child count toward its resolution).
 The removed nodes do not need their own key pairs because encrypting to the
-nodes key pair would be equivalent to encrypting to its non-copath child.<a href="#section-5.1.2-3" class="pilcrow">¶</a></p>
+node's key pair would be equivalent to encrypting to its non-copath child.<a href="#section-5.1.2-3" class="pilcrow">¶</a></p>
 <p id="section-5.1.2-4">For example, consider the following tree (where blank nodes are indicated with
 <code>_</code>, but also assigned a label for reference):<a href="#section-5.1.2-4" class="pilcrow">¶</a></p>
 <span id="name-a-complete-tree-with-seven-"></span><div id="full-tree">
 <figure id="figure-10">
             <div id="section-5.1.2-5.1">
               <div class="alignLeft art-svg artwork" id="section-5.1.2-5.1.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="240" width="208" viewBox="0 0 208 240" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="240" width="256" viewBox="0 0 256 240" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
                   <path d="M 56,104 L 56,128" fill="none" stroke="black"></path>
                   <path d="M 120,48 L 120,64" fill="none" stroke="black"></path>
                   <path d="M 184,112 L 184,128" fill="none" stroke="black"></path>
-                  <path d="M 200,160 L 200,176" fill="none" stroke="black"></path>
                   <path d="M 72,64 L 168,64" fill="none" stroke="black"></path>
                   <path d="M 40,128 L 72,128" fill="none" stroke="black"></path>
-                  <path d="M 168,128 L 184,128" fill="none" stroke="black"></path>
+                  <path d="M 168,128 L 200,128" fill="none" stroke="black"></path>
                   <path d="M 72,128 L 80,144" fill="none" stroke="black"></path>
                   <path d="M 92,168 L 96,176" fill="none" stroke="black"></path>
-                  <path d="M 184,128 L 200,160" fill="none" stroke="black"></path>
                   <path d="M 168,64 L 176,80" fill="none" stroke="black"></path>
+                  <path d="M 200,128 L 208,144" fill="none" stroke="black"></path>
+                  <path d="M 220,168 L 224,176" fill="none" stroke="black"></path>
                   <path d="M 32,144 L 40,128" fill="none" stroke="black"></path>
                   <path d="M 64,80 L 72,64" fill="none" stroke="black"></path>
                   <path d="M 80,176 L 84,168" fill="none" stroke="black"></path>
                   <path d="M 160,144 L 168,128" fill="none" stroke="black"></path>
+                  <path d="M 208,176 L 212,168" fill="none" stroke="black"></path>
                   <g class="text">
-                    <text x="120" y="36">X</text>
+                    <text x="120" y="36">W</text>
                     <text x="136" y="36">=</text>
                     <text x="164" y="36">root</text>
-                    <text x="64" y="100">_=V</text>
-                    <text x="184" y="100">Z</text>
-                    <text x="24" y="164">U</text>
-                    <text x="96" y="164">_=W</text>
-                    <text x="152" y="164">Y</text>
+                    <text x="64" y="100">_=U</text>
+                    <text x="184" y="100">Y</text>
+                    <text x="24" y="164">T</text>
+                    <text x="96" y="164">_=V</text>
+                    <text x="152" y="164">X</text>
+                    <text x="224" y="164">_=Z</text>
                     <text x="16" y="180">/</text>
                     <text x="32" y="180">\</text>
                     <text x="144" y="180">/</text>
@@ -2862,6 +2855,7 @@ nodes key pair would be equivalent to encrypting to its non-copath child.<a href
                     <text x="136" y="196">E</text>
                     <text x="168" y="196">F</text>
                     <text x="200" y="196">G</text>
+                    <text x="240" y="196">_=H</text>
                     <text x="8" y="228">0</text>
                     <text x="40" y="228">1</text>
                     <text x="72" y="228">2</text>
@@ -2869,6 +2863,7 @@ nodes key pair would be equivalent to encrypting to its non-copath child.<a href
                     <text x="136" y="228">4</text>
                     <text x="168" y="228">5</text>
                     <text x="200" y="228">6</text>
+                    <text x="232" y="228">7</text>
                   </g>
                 </svg><a href="#section-5.1.2-5.1.1" class="pilcrow">¶</a>
 </div>
@@ -2892,33 +2887,33 @@ nodes are as follows:<a href="#section-5.1.2-6" class="pilcrow">¶</a></p>
             <tbody>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">A</td>
-                <td class="text-left" rowspan="1" colspan="1">U, V, X</td>
-                <td class="text-left" rowspan="1" colspan="1">B, W, Z</td>
-                <td class="text-left" rowspan="1" colspan="1">U, X</td>
+                <td class="text-left" rowspan="1" colspan="1">T, U, W</td>
+                <td class="text-left" rowspan="1" colspan="1">B, V, Y</td>
+                <td class="text-left" rowspan="1" colspan="1">T, W</td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">B</td>
-                <td class="text-left" rowspan="1" colspan="1">U, V, X</td>
-                <td class="text-left" rowspan="1" colspan="1">A, W, Z</td>
-                <td class="text-left" rowspan="1" colspan="1">U, X</td>
+                <td class="text-left" rowspan="1" colspan="1">T, U, W</td>
+                <td class="text-left" rowspan="1" colspan="1">A, V, Y</td>
+                <td class="text-left" rowspan="1" colspan="1">T, W</td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">E</td>
-                <td class="text-left" rowspan="1" colspan="1">Y, Z, X</td>
-                <td class="text-left" rowspan="1" colspan="1">F, G, V</td>
-                <td class="text-left" rowspan="1" colspan="1">Y, Z, X</td>
+                <td class="text-left" rowspan="1" colspan="1">X, Y, W</td>
+                <td class="text-left" rowspan="1" colspan="1">F, Z, U</td>
+                <td class="text-left" rowspan="1" colspan="1">X, Y, W</td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">F</td>
-                <td class="text-left" rowspan="1" colspan="1">Y, Z, X</td>
-                <td class="text-left" rowspan="1" colspan="1">E, G, V</td>
-                <td class="text-left" rowspan="1" colspan="1">Y, Z, X</td>
+                <td class="text-left" rowspan="1" colspan="1">X, Y, W</td>
+                <td class="text-left" rowspan="1" colspan="1">E, Z, U</td>
+                <td class="text-left" rowspan="1" colspan="1">X, Y, W</td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">G</td>
-                <td class="text-left" rowspan="1" colspan="1">Z, X</td>
-                <td class="text-left" rowspan="1" colspan="1">Y, V</td>
-                <td class="text-left" rowspan="1" colspan="1">Z, X</td>
+                <td class="text-left" rowspan="1" colspan="1">Z, Y, W</td>
+                <td class="text-left" rowspan="1" colspan="1">H, X, U</td>
+                <td class="text-left" rowspan="1" colspan="1">Y, W</td>
               </tr>
             </tbody>
           </table>
@@ -4135,55 +4130,59 @@ described above:<a href="#section-8.4-13" class="pilcrow">¶</a></p>
 <a href="#section-8.5" class="section-number selfRef">8.5. </a><a href="#name-adding-and-removing-leaves" class="section-name selfRef">Adding and Removing Leaves</a>
         </h3>
 <p id="section-8.5-1">In addition to the path-based updates to the tree described above, it is also
-necessary to add and remove leaves of the tree in order to reflect changes to the
-membership of the group (see <a href="#add" class="xref">Section 13.1.1</a> and <a href="#remove" class="xref">Section 13.1.3</a>).  Leaves are always added and removed at the
-right edge of the tree: Either a new rightmost leaf is added, or the rightmost
-leaf is removed.  Nodes' parent/child node relationships are then updated to
-maintain the tree's left-balanced structure.  These operations are also known as
-<em>extending</em> and <em>truncating</em> the tree.<a href="#section-8.5-1" class="pilcrow">¶</a></p>
-<p id="section-8.5-2">To add a new leaf: Add leaf L as the new rightmost leaf of the tree.  Add
-a blank parent node P whose right child is L.  P is attached to the
-tree as the right child of the only appropriate node to make the updated tree
-left-balanced (or set it as a new root).  The former right child of P's
-parent becomes P's left child (or the old root becomes P's left child if
-P is the new root).<a href="#section-8.5-2" class="pilcrow">¶</a></p>
-<div class="alignLeft art-ascii-art art-text artwork" id="section-8.5-3">
+necessary to add and remove leaves of the tree in order to reflect changes to
+the membership of the group (see <a href="#add" class="xref">Section 13.1.1</a> and <a href="#remove" class="xref">Section 13.1.3</a>).  Since the tree is
+always full, adding or removing leaves corresponds to increasing or decreasing
+the depth of the tree, resulting in the number of leaves being doubled or
+halved. These operations are also known as <em>extending</em> and <em>truncating</em> the
+tree.<a href="#section-8.5-1" class="pilcrow">¶</a></p>
+<p id="section-8.5-2">Leaves are always added and removed at the right edge of the tree.  When the
+size of the tree needs to be increased, a new blank root node is added, whose
+left subtree is the existing tree and right subtree is a new all-blank subtree.
+This operation is typically done when adding a member to the group.<a href="#section-8.5-2" class="pilcrow">¶</a></p>
+<span id="name-extending-the-tree-to-make-"></span><figure id="figure-12">
+          <div class="alignLeft art-ascii-art art-text artwork" id="section-8.5-3.1">
 <pre>
-                   _ &lt;-- new parent              _
-                 __|_                          __|__
-                /    \                        /     \
-  X    ===&gt;    X     |               ===&gt;    X       _ &lt;-- new parent
- / \          / \    |                      / \     / \
-A   B        A   B   C &lt;-- new leaf        A   B   C   D &lt;-- new leaf
-</pre><a href="#section-8.5-3" class="pilcrow">¶</a>
+                  _ &lt;-- new blank root                    _
+                __|__                                   __|__
+               /     \                                 /     \
+  X    ===&gt;   X       _ &lt;-- new blank subtree ===&gt;    X       _
+ / \         / \     / \                             / \     / \
+A   B       A   B   _   _                           A   B   C   _
+                                                            ^
+                                                            |
+                                                            +-- new member
+</pre>
 </div>
-<p id="section-8.5-4">To remove the rightmost leaf: Remove the rightmost leaf node L and its parent
-node P.  If P was the root of the tree, P's left child
-is now the root of the tree.  Otherwise, set the right child of P's parent
-to be P's left child.<a href="#section-8.5-4" class="pilcrow">¶</a></p>
-<div class="alignLeft art-ascii-art art-text artwork" id="section-8.5-5">
+<figcaption><a href="#figure-12" class="selfRef">Figure 12</a>:
+<a href="#name-extending-the-tree-to-make-" class="selfRef">Extending the tree to make room for a third member</a>
+          </figcaption></figure>
+<p id="section-8.5-4">When the right subtree of the tree no longer has any non-blank nodes, it can be
+safely removed.  The root of the tree and the right subtree are discarded
+(whether or not the root node is blank). The left child of the root becomes the
+new root node, and the left subtree becomes the new tree.  This operation is
+typically done after removing a member from the group.<a href="#section-8.5-4" class="pilcrow">¶</a></p>
+<span id="name-cleaning-up-after-removing-"></span><figure id="figure-13">
+          <div class="alignLeft art-ascii-art art-text artwork" id="section-8.5-5.1">
 <pre>
-      Y                                    Y
-    __|__                                __|_
-   /     \                              /    \
-  X       Z &lt;-- remove parent  ===&gt;    X     | &lt;-- reassign child
- / \     / \                          / \    |
-A   B   C   D &lt;-- remove leaf        A   B   C
-
-
-      Y &lt;-- remove parent
-    __|_
-   /    \
-  X     |                  ===&gt;    X &lt;-- reassign root
- / \    |                         / \
-A   B   C &lt;-- remove leaf        A   B
-</pre><a href="#section-8.5-5" class="pilcrow">¶</a>
+               Y                  Y
+             __|__              __|__
+            /     \            /     \
+           X       _   ===&gt;   X       _   ==&gt;   X &lt;-- new root
+          / \     / \        / \     / \       / \
+         A   B   C   _      A   B   _   _     A   B
+                 ^
+                 |
+removed member --+
+</pre>
 </div>
-<p id="section-8.5-6">Note that in the rest of the protocol, the rightmost leaf will only be removed when it is blank.<a href="#section-8.5-6" class="pilcrow">¶</a></p>
-<p id="section-8.5-7">Concrete algorithms for these operations on array-based and link-based trees are
+<figcaption><a href="#figure-13" class="selfRef">Figure 13</a>:
+<a href="#name-cleaning-up-after-removing-" class="selfRef">Cleaning up after removing the third member</a>
+          </figcaption></figure>
+<p id="section-8.5-6">Concrete algorithms for these operations on array-based and link-based trees are
 provided in <a href="#array-based-trees" class="xref">Appendix B</a> and <a href="#link-based-trees" class="xref">Appendix C</a>.  The concrete
 algorithms are non-normative.  An implementation MAY use any algorithm that
-produces the correct tree in its internal representation.<a href="#section-8.5-7" class="pilcrow">¶</a></p>
+produces the correct tree in its internal representation.<a href="#section-8.5-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="synchronizing-views-of-the-tree">
@@ -4395,21 +4394,14 @@ that the path from P to the root may contain some blank nodes that are not
 fixed by P's Parent Hash. However, for each node that has an HPKE key, this key
 is fixed by P's Parent Hash.<a href="#section-8.8-6" class="pilcrow">¶</a></p>
 <p id="section-8.8-7">Finally, <code>original_sibling_tree_hash</code> is the tree hash of S in the ratchet tree
-modified as follows:<a href="#section-8.8-7" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-8.8-8.1">Extend the subtree of S by adding blank leaves until it is full, i.e., until
-its number of leaves is a power of 2 (see <a href="#adding-and-removing-leaves" class="xref">Section 8.5</a>).<a href="#section-8.8-8.1" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-8.8-8.2">For each leaf L in <code>P.unmerged_leaves</code>, blank L and remove it from the
-<code>unmerged_leaves</code> sets of all parent nodes.<a href="#section-8.8-8.2" class="pilcrow">¶</a>
-</li>
-        </ul>
-<p id="section-8.8-9">Observe that <code>original_sibling_tree_hash</code> does not change between updates of P.
-This property is crucial for the correctness of the protocol.<a href="#section-8.8-9" class="pilcrow">¶</a></p>
-<p id="section-8.8-10">For example, in the following tree:<a href="#section-8.8-10" class="pilcrow">¶</a></p>
+modified as follows: For each leaf L in <code>P.unmerged_leaves</code>, blank L and remove
+it from the <code>unmerged_leaves</code> sets of all parent nodes.<a href="#section-8.8-7" class="pilcrow">¶</a></p>
+<p id="section-8.8-8">Observe that <code>original_sibling_tree_hash</code> does not change between updates of P.
+This property is crucial for the correctness of the protocol.<a href="#section-8.8-8" class="pilcrow">¶</a></p>
+<p id="section-8.8-9">For example, in the following tree:<a href="#section-8.8-9" class="pilcrow">¶</a></p>
 <span id="name-a-tree-illustrating-parent-"></span><div id="parent-hash-tree">
-<figure id="figure-12">
-          <div class="alignLeft art-ascii-art art-text artwork" id="section-8.8-11.1">
+<figure id="figure-14">
+          <div class="alignLeft art-ascii-art art-text artwork" id="section-8.8-10.1">
 <pre>
               W [F]
         ______|_____
@@ -4417,18 +4409,18 @@ This property is crucial for the correctness of the protocol.<a href="#section-8
       U               Y [F]
     __|__           __|__
    /     \         /     \
-  T       _       _      |
- / \     / \     / \     |
-A   B   C   D   E   F    G
+  T       _       _       _
+ / \     / \     / \     / \
+A   B   C   D   E   F   G   _
 </pre>
 </div>
-<figcaption><a href="#figure-12" class="selfRef">Figure 12</a>:
+<figcaption><a href="#figure-14" class="selfRef">Figure 14</a>:
 <a href="#name-a-tree-illustrating-parent-" class="selfRef">A tree illustrating parent hash computations.</a>
           </figcaption></figure>
 </div>
-<p id="section-8.8-12">With P = W and S = Y, <code>original_sibling_tree_hash</code> is the tree hash of the
-following tree:<a href="#section-8.8-12" class="pilcrow">¶</a></p>
-<div class="alignLeft art-ascii-art art-text artwork" id="section-8.8-13">
+<p id="section-8.8-11">With P = W and S = Y, <code>original_sibling_tree_hash</code> is the tree hash of the
+following tree:<a href="#section-8.8-11" class="pilcrow">¶</a></p>
+<div class="alignLeft art-ascii-art art-text artwork" id="section-8.8-12">
 <pre>
       Y
     __|__
@@ -4436,23 +4428,23 @@ following tree:<a href="#section-8.8-12" class="pilcrow">¶</a></p>
   _       _
  / \     / \
 E   _   G   _
-</pre><a href="#section-8.8-13" class="pilcrow">¶</a>
+</pre><a href="#section-8.8-12" class="pilcrow">¶</a>
 </div>
-<p id="section-8.8-14">Because <code>W.unmerged_leaves</code> includes F, F is blanked and removed from
-<code>Y.unmerged_leaves</code>.<a href="#section-8.8-14" class="pilcrow">¶</a></p>
-<p id="section-8.8-15">Note that no recomputation is needed if the tree hash of S is unchanged since
+<p id="section-8.8-13">Because <code>W.unmerged_leaves</code> includes F, F is blanked and removed from
+<code>Y.unmerged_leaves</code>.<a href="#section-8.8-13" class="pilcrow">¶</a></p>
+<p id="section-8.8-14">Note that no recomputation is needed if the tree hash of S is unchanged since
 the last time P was updated. This is the case for computing or processing a
 Commit whose UpdatePath traverses P, since the Commit itself resets P. (In
 other words, it is only necessary to recompute the original sibling tree hash
 when validating a group's tree on joining.) More generally, if none of the entries
-in <code>P.unmerged_leaves</code> is in the subtree under S (and thus no nodes were truncated),
-then the original tree hash at S is the tree hash of S in the current tree.<a href="#section-8.8-15" class="pilcrow">¶</a></p>
-<p id="section-8.8-16">If it is necessary to recompute the original tree hash of a node, the efficiency
+in <code>P.unmerged_leaves</code> is in the subtree under S (and thus no leaves were blanked),
+then the original tree hash at S is the tree hash of S in the current tree.<a href="#section-8.8-14" class="pilcrow">¶</a></p>
+<p id="section-8.8-15">If it is necessary to recompute the original tree hash of a node, the efficiency
 of recomputation can be improved by caching intermediate tree hashes, to avoid
 recomputing over the subtree when the subtree is included in multiple parent
 hashes.  A subtree hash can be reused as long as the intersection of the
 parent's unmerged leaves with the subtree is the same as in the earlier
-computation.<a href="#section-8.8-16" class="pilcrow">¶</a></p>
+computation.<a href="#section-8.8-15" class="pilcrow">¶</a></p>
 <div id="using-parent-hashes">
 <section id="section-8.8.1">
           <h4 id="name-using-parent-hashes">
@@ -5266,7 +5258,7 @@ the ratchet is called a "generation".<a href="#section-10.1-4" class="pilcrow">�
 handshake and application ratchets that member D will use for sending and the
 first two application keys and nonces.<a href="#section-10.1-5" class="pilcrow">¶</a></p>
 <span id="name-secret-tree-for-a-four-memb"></span><div id="secret-tree-example">
-<figure id="figure-13">
+<figure id="figure-15">
           <div id="section-10.1-6.1">
             <div class="alignLeft art-svg artwork" id="section-10.1-6.1.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="320" width="200" viewBox="0 0 200 320" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
@@ -5308,7 +5300,7 @@ first two application keys and nonces.<a href="#section-10.1-5" class="pilcrow">
               </svg><a href="#section-10.1-6.1.1" class="pilcrow">¶</a>
 </div>
 </div>
-<figcaption><a href="#figure-13" class="selfRef">Figure 13</a>:
+<figcaption><a href="#figure-15" class="selfRef">Figure 15</a>:
 <a href="#name-secret-tree-for-a-four-memb" class="selfRef">Secret tree for a four-member group</a>
           </figcaption></figure>
 </div>
@@ -5404,7 +5396,7 @@ node L,<a href="#section-10.2-6.2" class="pilcrow">¶</a>
             <code>application_ratchet_nonce_[L]_[j]</code> and <code>application_ratchet_key_[L]_[j]</code>.<a href="#section-10.2-6.4" class="pilcrow">¶</a>
 </li>
         </ul>
-<p id="section-10.2-7">Concretely, consider the Secret Tree shown in <a href="#secret-tree-example" class="xref">Figure 13</a>.  Client
+<p id="section-10.2-7">Concretely, consider the Secret Tree shown in <a href="#secret-tree-example" class="xref">Figure 15</a>.  Client
 A, B, or C would generate the illustrated values on receiving a message from D
 with generation equal to 1, having not received a message with generation 0
 (e.g., due to out-of-order delivery).  In such a case, the following values
@@ -5856,8 +5848,10 @@ LeafNode stored at a leaf.  Let L be this leaf node.<a href="#section-13.1.3-5.1
 </li>
             <li class="normal" id="section-13.1.3-5.3">Blank the intermediate nodes along the path from L to the root<a href="#section-13.1.3-5.3" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-13.1.3-5.4">Truncate the tree by removing leaves from the right side of the tree until the
-rightmost leaf node is not blank.<a href="#section-13.1.3-5.4" class="pilcrow">¶</a>
+            <li class="normal" id="section-13.1.3-5.4">Truncate the tree by removing the right subtree until there is at least one
+non-blank leaf node in the right subtree.  If the rightmost non-blank leaf has
+index L, then this will result in the tree having <code>2^d</code> leaves, where <code>d</code> is
+the smallest value such that <code>2^d &gt; L</code>.<a href="#section-13.1.3-5.4" class="pilcrow">¶</a>
 </li>
           </ul>
 </section>
@@ -6778,17 +6772,26 @@ struct {
 optional&lt;Node&gt; ratchet_tree&lt;V&gt;;
 </pre><a href="#section-13.3-3" class="pilcrow">¶</a>
 </div>
-<p id="section-13.3-4">The nodes are listed in the order specified by a left-to-right in-order
+<p id="section-13.3-4">Each entry in the <code>ratchet_tree</code> vector provides the value for a node in the
+tree, or the null optional for a blank node.<a href="#section-13.3-4" class="pilcrow">¶</a></p>
+<p id="section-13.3-5">The nodes are listed in the order specified by a left-to-right in-order
 traversal of the ratchet tree. Each node is listed between its left subtree and
 its right subtree.  (This is the same ordering as specified for the array-based
-trees outlined in <a href="#array-based-trees" class="xref">Appendix B</a>.)<a href="#section-13.3-4" class="pilcrow">¶</a></p>
-<p id="section-13.3-5">The leaves of the tree are stored in even-numbered entries in
-the array (the leaf with index L in array position 2*L). The root node of the
-tree is at position 2^k - 1 of the array, where k is the largest number such
-that 2^k is smaller than the length of the array. Intermediate parent nodes can
-be identified by performing the same calculation to the subarrays to the left
-and right of the root, following something like the following algorithm:<a href="#section-13.3-5" class="pilcrow">¶</a></p>
-<div id="section-13.3-6">
+trees outlined in <a href="#array-based-trees" class="xref">Appendix B</a>.)<a href="#section-13.3-5" class="pilcrow">¶</a></p>
+<p id="section-13.3-6">If the tree has <code>2^d</code> leaves, then it has <code>2^(d+1) - 1</code> nodes.  The
+<code>ratchet_tree</code> vector logically has this number of entries, but the sender
+SHOULD NOT include blank nodes after the last non-blank node.  If a receiver
+encounters a vector whose length <code>L</code> is not of the form <code>2^(d+1) - 1</code>, then the
+receiver MUST extend it to the right with blank values until it has such a
+length, adding the minimum number of blank values possible.  (Obviously, this
+may be done "virtually", by synthesizing blank nodes when required, as opposed
+to actually changing the structure in memory.)<a href="#section-13.3-6" class="pilcrow">¶</a></p>
+<p id="section-13.3-7">The leaves of the tree are stored in even-numbered entries in the array (the
+leaf with index <code>L</code> in array position <code>2*L</code>). The root node of the tree is at
+position <code>2^d - 1</code> of the array. Intermediate parent nodes can be identified by
+performing the same calculation to the subarrays to the left and right of the
+root, following something like the following algorithm:<a href="#section-13.3-7" class="pilcrow">¶</a></p>
+<div id="section-13.3-8">
 <pre class="lang-python sourcecode">
 # Assuming a class Node that has left and right members
 def subtree_root(nodes):
@@ -6801,44 +6804,51 @@ def subtree_root(nodes):
         raise Exception("Malformed node array {}", len(nodes))
 
     # Identify the root of the subtree
-    k = 0
-    while (2**(k+1)) &lt; len(nodes):
-       k += 1
-    R = 2**k - 1
+    d = 0
+    while (2**(d+1)) &lt; len(nodes):
+       d += 1
+    R = 2**d - 1
     root = Node(nodes[R])
     root.left = subtree_root(nodes[:R])
     root.right = subtree_root(nodes[(R+1):])
     return root
-</pre><a href="#section-13.3-6" class="pilcrow">¶</a>
+</pre><a href="#section-13.3-8" class="pilcrow">¶</a>
 </div>
-<p id="section-13.3-7">(Note that this is the same ordering of nodes as in the array-based tree representation
+<p id="section-13.3-9">(Note that this is the same ordering of nodes as in the array-based tree representation
 described in <a href="#array-based-trees" class="xref">Appendix B</a>.  The algorithms in that section may be used to
-simplify decoding this extension into other representations.)<a href="#section-13.3-7" class="pilcrow">¶</a></p>
-<p id="section-13.3-8">The example tree in <a href="#ratchet-tree-terminology" class="xref">Section 5.1</a> would be represented as an
-array of nodes in the following form, where R represents the "subtree root" for
-a given subarray of the node array:<a href="#section-13.3-8" class="pilcrow">¶</a></p>
-<div id="section-13.3-9">
-          <div class="alignLeft art-svg artwork" id="section-13.3-9.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="304" width="208" viewBox="0 0 208 304" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
+simplify decoding this extension into other representations.)<a href="#section-13.3-9" class="pilcrow">¶</a></p>
+<p id="section-13.3-10">For example, the following tree with six non-blank leaves would be represented
+as an array of eleven elements, <code>[A, W, B, X, C, _, D, Y, E, Z, F]</code>.  The above
+decoding procedure would identify the subtree roots as follows (using R to
+represent a subtree root):<a href="#section-13.3-10" class="pilcrow">¶</a></p>
+<div id="section-13.3-11">
+          <div class="alignLeft art-svg artwork" id="section-13.3-11.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="304" width="240" viewBox="0 0 240 304" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
               <path d="M 56,112 L 56,128" fill="none" stroke="black"></path>
               <path d="M 120,48 L 120,64" fill="none" stroke="black"></path>
-              <path d="M 184,112 L 184,128" fill="none" stroke="black"></path>
-              <path d="M 200,160 L 200,176" fill="none" stroke="black"></path>
+              <path d="M 184,104 L 184,128" fill="none" stroke="black"></path>
               <path d="M 72,64 L 168,64" fill="none" stroke="black"></path>
               <path d="M 40,128 L 72,128" fill="none" stroke="black"></path>
-              <path d="M 168,128 L 184,128" fill="none" stroke="black"></path>
+              <path d="M 168,128 L 200,128" fill="none" stroke="black"></path>
               <path d="M 8,256 L 104,256" fill="none" stroke="black"></path>
-              <path d="M 136,256 L 200,256" fill="none" stroke="black"></path>
+              <path d="M 136,256 L 232,256" fill="none" stroke="black"></path>
               <path d="M 8,272 L 40,272" fill="none" stroke="black"></path>
               <path d="M 72,272 L 104,272" fill="none" stroke="black"></path>
               <path d="M 136,272 L 168,272" fill="none" stroke="black"></path>
+              <path d="M 200,272 L 232,272" fill="none" stroke="black"></path>
               <path d="M 72,128 L 80,144" fill="none" stroke="black"></path>
-              <path d="M 184,128 L 200,160" fill="none" stroke="black"></path>
+              <path d="M 92,168 L 96,176" fill="none" stroke="black"></path>
               <path d="M 168,64 L 176,80" fill="none" stroke="black"></path>
+              <path d="M 200,128 L 208,144" fill="none" stroke="black"></path>
+              <path d="M 220,168 L 224,176" fill="none" stroke="black"></path>
               <path d="M 32,144 L 40,128" fill="none" stroke="black"></path>
               <path d="M 64,80 L 72,64" fill="none" stroke="black"></path>
+              <path d="M 80,176 L 84,168" fill="none" stroke="black"></path>
               <path d="M 160,144 L 168,128" fill="none" stroke="black"></path>
-              <polygon class="arrowhead" points="208,256 196,250.4 196,261.6" fill="black" transform="rotate(0,200,256)"></polygon>
+              <path d="M 208,176 L 212,168" fill="none" stroke="black"></path>
+              <polygon class="arrowhead" points="240,272 228,266.4 228,277.6" fill="black" transform="rotate(0,232,272)"></polygon>
+              <polygon class="arrowhead" points="240,256 228,250.4 228,261.6" fill="black" transform="rotate(0,232,256)"></polygon>
+              <polygon class="arrowhead" points="208,272 196,266.4 196,277.6" fill="black" transform="rotate(180,200,272)"></polygon>
               <polygon class="arrowhead" points="176,272 164,266.4 164,277.6" fill="black" transform="rotate(0,168,272)"></polygon>
               <polygon class="arrowhead" points="144,272 132,266.4 132,277.6" fill="black" transform="rotate(180,136,272)"></polygon>
               <polygon class="arrowhead" points="144,256 132,250.4 132,261.6" fill="black" transform="rotate(180,136,256)"></polygon>
@@ -6849,16 +6859,15 @@ a given subarray of the node array:<a href="#section-13.3-8" class="pilcrow">¶<
               <polygon class="arrowhead" points="16,272 4,266.4 4,277.6" fill="black" transform="rotate(180,8,272)"></polygon>
               <polygon class="arrowhead" points="16,256 4,250.4 4,261.6" fill="black" transform="rotate(180,8,256)"></polygon>
               <g class="text">
-                <text x="120" y="36">P</text>
-                <text x="56" y="100">N</text>
-                <text x="184" y="100">R</text>
-                <text x="24" y="164">M</text>
-                <text x="88" y="164">O</text>
-                <text x="152" y="164">Q</text>
+                <text x="120" y="36">Y</text>
+                <text x="56" y="100">X</text>
+                <text x="184" y="100">_</text>
+                <text x="24" y="164">W</text>
+                <text x="88" y="164">_</text>
+                <text x="152" y="164">Z</text>
+                <text x="216" y="164">_</text>
                 <text x="16" y="180">/</text>
                 <text x="32" y="180">\</text>
-                <text x="80" y="180">/</text>
-                <text x="96" y="180">\</text>
                 <text x="144" y="180">/</text>
                 <text x="160" y="180">\</text>
                 <text x="8" y="196">A</text>
@@ -6867,10 +6876,9 @@ a given subarray of the node array:<a href="#section-13.3-8" class="pilcrow">¶<
                 <text x="104" y="196">D</text>
                 <text x="136" y="196">E</text>
                 <text x="168" y="196">F</text>
-                <text x="200" y="196">G</text>
+                <text x="200" y="196">_</text>
+                <text x="232" y="196">_</text>
                 <text x="168" y="228">1</text>
-                <text x="184" y="228">1</text>
-                <text x="200" y="228">1</text>
                 <text x="8" y="244">0</text>
                 <text x="24" y="244">1</text>
                 <text x="40" y="244">2</text>
@@ -6882,12 +6890,9 @@ a given subarray of the node array:<a href="#section-13.3-8" class="pilcrow">¶<
                 <text x="136" y="244">8</text>
                 <text x="152" y="244">9</text>
                 <text x="168" y="244">0</text>
-                <text x="184" y="244">1</text>
-                <text x="200" y="244">2</text>
                 <text x="120" y="260">R</text>
                 <text x="56" y="276">R</text>
                 <text x="184" y="276">R</text>
-                <text x="200" y="276">-</text>
                 <text x="8" y="292">-</text>
                 <text x="24" y="292">R</text>
                 <text x="40" y="292">-</text>
@@ -6897,23 +6902,26 @@ a given subarray of the node array:<a href="#section-13.3-8" class="pilcrow">¶<
                 <text x="136" y="292">-</text>
                 <text x="152" y="292">R</text>
                 <text x="168" y="292">-</text>
+                <text x="200" y="292">-</text>
+                <text x="216" y="292">R</text>
+                <text x="232" y="292">-</text>
               </g>
-            </svg><a href="#section-13.3-9.1" class="pilcrow">¶</a>
+            </svg><a href="#section-13.3-11.1" class="pilcrow">¶</a>
 </div>
 </div>
-<p id="section-13.3-10">The presence of a <code>ratchet_tree</code> extension in a GroupInfo message does not
+<p id="section-13.3-12">The presence of a <code>ratchet_tree</code> extension in a GroupInfo message does not
 result in any changes to the GroupContext extensions for the group.  The ratchet
-tree provided is simply stored by the client and used for MLS operations.<a href="#section-13.3-10" class="pilcrow">¶</a></p>
-<p id="section-13.3-11">If this extension is not provided in a Welcome message, then the client will
+tree provided is simply stored by the client and used for MLS operations.<a href="#section-13.3-12" class="pilcrow">¶</a></p>
+<p id="section-13.3-13">If this extension is not provided in a Welcome message, then the client will
 need to fetch the ratchet tree over some other channel before it can generate or
 process Commit messages.  Applications should ensure that this out-of-band
 channel is provided with security protections equivalent to the protections that
 are afforded to Proposal and Commit messages.  For example, an application that
 encrypts Proposal and Commit messages might distribute ratchet trees encrypted
-using a key exchanged over the MLS channel.<a href="#section-13.3-11" class="pilcrow">¶</a></p>
-<p id="section-13.3-12">Regardless of how the client obtains the tree, the client MUST verify that the
+using a key exchanged over the MLS channel.<a href="#section-13.3-13" class="pilcrow">¶</a></p>
+<p id="section-13.3-14">Regardless of how the client obtains the tree, the client MUST verify that the
 root hash of the ratchet tree matches the <code>tree_hash</code> of the GroupContext before
-using the tree for MLS operations.<a href="#section-13.3-12" class="pilcrow">¶</a></p>
+using the tree for MLS operations.<a href="#section-13.3-14" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="proposal-list-validation">
@@ -8184,10 +8192,6 @@ thyla.van.der@merwe.tech<a href="#section-19-1.15" class="pilcrow">¶</a>
         <dd>
 <span class="refAuthor">Beurdouche, B.</span>, <span class="refAuthor">Rescorla, E.</span>, <span class="refAuthor">Omara, E.</span>, <span class="refAuthor">Inguva, S.</span>, <span class="refAuthor">Kwon, A.</span>, and <span class="refAuthor">A. Duric</span>, <span class="refTitle">"The Messaging Layer Security (MLS) Architecture"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-mls-architecture-07</span>, <time datetime="2021-10-04" class="refDate">4 October 2021</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-mls-architecture-07">https://datatracker.ietf.org/doc/html/draft-ietf-mls-architecture-07</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="I-D.ietf-trans-rfc6962-bis">[I-D.ietf-trans-rfc6962-bis]</dt>
-        <dd>
-<span class="refAuthor">Laurie, B.</span>, <span class="refAuthor">Langley, A.</span>, <span class="refAuthor">Kasper, E.</span>, <span class="refAuthor">Messeri, E.</span>, and <span class="refAuthor">R. Stradling</span>, <span class="refTitle">"Certificate Transparency Version 2.0"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-trans-rfc6962-bis-42</span>, <time datetime="2021-08-31" class="refDate">31 August 2021</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-trans-rfc6962-bis-42">https://datatracker.ietf.org/doc/html/draft-ietf-trans-rfc6962-bis-42</a>&gt;</span>. </dd>
-<dd class="break"></dd>
 <dt id="I-D.irtf-cfrg-aead-limits">[I-D.irtf-cfrg-aead-limits]</dt>
         <dd>
 <span class="refAuthor">Günther, F.</span>, <span class="refAuthor">Thomson, M.</span>, and <span class="refAuthor">C. A. Wood</span>, <span class="refTitle">"Usage Limits on AEAD Algorithms"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-irtf-cfrg-aead-limits-04</span>, <time datetime="2022-03-07" class="refDate">7 March 2022</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-aead-limits-04">https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-aead-limits-04</a>&gt;</span>. </dd>
@@ -8240,11 +8244,11 @@ in this document.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="appendix-A-3.1">A creates a group with B, ..., G<a href="#appendix-A-3.1" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="appendix-A-3.2">F sends an empty Commit, setting Y, Z, X<a href="#appendix-A-3.2" class="pilcrow">¶</a>
+        <li class="normal" id="appendix-A-3.2">F sends an empty Commit, setting X, Y, W<a href="#appendix-A-3.2" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="appendix-A-3.3">G removes C and D, blanking W, V, and setting Z, X<a href="#appendix-A-3.3" class="pilcrow">¶</a>
+        <li class="normal" id="appendix-A-3.3">G removes C and D, blanking V, U, and setting Y, W<a href="#appendix-A-3.3" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="appendix-A-3.4">B sends an empty Commit, setting U and X<a href="#appendix-A-3.4" class="pilcrow">¶</a>
+        <li class="normal" id="appendix-A-3.4">B sends an empty Commit, setting T and W<a href="#appendix-A-3.4" class="pilcrow">¶</a>
 </li>
       </ul>
 <p id="appendix-A-4">To construct the tree in <a href="#resolution-tree" class="xref">Figure 9</a>:<a href="#appendix-A-4" class="pilcrow">¶</a></p>
@@ -8277,7 +8281,7 @@ direct path)<a href="#appendix-A-5.2" class="pilcrow">¶</a>
           </ul>
 </li>
       </ul>
-<p id="appendix-A-8">To construct the tree in <a href="#parent-hash-tree" class="xref">Figure 12</a>:<a href="#appendix-A-8" class="pilcrow">¶</a></p>
+<p id="appendix-A-8">To construct the tree in <a href="#parent-hash-tree" class="xref">Figure 14</a>:<a href="#appendix-A-8" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="appendix-A-9.1">A creates a group with B, ..., G<a href="#appendix-A-9.1" class="pilcrow">¶</a>
 </li>
@@ -8295,102 +8299,75 @@ direct path)<a href="#appendix-A-5.2" class="pilcrow">¶</a>
       <h2 id="name-array-based-trees">
 <a href="#appendix-B" class="section-number selfRef">Appendix B. </a><a href="#name-array-based-trees" class="section-name selfRef">Array-Based Trees</a>
       </h2>
-<p id="appendix-B-1">One benefit of using left-balanced trees is that they admit a simple
+<p id="appendix-B-1">One benefit of using complete balanced trees is that they admit a simple
 flat array representation.  In this representation, leaf nodes are
-even-numbered nodes, with the n-th leaf at 2*n.  Intermediate nodes
-are held in odd-numbered nodes.  For example, tree with 11 leaves has
+even-numbered nodes, with the <code>n</code>-th leaf at <code>2*n</code>.  Intermediate nodes
+are held in odd-numbered nodes.  For example, the tree with 8 leaves has
 the following structure:<a href="#appendix-B-1" class="pilcrow">¶</a></p>
 <div id="appendix-B-2">
         <div class="alignLeft art-svg artwork" id="appendix-B-2.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="352" width="544" viewBox="0 0 544 352" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
-            <path d="M 128,176 L 128,192" fill="none" stroke="black"></path>
-            <path d="M 224,112 L 224,128" fill="none" stroke="black"></path>
-            <path d="M 320,176 L 320,192" fill="none" stroke="black"></path>
-            <path d="M 416,48 L 416,64" fill="none" stroke="black"></path>
-            <path d="M 512,96 L 512,144" fill="none" stroke="black"></path>
-            <path d="M 512,176 L 512,192" fill="none" stroke="black"></path>
-            <path d="M 536,224 L 536,256" fill="none" stroke="black"></path>
-            <path d="M 240,64 L 496,64" fill="none" stroke="black"></path>
-            <path d="M 144,128 L 304,128" fill="none" stroke="black"></path>
-            <path d="M 96,192 L 160,192" fill="none" stroke="black"></path>
-            <path d="M 288,192 L 352,192" fill="none" stroke="black"></path>
-            <path d="M 480,192 L 520,192" fill="none" stroke="black"></path>
-            <path d="M 88,240 L 96,256" fill="none" stroke="black"></path>
-            <path d="M 160,192 L 168,208" fill="none" stroke="black"></path>
-            <path d="M 184,240 L 192,256" fill="none" stroke="black"></path>
-            <path d="M 280,240 L 288,256" fill="none" stroke="black"></path>
-            <path d="M 304,128 L 312,144" fill="none" stroke="black"></path>
-            <path d="M 352,192 L 360,208" fill="none" stroke="black"></path>
-            <path d="M 376,240 L 384,256" fill="none" stroke="black"></path>
-            <path d="M 472,240 L 480,256" fill="none" stroke="black"></path>
-            <path d="M 520,192 L 536,224" fill="none" stroke="black"></path>
-            <path d="M 496,64 L 512,96" fill="none" stroke="black"></path>
-            <path d="M 64,256 L 72,240" fill="none" stroke="black"></path>
-            <path d="M 88,208 L 96,192" fill="none" stroke="black"></path>
-            <path d="M 136,144 L 144,128" fill="none" stroke="black"></path>
-            <path d="M 232,80 L 240,64" fill="none" stroke="black"></path>
-            <path d="M 160,256 L 168,240" fill="none" stroke="black"></path>
-            <path d="M 256,256 L 264,240" fill="none" stroke="black"></path>
-            <path d="M 280,208 L 288,192" fill="none" stroke="black"></path>
-            <path d="M 352,256 L 360,240" fill="none" stroke="black"></path>
-            <path d="M 448,256 L 456,240" fill="none" stroke="black"></path>
-            <path d="M 472,208 L 480,192" fill="none" stroke="black"></path>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="288" width="400" viewBox="0 0 400 288" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
+            <path d="M 128,112 L 128,128" fill="none" stroke="black"></path>
+            <path d="M 224,48 L 224,64" fill="none" stroke="black"></path>
+            <path d="M 320,112 L 320,128" fill="none" stroke="black"></path>
+            <path d="M 144,64 L 304,64" fill="none" stroke="black"></path>
+            <path d="M 96,128 L 160,128" fill="none" stroke="black"></path>
+            <path d="M 288,128 L 352,128" fill="none" stroke="black"></path>
+            <path d="M 88,176 L 96,192" fill="none" stroke="black"></path>
+            <path d="M 160,128 L 168,144" fill="none" stroke="black"></path>
+            <path d="M 184,176 L 192,192" fill="none" stroke="black"></path>
+            <path d="M 280,176 L 288,192" fill="none" stroke="black"></path>
+            <path d="M 304,64 L 312,80" fill="none" stroke="black"></path>
+            <path d="M 352,128 L 360,144" fill="none" stroke="black"></path>
+            <path d="M 376,176 L 384,192" fill="none" stroke="black"></path>
+            <path d="M 64,192 L 72,176" fill="none" stroke="black"></path>
+            <path d="M 88,144 L 96,128" fill="none" stroke="black"></path>
+            <path d="M 136,80 L 144,64" fill="none" stroke="black"></path>
+            <path d="M 160,192 L 168,176" fill="none" stroke="black"></path>
+            <path d="M 256,192 L 264,176" fill="none" stroke="black"></path>
+            <path d="M 280,144 L 288,128" fill="none" stroke="black"></path>
+            <path d="M 352,192 L 360,176" fill="none" stroke="black"></path>
             <g class="text">
-              <text x="416" y="36">X</text>
-              <text x="224" y="100">X</text>
-              <text x="128" y="164">X</text>
-              <text x="320" y="164">X</text>
-              <text x="512" y="164">X</text>
-              <text x="80" y="228">X</text>
-              <text x="176" y="228">X</text>
-              <text x="272" y="228">X</text>
-              <text x="368" y="228">X</text>
-              <text x="464" y="228">X</text>
-              <text x="56" y="276">X</text>
-              <text x="104" y="276">X</text>
-              <text x="152" y="276">X</text>
-              <text x="200" y="276">X</text>
-              <text x="248" y="276">X</text>
-              <text x="296" y="276">X</text>
-              <text x="344" y="276">X</text>
-              <text x="392" y="276">X</text>
-              <text x="440" y="276">X</text>
-              <text x="488" y="276">X</text>
-              <text x="536" y="276">X</text>
-              <text x="24" y="308">Node:</text>
-              <text x="56" y="308">0</text>
-              <text x="80" y="308">1</text>
-              <text x="104" y="308">2</text>
-              <text x="128" y="308">3</text>
-              <text x="152" y="308">4</text>
-              <text x="176" y="308">5</text>
-              <text x="200" y="308">6</text>
-              <text x="224" y="308">7</text>
-              <text x="248" y="308">8</text>
-              <text x="272" y="308">9</text>
-              <text x="292" y="308">10</text>
-              <text x="316" y="308">11</text>
-              <text x="340" y="308">12</text>
-              <text x="364" y="308">13</text>
-              <text x="388" y="308">14</text>
-              <text x="412" y="308">15</text>
-              <text x="436" y="308">16</text>
-              <text x="460" y="308">17</text>
-              <text x="484" y="308">18</text>
-              <text x="508" y="308">19</text>
-              <text x="532" y="308">20</text>
-              <text x="24" y="340">Leaf:</text>
-              <text x="56" y="340">0</text>
-              <text x="104" y="340">1</text>
-              <text x="152" y="340">2</text>
-              <text x="200" y="340">3</text>
-              <text x="248" y="340">4</text>
-              <text x="296" y="340">5</text>
-              <text x="344" y="340">6</text>
-              <text x="392" y="340">7</text>
-              <text x="440" y="340">8</text>
-              <text x="488" y="340">9</text>
-              <text x="532" y="340">10</text>
+              <text x="224" y="36">X</text>
+              <text x="128" y="100">X</text>
+              <text x="320" y="100">X</text>
+              <text x="80" y="164">X</text>
+              <text x="176" y="164">X</text>
+              <text x="272" y="164">X</text>
+              <text x="368" y="164">X</text>
+              <text x="56" y="212">X</text>
+              <text x="104" y="212">X</text>
+              <text x="152" y="212">X</text>
+              <text x="200" y="212">X</text>
+              <text x="248" y="212">X</text>
+              <text x="296" y="212">X</text>
+              <text x="344" y="212">X</text>
+              <text x="392" y="212">X</text>
+              <text x="24" y="244">Node:</text>
+              <text x="56" y="244">0</text>
+              <text x="80" y="244">1</text>
+              <text x="104" y="244">2</text>
+              <text x="128" y="244">3</text>
+              <text x="152" y="244">4</text>
+              <text x="176" y="244">5</text>
+              <text x="200" y="244">6</text>
+              <text x="224" y="244">7</text>
+              <text x="248" y="244">8</text>
+              <text x="272" y="244">9</text>
+              <text x="292" y="244">10</text>
+              <text x="316" y="244">11</text>
+              <text x="340" y="244">12</text>
+              <text x="364" y="244">13</text>
+              <text x="388" y="244">14</text>
+              <text x="24" y="276">Leaf:</text>
+              <text x="56" y="276">0</text>
+              <text x="104" y="276">1</text>
+              <text x="152" y="276">2</text>
+              <text x="200" y="276">3</text>
+              <text x="248" y="276">4</text>
+              <text x="296" y="276">5</text>
+              <text x="344" y="276">6</text>
+              <text x="392" y="276">7</text>
             </g>
           </svg><a href="#appendix-B-2.1" class="pilcrow">¶</a>
 </div>
@@ -8405,12 +8382,12 @@ parent=01x =&gt; left=00x, right=10x
 </pre><a href="#appendix-B-4" class="pilcrow">¶</a>
 </div>
 <p id="appendix-B-5">Since node relationships are implicit, the algorithms for adding and removing
-nodes at the right edge of the tree are quite simple:<a href="#appendix-B-5" class="pilcrow">¶</a></p>
+nodes at the right edge of the tree are quite simple.  If there are <code>N</code> nodes in
+the array:<a href="#appendix-B-5" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="appendix-B-6.1">Add: Append a blank parent node to the array of nodes, then append the new
-leaf node<a href="#appendix-B-6.1" class="pilcrow">¶</a>
+<li class="normal" id="appendix-B-6.1">Add: Append <code>N + 1</code> blank values to the end of the array.<a href="#appendix-B-6.1" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="appendix-B-6.2">Remove: Remove the rightmost two nodes from the array of nodes<a href="#appendix-B-6.2" class="pilcrow">¶</a>
+        <li class="normal" id="appendix-B-6.2">Remove: Truncate the array to its first <code>(N-1) / 2</code> entries.<a href="#appendix-B-6.2" class="pilcrow">¶</a>
 </li>
       </ul>
 <p id="appendix-B-7">The following python code demonstrates the tree computations necessary to use an
@@ -8452,8 +8429,7 @@ def root(n):
     w = node_width(n)
     return (1 &lt;&lt; log2(w)) - 1
 
-# The left child of an intermediate node. Note that because the tree
-# is left-balanced, there is no dependency on the size of the tree.
+# The left child of an intermediate node.
 def left(x):
     k = level(x)
     if k == 0:
@@ -8461,42 +8437,28 @@ def left(x):
 
     return x ^ (0x01 &lt;&lt; (k - 1))
 
-# The right child of an intermediate node. Depends on the number of
-# leaves because the straightforward calculation can take you beyond
-# the edge of the tree.
-def right(x, n):
+# The right child of an intermediate node.
+def right(x):
     k = level(x)
     if k == 0:
         raise Exception('leaf node has no children')
 
-    r = x ^ (0x03 &lt;&lt; (k - 1))
-    while r &gt;= node_width(n):
-        r = left(r)
-    return r
+    return x ^ (0x03 &lt;&lt; (k - 1))
 
-# The immediate parent of a node. May be beyond the right edge of the
-# tree.
-def parent_step(x):
-    k = level(x)
-    b = (x &gt;&gt; (k + 1)) &amp; 0x01
-    return (x | (1 &lt;&lt; k)) ^ (b &lt;&lt; (k + 1))
-
-# The parent of a node. As with the right child calculation, we have
-# to walk back until the parent is within the range of the tree.
+# The parent of a node.
 def parent(x, n):
     if x == root(n):
         raise Exception('root node has no parent')
 
-    p = parent_step(x)
-    while p &gt;= node_width(n):
-        p = parent_step(p)
-    return p
+    k = level(x)
+    b = (x &gt;&gt; (k + 1)) &amp; 0x01
+    return (x | (1 &lt;&lt; k)) ^ (b &lt;&lt; (k + 1))
 
 # The other child of the node's parent.
 def sibling(x, n):
     p = parent(x, n)
     if x &lt; p:
-        return right(p, n)
+        return right(p)
     else:
         return left(p)
 
@@ -8564,86 +8526,58 @@ representation, where each node stores references to its parents and/or
 children.   (As opposed to the array-based representation suggested above, where
 these relationships are computed from relationships between nodes' indices in
 the array.)  Such an implementation needs to update these links to maintain the
-left-balanced structure of the tree as the tree is extended to add new members,
+balanced structure of the tree as the tree is extended to add new members,
 or truncated when members are removed.<a href="#appendix-C-1" class="pilcrow">¶</a></p>
 <p id="appendix-C-2">The following code snippet shows how these algorithms could be implemented in
 Python.<a href="#appendix-C-2" class="pilcrow">¶</a></p>
 <div id="appendix-C-3">
-<pre class="breakable lang-python sourcecode">
+<pre class="lang-python sourcecode">
 class Node:
-    def __init__(self, value, parent=None, left=None, right=None):
+    def __init__(self, value, left=None, right=None):
         self.value = value    # Value of the node
-        self.parent = parent  # Parent node
         self.left = left      # Left child node
         self.right = right    # Right child node
 
-    def leaf(self):
-        return self.left == None and self.right == None
+    @staticmethod
+    def blank_subtree(depth):
+        if depth == 1:
+            return Node(None)
 
-    def span(self):
-        if self.leaf():
-            return 1
-        return self.left.span() + self.right.span()
+        L = Node.blank_subtree(depth-1)
+        R = Node.blank_subtree(depth-1)
+        return Node(None, left=L, right=R)
 
-    def full(self):
-        span = self.span()
-        while span % 2 == 0:
-            span &gt;&gt;= 1
-        return span == 1
-
-    def rightmost_leaf(self):
-        X = self
-        while X.right != None:
-            X = X.right
-        return X
+    def empty(self):
+        L_empty = (self.left == None) or self.left.empty()
+        R_empty = (self.left == None) or self.left.empty()
+        return (self.value == None) and L_empty and R_empty
 
 class Tree:
     def __init__(self):
+        self.depth = 0    # Depth of the tree
         self.root = None  # Root node of the tree, initially empty
 
-    def extend(self, N):
-        if self.root == None:
-            self.root = N
-            return
+    # Add a blank subtree to the right
+    def extend(self):
+        if self.depth == 0:
+            self.depth = 1
+            self.root = Node(None)
 
-        # Identify the proper point to insert the new parent node
-        X = self.root.rightmost_leaf()
-        while X.full() and X != self.root:
-            X = X.parent
+        L = self.root
+        R = Node.blank_subtree(self.depth)
+        self.root = Node(None, left=self.root, right=R)
+        self.depth += 1
 
-        # If X is not full, insert the new parent under X
-        P = Node("_", right=N)
-        N.parent = P
-        if not X.full():
-            P.parent = X
-            P.left = X.right
-            X.right.parent = P
-            X.right = P
-            return
-
-        # If X is full, then X is the root, so P replaces the root
-        P.left = self.root
-        self.root.parent = P
-        self.root = P
-        return
-
+    # Truncate the right subtree
     def truncate(self):
-        X = self.root.rightmost_leaf()
-        if X == self.root:
-            self.root = None
-            return
+        if self.root == None or self.root.right == None:
+            raise Exception("Cannot truncate a tree with 0 or 1 nodes")
 
-        # If X's parent is the root, then shift the root to the left
-        if X.parent == self.root:
-            self.root = self.root.left
-            self.root.parent = None
-            return
+        if not self.root.right.empty():
+            raise Exception("Cannot truncate non-blank subtree")
 
-        # Otherwise, reassign the right child of the parent's parent
-        Q = X.parent.parent
-        Q.right = X.parent.left
-        Q.right.parent = Q
-        return
+        self.depth -= 1
+        self.root = self.root.left
 </pre><a href="#appendix-C-3" class="pilcrow">¶</a>
 </div>
 </section>
