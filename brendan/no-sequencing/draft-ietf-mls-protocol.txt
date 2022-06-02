@@ -5,7 +5,7 @@
 Network Working Group                                          R. Barnes
 Internet-Draft                                                     Cisco
 Intended status: Informational                             B. Beurdouche
-Expires: 29 November 2022                                Inria & Mozilla
+Expires: 4 December 2022                                 Inria & Mozilla
                                                                R. Robert
                                                                         
                                                              J. Millican
@@ -14,7 +14,7 @@ Expires: 29 November 2022                                Inria & Mozilla
                                                                   Google
                                                           K. Cohn-Gordon
                                                     University of Oxford
-                                                             28 May 2022
+                                                             2 June 2022
 
 
               The Messaging Layer Security (MLS) Protocol
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 29 November 2022.
+   This Internet-Draft will expire on 4 December 2022.
 
 Copyright Notice
 
@@ -4800,9 +4800,9 @@ psk_secret (or 0) --> KDF.Extract
    The generation of Commit messages MUST NOT modify a client's state,
    since the client doesn't know at that time whether the changes
    implied by the Commit message will conflict with another Commit or
-   not.  Similarly, a client MUST NOT send Welcome messages
-   corresponding to a Commit until it's clear that the Commit has been
-   accepted.
+   not.  Similarly, the Welcome message corresponding to a Commit MUST
+   NOT be delivered to a new joiner until it's clear that the Commit has
+   been accepted.
 
    Regardless of how messages are kept in sequence, there is a risk that
    in a sufficiently busy group, a given member may never be able to
