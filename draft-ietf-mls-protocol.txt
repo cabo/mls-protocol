@@ -4000,7 +4000,8 @@ psk_secret (or 0) --> KDF.Extract
       -  Generate path secrets for the parent nodes along the sender's
          filtered direct path, as described in Section 8.6.  Define
          commit_secret as the value path_secret[n+1] derived from the
-         path_secret[n] value assigned to the root node.
+         last path secret value (path_secret[n]) derived for the
+         UpdatePath.
 
       -  Update the new ratchet tree by setting the parent nodes on the
          sender's filtered direct path based on the path secrets.
@@ -4191,7 +4192,8 @@ psk_secret (or 0) --> KDF.Extract
          secret and storing leaf_node at the committer's leaf.
 
       -  Define commit_secret as the value path_secret[n+1] derived from
-         the path_secret[n] value assigned to the root node.
+         the last path secret value (path_secret[n]) derived for the
+         UpdatePath.
 
    *  If the path value is not populated: Define commit_secret as the
       all-zero vector of length KDF.Nh (the same length as a path_secret
