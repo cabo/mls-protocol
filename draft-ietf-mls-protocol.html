@@ -1435,14 +1435,6 @@ in size ranging from two to thousands.<a href="#section-abstract-1" class="pilcr
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14">
             <p id="section-toc.1-1.14.1"><a href="#section-14" class="xref">14</a>. <a href="#name-sequencing-of-state-changes" class="xref">Sequencing of State Changes</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.1">
-                <p id="section-toc.1-1.14.2.1.1"><a href="#section-14.1" class="xref">14.1</a>.  <a href="#name-server-enforced-ordering" class="xref">Server-Enforced Ordering</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.2">
-                <p id="section-toc.1-1.14.2.2.1"><a href="#section-14.2" class="xref">14.2</a>.  <a href="#name-client-enforced-ordering" class="xref">Client-Enforced Ordering</a></p>
-</li>
-            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15">
             <p id="section-toc.1-1.15.1"><a href="#section-15" class="xref">15</a>. <a href="#name-application-messages" class="xref">Application Messages</a></p>
@@ -7161,75 +7153,23 @@ group member sends a Commit message, it is based on the most
 current state of the group.  In practice, however, there is a risk
 that two members will generate Commit messages simultaneously
 based on the same state.<a href="#section-14-2" class="pilcrow">¶</a></p>
-<p id="section-14-3">When this happens, there is a need for the members of the group to
-deconflict the simultaneous Commit messages.  There are two
-general approaches:<a href="#section-14-3" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-14-4.1">Have the Delivery Service enforce a total order<a href="#section-14-4.1" class="pilcrow">¶</a>
-</li>
-        <li class="normal" id="section-14-4.2">Have a signal in the message that clients can use to break ties<a href="#section-14-4.2" class="pilcrow">¶</a>
-</li>
-      </ul>
-<p id="section-14-5">As long as Commit messages cannot be merged, there is a risk of
-starvation.  In a sufficiently busy group, a given member may never
-be able to send a Commit message, because he always loses to other
-members.  The degree to which this is a practical problem will depend
+<p id="section-14-3">Applications MUST have an established way to resolve conflicting Commit messages
+for the same epoch. They can do this either by preventing conflicting messages
+from occurring in the first place, or by developing rules for deciding which
+Commit out of several sent in an epoch will be canonical. The approach chosen
+MUST minimize the amount of time that forked or previous group states are kept
+in memory, and promptly delete them once they're no longer necessary to ensure
+forward secrecy.<a href="#section-14-3" class="pilcrow">¶</a></p>
+<p id="section-14-4">The generation of Commit messages MUST NOT modify a client's state, since the
+client doesn't know at that time whether the changes implied by the Commit
+message will conflict with another Commit or not. Similarly, the Welcome
+message corresponding to a Commit MUST NOT be delivered to a new
+joiner until it's clear that the Commit has been accepted.<a href="#section-14-4" class="pilcrow">¶</a></p>
+<p id="section-14-5">Regardless of how messages are kept in sequence, there is a risk that
+in a sufficiently busy group, a given member may never
+be able to send a Commit message because they always lose to other
+members. The degree to which this is a practical problem will depend
 on the dynamics of the application.<a href="#section-14-5" class="pilcrow">¶</a></p>
-<p id="section-14-6">It might be possible, because of the non-contributivity of intermediate
-nodes, that Commit messages could be applied one after the other
-without the Delivery Service having to reject any Commit message,
-which would make MLS more resilient regarding the concurrency of
-Commit messages.
-The Messaging system can decide to choose the order for applying
-the state changes. Note that there are certain cases (if no total
-ordering is applied by the Delivery Service) where the ordering is
-important for security, ie. all updates must be executed before
-removes.<a href="#section-14-6" class="pilcrow">¶</a></p>
-<p id="section-14-7">Regardless of how messages are kept in sequence, implementations
-MUST only update their cryptographic state when valid Commit
-messages are received.
-Generation of Commit messages MUST NOT modify a client's state, since the
-endpoint doesn't know at that time whether the changes implied by
-the Commit message will succeed or not.<a href="#section-14-7" class="pilcrow">¶</a></p>
-<div id="server-enforced-ordering">
-<section id="section-14.1">
-        <h3 id="name-server-enforced-ordering">
-<a href="#section-14.1" class="section-number selfRef">14.1. </a><a href="#name-server-enforced-ordering" class="section-name selfRef">Server-Enforced Ordering</a>
-        </h3>
-<p id="section-14.1-1">With this approach, the Delivery Service ensures that incoming
-messages are added to an ordered queue and outgoing messages are
-dispatched in the same order. The server is trusted to break ties
-when two members send a Commit message at the same time.<a href="#section-14.1-1" class="pilcrow">¶</a></p>
-<p id="section-14.1-2">Messages should have a counter field sent in clear-text that can
-be checked by the server and used for tie-breaking. The counter
-starts at 0 and is incremented for every new incoming message.
-If two group members send a message with the same counter, the
-first message to arrive will be accepted by the server and the
-second one will be rejected. The rejected message needs to be sent
-again with the correct counter number.<a href="#section-14.1-2" class="pilcrow">¶</a></p>
-<p id="section-14.1-3">To prevent counter manipulation by the server, the counter's
-integrity can be ensured by including the counter in a signed
-message envelope.<a href="#section-14.1-3" class="pilcrow">¶</a></p>
-<p id="section-14.1-4">This applies to all messages, not only state changing messages.<a href="#section-14.1-4" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="client-enforced-ordering">
-<section id="section-14.2">
-        <h3 id="name-client-enforced-ordering">
-<a href="#section-14.2" class="section-number selfRef">14.2. </a><a href="#name-client-enforced-ordering" class="section-name selfRef">Client-Enforced Ordering</a>
-        </h3>
-<p id="section-14.2-1">Order enforcement can be implemented on the client as well,
-one way to achieve it is to use a two step update protocol: the
-first client sends a proposal to update and the proposal is
-accepted when it gets 50%+ approval from the rest of the group,
-then it sends the approved update. Clients which didn't get
-their proposal accepted, will wait for the winner to send their
-update before retrying new proposals.<a href="#section-14.2-1" class="pilcrow">¶</a></p>
-<p id="section-14.2-2">While this seems safer as it doesn't rely on the server, it is
-more complex and harder to implement. It also could cause starvation
-for some clients if they keep failing to get their proposal accepted.<a href="#section-14.2-2" class="pilcrow">¶</a></p>
-</section>
-</div>
 </section>
 </div>
 <div id="application-messages">
