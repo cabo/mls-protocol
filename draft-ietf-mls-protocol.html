@@ -1234,7 +1234,10 @@ in size ranging from two to thousands.<a href="#section-abstract-1" class="pilcr
                 <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="xref">6.3</a>.  <a href="#name-credentials" class="xref">Credentials</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3.2.1">
-                    <p id="section-toc.1-1.6.2.3.2.1.1"><a href="#section-6.3.1" class="xref">6.3.1</a>.  <a href="#name-uniquely-identifying-client" class="xref">Uniquely Identifying Clients</a></p>
+                    <p id="section-toc.1-1.6.2.3.2.1.1"><a href="#section-6.3.1" class="xref">6.3.1</a>.  <a href="#name-credential-validation" class="xref">Credential Validation</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3.2.2">
+                    <p id="section-toc.1-1.6.2.3.2.2.1"><a href="#section-6.3.2" class="xref">6.3.2</a>.  <a href="#name-uniquely-identifying-client" class="xref">Uniquely Identifying Clients</a></p>
 </li>
                 </ul>
 </li>
@@ -3160,42 +3163,80 @@ the end-entity certificate and each subsequent certificate in the chain MUST be
 the issuer of the previous certificate.  The public key encoded in the
 <code>subjectPublicKeyInfo</code> of the end-entity certificate MUST be identical to the
 <code>signature_key</code> in the LeafNode containing this credential.<a href="#section-6.3-5" class="pilcrow">¶</a></p>
-<p id="section-6.3-6">Each new credential that has not already been validated by the application MUST
-be validated against the Authentication Service.  Applications SHOULD require
-that a client present the same set of identifiers throughout its presence in
-the group, even if its Credential is changed in a Commit or Update.  If an
-application allows clients to change identifiers over time, then each time the
-client presents a new credential, the application MUST verify that the set
-of identifiers in the credential is acceptable to the application for this
-client.<a href="#section-6.3-6" class="pilcrow">¶</a></p>
-<div id="uniquely-identifying-clients">
+<div id="credential-validation">
 <section id="section-6.3.1">
-          <h4 id="name-uniquely-identifying-client">
-<a href="#section-6.3.1" class="section-number selfRef">6.3.1. </a><a href="#name-uniquely-identifying-client" class="section-name selfRef">Uniquely Identifying Clients</a>
+          <h4 id="name-credential-validation">
+<a href="#section-6.3.1" class="section-number selfRef">6.3.1. </a><a href="#name-credential-validation" class="section-name selfRef">Credential Validation</a>
           </h4>
-<p id="section-6.3.1-1">MLS implementations will presumably provide applications with a way to request
+<p id="section-6.3.1-1">The application using MLS is responsible for specifying which identifiers it
+finds acceptable for each member in a group.  In other words, following the
+model that <span>[<a href="#RFC6125" class="xref">RFC6125</a>]</span> describes for TLS, the application maintains a list of
+"reference identifiers" for the members of a group, and the credentials provide
+"presented identifiers".  A member of a group is authenticated by first
+validating that the member's credential legitimately represents some presented
+identifiers, and then ensuring that the reference identifiers for the member are
+authenticated by those presented identifiers.<a href="#section-6.3.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-2">The parts of the system that perform these functions are collectively referred
+to as the Authentication Service (AS) <span>[<a href="#I-D.ietf-mls-architecture" class="xref">I-D.ietf-mls-architecture</a>]</span>.  A
+member's credential is said to be <em>validated with the AS</em> when the AS verifies
+the credential's presented identifiers, and verifies that those identifiers
+match the reference identifiers for the member.<a href="#section-6.3.1-2" class="pilcrow">¶</a></p>
+<p id="section-6.3.1-3">Whenever a new credential is introduced in the group, it MUST be validated with
+the AS.  In particular, at the following events in the protocol:<a href="#section-6.3.1-3" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.3.1-4.1">When a member receives a KeyPackage that it will use in an Add proposal to add
+a new member to the group.<a href="#section-6.3.1-4.1" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-6.3.1-4.2">When a member receives a GroupInfo object that it will use to join a group,
+either via a Welcome or via an External Commit<a href="#section-6.3.1-4.2" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-6.3.1-4.3">When a member receives an Add proposal adding a member to the group.<a href="#section-6.3.1-4.3" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-6.3.1-4.4">When a member receives an Update proposal whose LeafNode has a new credential
+for the member.<a href="#section-6.3.1-4.4" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-6.3.1-4.5">When a member receives a Commit with an UpdatePath whose LeafNode has a new
+credential for the committer.<a href="#section-6.3.1-4.5" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-6.3.1-4.6">When an <code>external_senders</code> extension is added to the group, or an existing
+<code>external_senders</code> extension is updated.<a href="#section-6.3.1-4.6" class="pilcrow">¶</a>
+</li>
+          </ul>
+<p id="section-6.3.1-5">In cases where a member's credential is being replaced, such as Update and
+Commit cases above, the AS MUST also verify that the set of presented
+identifiers in the new credential is valid as a successor to the set of
+presented identifiers in the old credential, according to the application's
+policy.<a href="#section-6.3.1-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="uniquely-identifying-clients">
+<section id="section-6.3.2">
+          <h4 id="name-uniquely-identifying-client">
+<a href="#section-6.3.2" class="section-number selfRef">6.3.2. </a><a href="#name-uniquely-identifying-client" class="section-name selfRef">Uniquely Identifying Clients</a>
+          </h4>
+<p id="section-6.3.2-1">MLS implementations will presumably provide applications with a way to request
 protocol operations with regard to other clients (e.g., removing clients).  Such
 functions will need to refer to the other clients using some identifier.  MLS
-clients have a few types of identifiers, with different operational properties.<a href="#section-6.3.1-1" class="pilcrow">¶</a></p>
-<p id="section-6.3.1-2">Internally to the protocol, group members are uniquely identified by their leaf
+clients have a few types of identifiers, with different operational properties.<a href="#section-6.3.2-1" class="pilcrow">¶</a></p>
+<p id="section-6.3.2-2">Internally to the protocol, group members are uniquely identified by their leaf
 index. However, a leaf index is only valid for referring to members in a given
 epoch. The same leaf index may represent a different member, or no member at
-all, in a subsequent epoch.<a href="#section-6.3.1-2" class="pilcrow">¶</a></p>
-<p id="section-6.3.1-3">The Credentials presented by the clients in a group authenticate
+all, in a subsequent epoch.<a href="#section-6.3.2-2" class="pilcrow">¶</a></p>
+<p id="section-6.3.2-3">The Credentials presented by the clients in a group authenticate
 application-level identifiers for the clients.  However, these identifiers may not
 uniquely identify clients.  For example, if a user has multiple devices that are
 all present in an MLS group, then those devices' clients could all present the
-user's application-layer identifiers.<a href="#section-6.3.1-3" class="pilcrow">¶</a></p>
-<p id="section-6.3.1-4">If needed, applications may add application-specific identifiers to the
-<code>extensions</code> field of a LeafNode object with the <code>application_id</code> extension.<a href="#section-6.3.1-4" class="pilcrow">¶</a></p>
-<div id="section-6.3.1-5">
+user's application-layer identifiers.<a href="#section-6.3.2-3" class="pilcrow">¶</a></p>
+<p id="section-6.3.2-4">If needed, applications may add application-specific identifiers to the
+<code>extensions</code> field of a LeafNode object with the <code>application_id</code> extension.<a href="#section-6.3.2-4" class="pilcrow">¶</a></p>
+<div id="section-6.3.2-5">
 <pre class="lang-tls sourcecode">
 opaque application_id&lt;V&gt;;
-</pre><a href="#section-6.3.1-5" class="pilcrow">¶</a>
+</pre><a href="#section-6.3.2-5" class="pilcrow">¶</a>
 </div>
-<p id="section-6.3.1-6">However, applications SHOULD NOT rely on the data in an <code>application_id</code> extension
+<p id="section-6.3.2-6">However, applications SHOULD NOT rely on the data in an <code>application_id</code> extension
 as if it were authenticated by the Authentication Service, and SHOULD gracefully
-handle cases where the identifier presented is not unique.<a href="#section-6.3.1-6" class="pilcrow">¶</a></p>
+handle cases where the identifier presented is not unique.<a href="#section-6.3.2-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -3850,21 +3891,8 @@ processing a commit<a href="#section-8.3-2.3" class="pilcrow">¶</a>
         </ul>
 <p id="section-8.3-3">The client verifies the validity of a LeafNode using the following steps:<a href="#section-8.3-3" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-8.3-4.1">
-            <p id="section-8.3-4.1.1">Verify that the credential in the LeafNode is valid according to the
-authentication service and the client's local policy. These actions MUST be
-the same regardless of at what point in the protocol the LeafNode is being
-verified with the following exception: If the LeafNode is an update to
-another LeafNode, the authentication service MUST additionally validate that
-the set of identities attested by the credential in the new LeafNode is
-acceptable relative to the identities attested by the old credential.
-For example:<a href="#section-8.3-4.1.1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-8.3-4.1.2.1">An Update proposal updates the sender's old LeafNode to a new one<a href="#section-8.3-4.1.2.1" class="pilcrow">¶</a>
-</li>
-              <li class="normal" id="section-8.3-4.1.2.2">A "resync" external commit removes the joiner's old LeafNode via a Remove proposal and replaces it with a new one<a href="#section-8.3-4.1.2.2" class="pilcrow">¶</a>
-</li>
-            </ul>
+<li class="normal" id="section-8.3-4.1">Verify that the credential in the LeafNode is valid as described in
+<a href="#credential-validation" class="xref">Section 6.3.1</a>.<a href="#section-8.3-4.1" class="pilcrow">¶</a>
 </li>
           <li class="normal" id="section-8.3-4.2">Verify that the signature on the LeafNode is valid using <code>signature_key</code>.<a href="#section-8.3-4.2" class="pilcrow">¶</a>
 </li>
