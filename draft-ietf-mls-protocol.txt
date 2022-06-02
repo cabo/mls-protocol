@@ -141,41 +141,41 @@ Table of Contents
        13.1.6.  ExternalInit
        13.1.7.  GroupContextExtensions
        13.1.8.  External Proposals
-     13.2.  Commit
-       13.2.1.  Creating a Commit
-       13.2.2.  Processing a Commit
-       13.2.3.  Adding Members to the Group
-     13.3.  Ratchet Tree Extension
-     13.4.  Proposal List Validation
-   14. Extensibility
-     14.1.  Ciphersuites
-     14.2.  Proposals
-     14.3.  Credential Extensibility
-     14.4.  Extensions
-   15. Sequencing of State Changes
-     15.1.  Server-Enforced Ordering
-     15.2.  Client-Enforced Ordering
-   16. Application Messages
-     16.1.  Padding
-     16.2.  Restrictions
-     16.3.  Delayed and Reordered Application messages
-   17. Security Considerations
-     17.1.  Confidentiality of the Group Secrets
-     17.2.  Authentication
-     17.3.  Forward Secrecy and Post-Compromise Security
-     17.4.  KeyPackage Reuse
-     17.5.  Group Fragmentation by Malicious Insiders
-   18. IANA Considerations
-     18.1.  MLS Ciphersuites
-     18.2.  MLS Extension Types
-     18.3.  MLS Proposal Types
-     18.4.  MLS Credential Types
-     18.5.  MLS Designated Expert Pool
-     18.6.  The "message/mls" MIME Type
-   19. Contributors
-   20. References
-     20.1.  Normative References
-     20.2.  Informative References
+     13.2.  Proposal List Validation
+     13.3.  Applying a Proposal List
+     13.4.  Commit
+       13.4.1.  Creating a Commit
+       13.4.2.  Processing a Commit
+       13.4.3.  Adding Members to the Group
+     13.5.  Ratchet Tree Extension
+     13.6.  Ciphersuites
+     13.7.  Proposals
+     13.8.  Credential Extensibility
+     13.9.  Extensions
+   14. Sequencing of State Changes
+     14.1.  Server-Enforced Ordering
+     14.2.  Client-Enforced Ordering
+   15. Application Messages
+     15.1.  Padding
+     15.2.  Restrictions
+     15.3.  Delayed and Reordered Application messages
+   16. Security Considerations
+     16.1.  Confidentiality of the Group Secrets
+     16.2.  Authentication
+     16.3.  Forward Secrecy and Post-Compromise Security
+     16.4.  KeyPackage Reuse
+     16.5.  Group Fragmentation by Malicious Insiders
+   17. IANA Considerations
+     17.1.  MLS Ciphersuites
+     17.2.  MLS Extension Types
+     17.3.  MLS Proposal Types
+     17.4.  MLS Credential Types
+     17.5.  MLS Designated Expert Pool
+     17.6.  The "message/mls" MIME Type
+   18. Contributors
+   19. References
+     19.1.  Normative References
+     19.2.  Informative References
    Appendix A.  Protocol Origins of Example Trees
    Appendix B.  Array-Based Trees
    Appendix C.  Link-Based Trees
@@ -1380,7 +1380,7 @@ Table of Contents
    Here, the functions Signature.Sign and Signature.Verify are defined
    by the signature algorithm.
 
-   The ciphersuites are defined in section Section 18.1.
+   The ciphersuites are defined in section Section 17.1.
 
 6.2.  Hash-Based Identifiers
 
@@ -1742,7 +1742,7 @@ Welcome  KeyPackage  GroupInfo   MLSPlaintext      MLSCiphertext -'
       proposal.
 
    *  new_member_commit: The signature key in the LeafNode in the
-      Commit's path (see Section 13.2.3.1).  The content_type of the
+      Commit's path (see Section 13.4.3.1).  The content_type of the
       message MUST be commit.
 
    *  new_member_proposal: The signature key in the LeafNode in the
@@ -2178,7 +2178,7 @@ Welcome  KeyPackage  GroupInfo   MLSPlaintext      MLSCiphertext -'
 8.4.  Ratchet Tree Evolution
 
    Whenever a member initiates an epoch change (i.e., commits; see
-   Section 13.2), they may need to refresh the key pairs of their leaf
+   Section 13.4), they may need to refresh the key pairs of their leaf
    and of the nodes on their leaf's direct path in order to maintain
    forward secrecy and post-compromise security.
 
@@ -2646,7 +2646,7 @@ A   B       A   B   _   _                           A   B   C   _
 
 8.9.  Update Paths
 
-   As described in Section 13.2, each Commit message may optionally
+   As described in Section 13.4, each Commit message may optionally
    contain an UpdatePath, with a new LeafNode and set of parent nodes
    for the sender's filtered direct path.  For each parent node, the
    UpdatePath contains a new public key and encrypted path secret.  The
@@ -3315,7 +3315,7 @@ psk_secret (or 0) --> KDF.Extract
        represent this client.
 
    KeyPackages are intended to be used only once and SHOULD NOT be
-   reused except in the case of last resort (see Section 17.4).  Clients
+   reused except in the case of last resort (see Section 16.4).  Clients
    MAY generate and publish multiple KeyPackages to support multiple
    ciphersuites.
 
@@ -3401,7 +3401,7 @@ psk_secret (or 0) --> KDF.Extract
    other members are added when the creator effectively sends itself Add
    proposals, commits them, and then sends the corresponding Welcome
    message to the new participants.  These processes are described in
-   detail in Section 13.1.1, Section 13.2, and Section 13.2.3.2.
+   detail in Section 13.1.1, Section 13.4, and Section 13.4.3.2.
 
    The creator of a group MUST take the following steps to initialize
    the group:
@@ -3436,7 +3436,7 @@ psk_secret (or 0) --> KDF.Extract
       that member (see Section 13.1.1)
 
    *  Construct a Commit message that commits all of the Add proposals,
-      in any order chosen by the creator (see Section 13.2)
+      in any order chosen by the creator (see Section 13.4)
 
    *  Process the Commit message to obtain a new group state (for the
       epoch in which the new members are added) and a Welcome message
@@ -3452,7 +3452,7 @@ psk_secret (or 0) --> KDF.Extract
    with a previously used ID.
 
    The recipient of a Welcome message processes it as described in
-   Section 13.2.3.2.
+   Section 13.4.3.2.
 
    In principle, the above process could be streamlined by having the
    creator directly create a tree and choose a random value for first
@@ -3687,7 +3687,7 @@ psk_secret (or 0) --> KDF.Extract
 
    *  Identify a leaf node matching removed.  This lookup MUST be done
       on the tree before any non-Remove proposals have been applied (the
-      "old" tree in the terminology of Section 13.2), since proposals
+      "old" tree in the terminology of Section 13.4), since proposals
       such as Update can change the LeafNode stored at a leaf.  Let L be
       this leaf node.
 
@@ -3823,7 +3823,121 @@ psk_secret (or 0) --> KDF.Extract
 
    ExternalSender external_senders<V>;
 
-13.2.  Commit
+13.2.  Proposal List Validation
+
+   A group member creating a commit and a group member processing a
+   commit MUST verify that the list of committed proposals is valid
+   using one of the following procedures, depending on whether the
+   commit is external or not.
+
+   For a regular, i.e. not external, commit the list is invalid if any
+   of the following occurs:
+
+   *  It contains an individual proposal that is invalid as specified in
+      Section 13.1.
+
+   *  It contains an Update proposal generated by the committer.
+
+   *  It contains a Remove proposal that removes the committer.
+
+   *  It contains multiple Update and/or Remove proposals that apply to
+      the same leaf.  If the committer has received multiple such
+      proposals they SHOULD prefer any Remove received, or the most
+      recent Update if there are no Removes.
+
+   *  It contains multiple Add proposals that contain KeyPackages that
+      represent the same client according to the application (for
+      example, identical signature keys).
+
+   *  It contains an Add proposal with a KeyPackage that represents a
+      client already in the group according to the application, unless
+      there is a Remove proposal in the list removing the matching
+      client from the group.
+
+   *  It contains multiple PreSharedKey proposals that reference the
+      same PreSharedKeyID.
+
+   *  It contains multiple GroupContextExtensions proposals.
+
+   *  It contains a ReInit proposal together with any other proposal.
+      If the committer has received other proposals during the epoch,
+      they SHOULD prefer them over the ReInit proposal, allowing the
+      ReInit to be resent and applied in a subsequent epoch.
+
+   *  It contains an ExternalInit proposal.
+
+   *  It contains a proposal with a non-default proposal type that is
+      not supported by some members of the group that will process the
+      Commit (i.e., members being added or removed by the Commit do not
+      need to support the proposal type).
+
+   *  After processing the commit the ratchet tree is invalid, in
+      particular, if it contains any leaf node that is invalid according
+      to Section 8.3.
+
+   An application may extend the above procedure by additional rules,
+   for example, requiring application-level permissions to add members,
+   or rules concerning non-default proposal types.
+
+   For an external commit, the list is valid if it contains only the
+   following proposals (not necessarily in this order):
+
+   *  Exactly one ExternalInit
+
+   *  At most one Remove proposal, with which the joiner removes an old
+      version of themselves.  If a Remove proposal is present, then the
+      LeafNode in the path field of the external commit MUST meet the
+      same criteria as would the LeafNode in an Update for the removed
+      leaf (see Section 13.1.2).  In particular, the credential in the
+      LeafNode MUST present a set of identifiers that is acceptable to
+      the application for the removed participant.
+
+   *  Zero or more PreSharedKey proposals.
+
+   *  No other proposals.
+
+   Proposal types defined in the future may make updates to the above
+   validation logic to incorporate considerations related to proposals
+   of the new type.
+
+13.3.  Applying a Proposal List
+
+   The sections above defining each proposal type describe how each
+   individual proposals is applied.  When creating or processing a
+   Commit, a client applies a list of proposals to the ratchet tree and
+   GroupContext.  The client MUST apply the proposals in the list in the
+   following order:
+
+   *  If there is a GroupContextExtensions proposal, replace the
+      extensions field of the GroupContext for the group with the
+      contents of the proposal.  The new extensions MUST be used for
+      evaluating other proposals in this list.  For example, if a
+      GroupContextExtensions proposal adds a required_capabilities
+      extension, then any Add proposals need to indicate support for
+      those capabilities.
+
+   *  Apply any Update proposals to the ratchet tree, in any order.
+
+   *  Apply any Remove proposals to the ratchet tree, in any order.
+
+   *  Apply any Add proposals to the ratchet tree, in the order they
+      appear in the list.
+
+   *  Look up the PSK secrets for any PreSharedKey proposals, in the
+      order they appear in the list.  These secrets are then used to
+      advance the key schedule later in Commit processing.
+
+   *  If there is an ExternalInit proposal, use it to derive the
+      init_secret for use later in Commit processing.
+
+   *  If there is a ReInit proposal, note its parameters for application
+      later in Commit processing.
+
+   Proposal types defined in the future MUST specify how the above steps
+   are to be adjusted to accommodate the application of proposals of the
+   new type.
+
+13.4.  Commit
 
    A Commit message initiates a new epoch for the group, based on a
    collection of Proposals.  It instructs group members to update their
@@ -3865,7 +3979,7 @@ psk_secret (or 0) --> KDF.Extract
    data is transmitted.
 
    A sender and a receiver of a Commit MUST verify that the committed
-   list of proposals is valid as specified in Section 13.4.  A list is
+   list of proposals is valid as specified in Section 13.2.  A list is
    invalid if, for example, it includes an Update and a Remove for the
    same member, or an Add when the sender does not have the application-
    level permission to add new users.
@@ -3909,7 +4023,7 @@ psk_secret (or 0) --> KDF.Extract
    instance of a proposal type requires a path, then the proposal type
    requires a path.  This attribute of a proposal type is reflected in
    the "Path Required" field of the proposal type registry defined in
-   Section 18.3.
+   Section 17.3.
 
    Update and Remove proposals are the clearest examples of proposals
    that require a path.  An UpdatePath is required to evict the removed
@@ -3952,7 +4066,7 @@ psk_secret (or 0) --> KDF.Extract
        provides FS with regard to any removed members and PCS for the
        committer and any updated members.
 
-13.2.1.  Creating a Commit
+13.4.1.  Creating a Commit
 
    When creating or processing a Commit, a client updates the ratchet
    tree and GroupContext for the group.  These values advance from an
@@ -3966,26 +4080,15 @@ psk_secret (or 0) --> KDF.Extract
    Welcome message at the same time, by taking the following steps:
 
    *  Verify that the list of proposals to be committed is valid as
-      specified in Section 13.4.
+      specified in Section 13.2.
 
    *  Construct an initial Commit object with the proposals field
       populated from Proposals received during the current epoch, and an
       empty path field.
 
-   *  Initialize the new ratchet tree and GroupContext by applying the
-      proposals referenced in the initial Commit object, as described in
-      Section 13.1.  Update proposals are applied first, followed by
-      Remove proposals, and then finally Add proposals.  Add proposals
-      are applied in the order listed in the proposals vector, and
-      always to the leftmost unoccupied leaf in the tree, or the right
-      edge of the tree if all leaves are occupied.
-
-      -  Note that the order in which different types of proposals are
-         applied should be updated by the implementation to include any
-         new proposals added by negotiated group extensions.
-
-      -  PreSharedKey proposals are processed later when deriving the
-         psk_secret for the Key Schedule.
+   *  Create the new ratchet tree and GroupContext by applying the list
+      of proposals to the old ratchet tree and GroupContext, as defined
+      in Section 13.3
 
    *  Decide whether to populate the path field: If the path field is
       required based on the proposals that are in the commit (see
@@ -4085,12 +4188,12 @@ psk_secret (or 0) --> KDF.Extract
       -  Other extensions as defined by the application
 
       -  Optionally derive an external keypair as described in Section 9
-         (required for External Commits, see Section 13.2.3.1)
+         (required for External Commits, see Section 13.4.3.1)
 
       -  Sign the GroupInfo using the member's private signing key
 
       -  Encrypt the GroupInfo using the key and nonce derived from the
-         joiner_secret for the new epoch (see Section 13.2.3.2)
+         joiner_secret for the new epoch (see Section 13.4.3.2)
 
    *  For each new member in the group:
 
@@ -4123,7 +4226,7 @@ psk_secret (or 0) --> KDF.Extract
 
       -  epoch: The epoch that the group will be in after this Commit
 
-13.2.2.  Processing a Commit
+13.4.2.  Processing a Commit
 
    A member of the group applies a Commit message by taking the
    following steps:
@@ -4135,22 +4238,14 @@ psk_secret (or 0) --> KDF.Extract
       described in Section Section 7.1.
 
    *  Verify that the proposals vector is valid as specified in
-      Section 13.4.
+      Section 13.2.
 
    *  Verify that all PreSharedKey proposals in the proposals vector are
       available.
 
-   *  Initialize the new ratchet tree and GroupContext by applying the
-      proposals referenced in the initial Commit object, as described in
-      Section 13.1.  Update proposals are applied first, followed by
-      Remove proposals, and then finally Add proposals.  Add proposals
-      are applied in the order listed in the proposals vector, and
-      always to the leftmost unoccupied leaf in the tree, or the right
-      edge of the tree if all leaves are occupied.
-
-      -  Note that the order in which different types of proposals are
-         applied should be updated by the implementation to include any
-         new proposals added by negotiated group extensions.
+   *  Create the new ratchet tree and GroupContext by applying the list
+      of proposals to the old ratchet tree and GroupContext, as defined
+      in Section 13.3
 
    *  Verify that the path value is populated if the proposals vector
       contains any Update or Remove proposals, or if it's empty.
@@ -4226,7 +4321,7 @@ psk_secret (or 0) --> KDF.Extract
       Welcome message from the committer meeting the requirements of
       Section 12.2.
 
-13.2.3.  Adding Members to the Group
+13.4.3.  Adding Members to the Group
 
    New members can join the group in two ways.  Either by being added by
    a group member, or by adding themselves through an external Commit.
@@ -4267,7 +4362,7 @@ psk_secret (or 0) --> KDF.Extract
        uint32 signer;
    } GroupInfoTBS;
 
-13.2.3.1.  Joining via External Commits
+13.4.3.1.  Joining via External Commits
 
    External Commits are a mechanism for new members (external parties
    that want to become members of the group) to add themselves to a
@@ -4314,7 +4409,7 @@ psk_secret (or 0) --> KDF.Extract
 
    Note that the tree_hash field is used the same way as in the Welcome
    message.  The full tree can be included via the ratchet_tree
-   extension Section 13.3.
+   extension Section 13.5.
 
    The information in a GroupInfo is not generally public information,
    but applications can choose to make it available to new members in
@@ -4360,7 +4455,7 @@ psk_secret (or 0) --> KDF.Extract
    but the application will need to ensure that continuing, non-
    resynchronizing members have the required PSK.
 
-13.2.3.2.  Joining via Welcome Message
+13.4.3.2.  Joining via Welcome Message
 
    The sender of a Commit message is responsible for sending a single
    Welcome message to all the new members added via Add proposals.  The
@@ -4522,7 +4617,7 @@ psk_secret (or 0) --> KDF.Extract
          members of the new group compose a subset of the members of the
          old group, according to the application.
 
-13.3.  Ratchet Tree Extension
+13.5.  Ratchet Tree Extension
 
    By default, a GroupInfo message only provides the joiner with a hash
    of the group's ratchet tree.  In order to process or generate
@@ -4636,82 +4731,8 @@ psk_secret (or 0) --> KDF.Extract
 
    Regardless of how the client obtains the tree, the client MUST verify
    that the root hash of the ratchet tree matches the tree_hash of the
-   GroupContext before using the tree for MLS operations.
-
-13.4.  Proposal List Validation
-
-   A group member creating a commit and a group member processing a
-   commit MUST verify that the list of committed proposals is valid
-   using one of the following procedures, depending on whether the
-   commit is external or not.
-
-   For a regular, i.e. not external, commit the list is invalid if any
-   of the following occurs:
-
-   *  It contains an individual proposal that is invalid as specified in
-      Section 13.1.
-
-   *  It contains an Update proposal generated by the committer.
-
-   *  It contains a Remove proposal that removes the committer.
-
-   *  It contains multiple Update and/or Remove proposals that apply to
-      the same leaf.  If the committer has received multiple such
-      proposals they SHOULD prefer any Remove received, or the most
-      recent Update if there are no Removes.
-
-   *  It contains multiple Add proposals that contain KeyPackages that
-      represent the same client according to the application (for
-      example, identical signature keys).
-
-   *  It contains an Add proposal with a KeyPackage that represents a
-      client already in the group according to the application, unless
-      there is a Remove proposal in the list removing the matching
-      client from the group.
-
-   *  It contains multiple PreSharedKey proposals that reference the
-      same PreSharedKeyID.
-
-   *  It contains multiple GroupContextExtensions proposals.
-
-   *  It contains a ReInit proposal together with any other proposal.
-      If the committer has received other proposals during the epoch,
-      they SHOULD prefer them over the ReInit proposal, allowing the
-      ReInit to be resent and applied in a subsequent epoch.
-
-   *  It contains an ExternalInit proposal.
-
-   *  It contains a proposal with a non-default proposal type that is
-      not supported by some members of the group that will process the
-      Commit (i.e., members being added or removed by the Commit do not
-      need to support the proposal type).
-
-   *  After processing the commit the ratchet tree is invalid, in
-      particular, if it contains any leaf node that is invalid according
-      to Section 8.3.
-
-   An application may extend the above procedure by additional rules,
-   for example, requiring application-level permissions to add members,
-   or rules concerning non-default proposal types.
-
-   For an external commit, the list is valid if it contains only the
-   following proposals (not necessarily in this order):
-
-   *  Exactly one ExternalInit
-
-   *  At most one Remove proposal, with which the joiner removes an old
-      version of themselves.  If a Remove proposal is present, then the
-      LeafNode in the path field of the external commit MUST meet the
-      same criteria as would the LeafNode in an Update for the removed
-      leaf (see Section 13.1.2).  In particular, the credential in the
-      LeafNode MUST present a set of identifiers that is acceptable to
-      the application for the removed participant.
-
-   *  Zero or more PreSharedKey proposals.
-
-   *  No other proposals.
-
-14.  Extensibility
+   GroupContext before using the tree for MLS operations. #
+   Extensibility
 
    The base MLS protocol can be extended in a few ways.  New
    ciphersuites can be added to enable the use of new cryptographic
@@ -4721,7 +4742,7 @@ psk_secret (or 0) --> KDF.Extract
    some constraints on these extensibility mechanisms that are necessary
    to ensure broad interoperability.
 
-14.1.  Ciphersuites
+13.6.  Ciphersuites
 
    As discussed in Section 6.1, MLS allows the participants in a group
    to negotiate the cryptographic algorithms used within the group.
@@ -4730,7 +4751,7 @@ psk_secret (or 0) --> KDF.Extract
    interoperability failure due to clients not supporting a common
    ciphersuite.
 
-   The ciphersuite registry defined in Section 18.1 attempts to strike a
+   The ciphersuite registry defined in Section 17.1 attempts to strike a
    balance on this point.  On the one hand, the base policy for the
    registry is Specification Required, a fairly low bar designed to
    avoid the need for standards work in cases where different ciphers
@@ -4748,15 +4769,15 @@ psk_secret (or 0) --> KDF.Extract
    HTTP/2, which restricted the set of allowed TLS ciphers (see
    Section 9.2.2 of [RFC7540].
 
-14.2.  Proposals
+13.7.  Proposals
 
    Commit messages do not have an extension field because the set of
-   proposals is extensible.  As discussed in Section 13.2, Proposals
+   proposals is extensible.  As discussed in Section 13.4, Proposals
    with a non-default proposal type MUST NOT be included in a commit
    unless the proposal type is supported by all the members of the group
    that will process the Commit.
 
-14.3.  Credential Extensibility
+13.8.  Credential Extensibility
 
    In order to ensure that MLS provides meaningful authentication it is
    important that each member is able to authenticate some identity
@@ -4768,7 +4789,7 @@ psk_secret (or 0) --> KDF.Extract
    what all members of the group support, as specified by the
    capabilities field of each LeafNode in the ratchet tree.  An
    application can introduce new credential types by choosing an
-   unallocated identifier from the registry in Section 18.4 and
+   unallocated identifier from the registry in Section 17.4 and
    indicating support for the credential type in published LeafNodes,
    whether in Update proposals to existing groups or KeyPackages that
    are added to new groups.  Once all members in a group indicate
@@ -4788,7 +4809,7 @@ psk_secret (or 0) --> KDF.Extract
    each pair of members (Alice, Bob), Alice would need to present at
    least one credential of a type that Bob supports.
 
-14.4.  Extensions
+13.9.  Extensions
 
    This protocol includes a mechanism for negotiating extension
    parameters similar to the one in TLS [RFC8446].  In TLS, extension
@@ -4852,7 +4873,7 @@ psk_secret (or 0) --> KDF.Extract
    GroupContextExtensions proposal to enable additional extensions, or
    by reinitializing the group as described in Section 12.2.
 
-15.  Sequencing of State Changes
+14.  Sequencing of State Changes
 
    Each Commit message is premised on a given starting state, indicated
    by the epoch field of the enclosing MLSMessageContent.  If the
@@ -4895,7 +4916,7 @@ psk_secret (or 0) --> KDF.Extract
    state, since the endpoint doesn't know at that time whether the
    changes implied by the Commit message will succeed or not.
 
-15.1.  Server-Enforced Ordering
+14.1.  Server-Enforced Ordering
 
    With this approach, the Delivery Service ensures that incoming
    messages are added to an ordered queue and outgoing messages are
@@ -4916,7 +4937,7 @@ psk_secret (or 0) --> KDF.Extract
 
    This applies to all messages, not only state changing messages.
 
-15.2.  Client-Enforced Ordering
+14.2.  Client-Enforced Ordering
 
    Order enforcement can be implemented on the client as well, one way
    to achieve it is to use a two step update protocol: the first client
@@ -4929,7 +4950,7 @@ psk_secret (or 0) --> KDF.Extract
    complex and harder to implement.  It also could cause starvation for
    some clients if they keep failing to get their proposal accepted.
 
-16.  Application Messages
+15.  Application Messages
 
    The primary purpose of handshake messages are to provide an
    authenticated group key exchange to clients.  In order to protect
@@ -4953,7 +4974,7 @@ psk_secret (or 0) --> KDF.Extract
    order to produce the required nonce and key for encryption or
    decryption.
 
-16.1.  Padding
+15.1.  Padding
 
    Application messages MAY be padded to provide some resistance against
    traffic analysis techniques over encrypted traffic [CLINIC] [HCJ16].
@@ -4968,7 +4989,7 @@ psk_secret (or 0) --> KDF.Extract
    padding to reduce the ability of attackers outside the group to infer
    the size of the encrypted content.
 
-16.2.  Restrictions
+15.2.  Restrictions
 
    During each epoch, senders MUST NOT encrypt more data than permitted
    by the security bounds of the AEAD scheme used
@@ -4981,7 +5002,7 @@ psk_secret (or 0) --> KDF.Extract
    messages and to (potentially) recover confidentiality and
    authenticity for future messages despite a past state compromise.
 
-16.3.  Delayed and Reordered Application messages
+15.3.  Delayed and Reordered Application messages
 
    Since each application message contains the group identifier, the
    epoch, and a generation counter, a client can receive messages out of
@@ -5005,14 +5026,14 @@ psk_secret (or 0) --> KDF.Extract
    beginning of a new epoch, forcing recipients to perform billions of
    key derivations.
 
-17.  Security Considerations
+16.  Security Considerations
 
    The security goals of MLS are described in
    [I-D.ietf-mls-architecture].  We describe here how the protocol
    achieves its goals at a high level, though a complete security
    analysis is outside of the scope of this document.
 
-17.1.  Confidentiality of the Group Secrets
+16.1.  Confidentiality of the Group Secrets
 
    Group secrets are partly derived from the output of a ratchet tree.
    Ratchet trees work by assigning each member of the group to a leaf in
@@ -5028,7 +5049,7 @@ psk_secret (or 0) --> KDF.Extract
    to rotate their keypair such that the old private key can no longer
    be used to decrypt new messages.
 
-17.2.  Authentication
+16.2.  Authentication
 
    The first form of authentication we provide is that group members can
    verify a message originated from one of the members of the group.
@@ -5063,7 +5084,7 @@ psk_secret (or 0) --> KDF.Extract
    that ensures that the legitimate members of the group to have the
    required PSKs.
 
-17.3.  Forward Secrecy and Post-Compromise Security
+16.3.  Forward Secrecy and Post-Compromise Security
 
    Post-compromise security is provided between epochs by members
    regularly updating their leaf key in the ratchet tree.  Updating
@@ -5081,7 +5102,7 @@ psk_secret (or 0) --> KDF.Extract
    Delivery Service, such that compromised key material won't be used
    when the member is added to a new group.
 
-17.4.  KeyPackage Reuse
+16.4.  KeyPackage Reuse
 
    KeyPackages are intended to be used only once.  That is, once a
    KeyPackage has been used to introduce the corresponding client to a
@@ -5096,7 +5117,7 @@ psk_secret (or 0) --> KDF.Extract
    KeyPackage publication system SHOULD rate-limit KeyPackage requests,
    especially if not authenticated.
 
-17.5.  Group Fragmentation by Malicious Insiders
+16.5.  Group Fragmentation by Malicious Insiders
 
    It is possible for a malicious member of a group to "fragment" the
    group by crafting an invalid UpdatePath.  Recall that an UpdatePath
@@ -5139,28 +5160,28 @@ psk_secret (or 0) --> KDF.Extract
    UpdatePath, that is, one member from each subtree rooted in the
    copath node corresponding to the node in the UpdatePath.
 
-18.  IANA Considerations
+17.  IANA Considerations
 
    This document requests the creation of the following new IANA
    registries:
 
-   *  MLS Ciphersuites (Section 18.1)
+   *  MLS Ciphersuites (Section 17.1)
 
-   *  MLS Extension Types (Section 18.2)
+   *  MLS Extension Types (Section 17.2)
 
-   *  MLS Proposal Types (Section 18.3)
+   *  MLS Proposal Types (Section 17.3)
 
-   *  MLS Credential Types (Section 18.4)
+   *  MLS Credential Types (Section 17.4)
 
    All of these registries should be under a heading of "Messaging Layer
    Security", and assignments are made via the Specification Required
-   policy [RFC8126].  See Section 18.5 for additional information about
+   policy [RFC8126].  See Section 17.5 for additional information about
    the MLS Designated Experts (DEs).
 
    RFC EDITOR: Please replace XXXX throughout with the RFC number
    assigned to this document
 
-18.1.  MLS Ciphersuites
+17.1.  MLS Ciphersuites
 
    A ciphersuite is a combination of a protocol version and the set of
    cryptographic algorithms that should be used.
@@ -5297,9 +5318,9 @@ psk_secret (or 0) --> KDF.Extract
    Use.
 
    New ciphersuite values are assigned by IANA as described in
-   Section 18.
+   Section 17.
 
-18.2.  MLS Extension Types
+17.2.  MLS Extension Types
 
    This registry lists identifiers for extensions to the MLS protocol.
    The extension type field is two bytes wide, so valid extension type
@@ -5354,7 +5375,7 @@ psk_secret (or 0) --> KDF.Extract
 
                                   Table 8
 
-18.3.  MLS Proposal Types
+17.3.  MLS Proposal Types
 
    This registry lists identifiers for types of proposals that can be
    made for changes to an MLS group.  The extension type field is two
@@ -5375,7 +5396,7 @@ psk_secret (or 0) --> KDF.Extract
       transition.
 
    *  Path Required: Whether a Commit covering a proposal of this type
-      is required to have its path field populated (see Section 13.2).
+      is required to have its path field populated (see Section 13.4).
 
    *  Reference: The document where this extension is defined
 
@@ -5408,7 +5429,7 @@ psk_secret (or 0) --> KDF.Extract
 
                                   Table 9
 
-18.4.  MLS Credential Types
+17.4.  MLS Credential Types
 
    This registry lists identifiers for types of credentials that can be
    used for authentication in the MLS protocol.  The credential type
@@ -5447,7 +5468,7 @@ psk_secret (or 0) --> KDF.Extract
 
                                  Table 10
 
-18.5.  MLS Designated Expert Pool
+17.5.  MLS Designated Expert Pool
 
    Specification Required [RFC8126] registry requests are registered
    after a three-week review period on the MLS DEs' mailing list: mls-
@@ -5485,7 +5506,7 @@ psk_secret (or 0) --> KDF.Extract
    be perceived as creating a conflict of interest for a particular MLS
    DE, that MLS DE SHOULD defer to the judgment of the other MLS DEs.
 
-18.6.  The "message/mls" MIME Type
+17.6.  The "message/mls" MIME Type
 
    This document registers the "message/mls" MIME media type in order to
    allow other protocols (ex: HTTP [RFC7540]) to convey MLS messages.
@@ -5514,7 +5535,7 @@ psk_secret (or 0) --> KDF.Extract
       The security considerations in this document (RFC XXXX) also
       apply.
 
-19.  Contributors
+18.  Contributors
 
    *  Joel Alwen
       Amazon
@@ -5575,9 +5596,9 @@ psk_secret (or 0) --> KDF.Extract
       Royal Holloway, University of London
       thyla.van.der@merwe.tech
 
-20.  References
+19.  References
 
-20.1.  Normative References
+19.1.  Normative References
 
    [RFC2104]  Krawczyk, H., Bellare, M., and R. Canetti, "HMAC: Keyed-
               Hashing for Message Authentication", RFC 2104,
@@ -5611,7 +5632,7 @@ psk_secret (or 0) --> KDF.Extract
               Public Key Encryption", RFC 9180, DOI 10.17487/RFC9180,
               February 2022, <https://www.rfc-editor.org/rfc/rfc9180>.
 
-20.2.  Informative References
+19.2.  Informative References
 
    [art]      Cohn-Gordon, K., Cremers, C., Garratt, L., Millican, J.,
               and K. Milner, "On Ends-to-Ends Encryption: Asynchronous
