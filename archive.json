@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-05-31T01:57:29.075317+00:00",
+  "timestamp": "2022-06-02T01:58:20.441491+00:00",
   "repo": "mlswg/mls-protocol",
   "labels": [
     {
@@ -6853,9 +6853,17 @@
       "labels": [],
       "body": "Regarding the Tree Hash\r\n1. Including the parent_node in the tree hash which is supposed to be computed from the leaves, makes the definition appear circular to a new reader. Since the situation when you have blank nodes in the middle of a tree but not at the root is a rather complicated, the situation when you could calculate a tree hash using the parent_node is non-obvious.\r\n2. In the description of Tree Hash the document says that the ParentNode object is optional \"depending on whether the node is blank or not.\" This isn't clear specification language. Saying the parent_node object is present if the node is blank or present if the node is not blank would be clear. \r\n3. What if the parent node is also blank? What if the root is blank? \r\n4. I think an example with and without blank nodes would be appropriate.\r\n5. Explaining the reason why the parent_node is included will help the reader establish a better mental model.\r\n\r\nRegarding the Parent Hash\r\nI still find this section super confusing. A few points\r\n1. Using a tree hash (sibling_tree_hash) inside the parent hash is non-obvious. There should be some explanation about what property this is providing and that it is a tree hash and not a parent hash. (Honestly it was the third time I read the section that I realized that it was really the tree hash and not the parent hash of the sibling.) \r\n2. Using P, V, and S for Parent, target node, and sibling node is introduced here and never used anywhere else in the document. P for parent and S for sibling make sense. I can't tell what V is supposed to stand for, and it unfortunately could cause people to confuse the <V> vector notation used throughout, but shortly after introducing V for the target node. I propose using \"N\" for node or \"X\" instead.\r\n3. There is one reference to the filtered direct path of U. Perhaps this is V, or a child of V?\r\n4. The calculations are sufficiently complicated that I think this warrants a complete, non-trivial, worked example (possibly in an appendix). At some point we should consider providing test vectors in a future document, and this would be an ideal candidate. \r\n",
       "createdAt": "2022-05-06T09:11:52Z",
-      "updatedAt": "2022-05-06T09:11:52Z",
+      "updatedAt": "2022-06-01T23:31:55Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Regarding the Tree Hash\r\n\r\n> 1. Including the parent_node in the tree hash which is supposed to be computed\r\n> from the leaves, makes the definition appear circular to a new reader. Since the\r\n> situation when you have blank nodes in the middle of a tree but not at the root\r\n> is a rather complicated, the situation when you could calculate a tree hash\r\n> using the parent_node is non-obvious.\r\n\r\nTo be clear, the `parent_node` that is included in the tree hash is the node\r\nwhose subtree is being hashed.  The tree hash doesn't include only the leaves,\r\nit includes all the nodes in the tree.\r\n\r\nIf you mean `parent_hash`, then yes, I agree the connection is a little subtle.\r\nI've tried to explain this a little better.\r\n\r\n\r\n> 2. In the description of Tree Hash the document says that the ParentNode object\r\n> is optional \"depending on whether the node is blank or not.\" This isn't clear\r\n> specification language. Saying the parent_node object is present if the node is\r\n> blank or present if the node is not blank would be clear.\r\n\r\nUpdated this to be clear that the ParentNode is omitted if and only if the node is blank.\r\n\r\n\r\n> 3. What if the parent node is also blank? What if the root is blank?\r\n\r\nNot clear what situation you mean here.  I think the specific computations are\r\npretty clearly specified for these cases.\r\n\r\n\r\n> 4. I think an example with and without blank nodes would be appropriate.\r\n\r\nSomething like this was added in #689:\r\n\r\nhttps://github.com/mlswg/mls-protocol/blob/main/draft-ietf-mls-protocol.md#verifying-parent-hashes\r\n\r\nI extended the example and put it in an appendix.\r\n\r\n\r\n> 5. Explaining the reason why the parent_node is included will help the reader\r\n> establish a better mental model.\r\n\r\nAssuming you mean `parent_hash` here, hopefully this is addressed by the above notes. \r\n\r\n\r\n> 1. Using a tree hash (sibling_tree_hash) inside the parent hash is non-obvious.\r\n> There should be some explanation about what property this is providing and that\r\n> it is a tree hash and not a parent hash. (Honestly it was the third time I read\r\n> the section that I realized that it was really the tree hash and not the parent\r\n> hash of the sibling.)\r\n\r\nAdded a note to clarify that this is the tree hash and why.\r\n\r\n\r\n> 2. Using P, V, and S for Parent, target node, and sibling node is introduced\r\n> here and never used anywhere else in the document. P for parent and S for\r\n> sibling make sense. I can't tell what V is supposed to stand for, and it\r\n> unfortunately could cause people to confuse the vector notation used throughout,\r\n> but shortly after introducing V for the target node. I propose using \"N\" for\r\n> node or \"X\" instead.\r\n\r\nChanged to \"D\" for \"direct path\", and explained the semantics.\r\n\r\n\r\n> 3. There is one reference to the filtered direct path of U. Perhaps this is V,\r\n> or a child of V?\r\n\r\nActually it's the leaf, which is now called \"L\".\r\n\r\n\r\n> 4. The calculations are sufficiently complicated that I think this warrants a\r\n> complete, non-trivial, worked example (possibly in an appendix). At some point\r\n> we should consider providing test vectors in a future document, and this would\r\n> be an ideal candidate.\r\n\r\nI think the example linked above does a pretty good job.  Feedback obviously\r\nwelcome.  Agreed that a test vectors document will be a useful follow-on.\r\n",
+          "createdAt": "2022-06-01T23:31:54Z",
+          "updatedAt": "2022-06-01T23:31:54Z"
+        }
+      ]
     },
     {
       "number": 657,
@@ -7202,7 +7210,7 @@
       "labels": [],
       "body": "* \u201cAdding and Removing Leaves\u201d after \u201cSynchronizing Views of the Tree\u201d\r\n* Consider merging \u201cRatchet Tree Evolution\u201d and \u201cSynchronizing Views of the Tree\u201d and \u201cUpdate Paths\u201d\r\n* Swap \u201cJoining via External Commits\u201d and \u201cJoining via Welcome Message\u201d\r\n* Restore section break for \u201cExtensions\u201d",
       "createdAt": "2022-05-16T22:10:40Z",
-      "updatedAt": "2022-05-25T18:30:14Z",
+      "updatedAt": "2022-05-31T22:05:05Z",
       "closedAt": null,
       "comments": [
         {
@@ -7218,6 +7226,13 @@
           "body": "* Move \"Proposal List Validation\" under \"Proposals\"",
           "createdAt": "2022-05-25T18:30:14Z",
           "updatedAt": "2022-05-25T18:30:14Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "If folks are OK with this, I will just implement it before shipping the new post-LC draft.",
+          "createdAt": "2022-05-31T22:05:05Z",
+          "updatedAt": "2022-05-31T22:05:05Z"
         }
       ]
     },
@@ -7571,6 +7586,22 @@
           "updatedAt": "2022-05-26T16:03:51Z"
         }
       ]
+    },
+    {
+      "number": 711,
+      "id": "I_kwDOBoyH6c5KxZr9",
+      "title": "Add changelist for draft-15",
+      "url": "https://github.com/mlswg/mls-protocol/issues/711",
+      "state": "OPEN",
+      "author": "bifurcation",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Just filing this so that I don't forget it before posting the draft.",
+      "createdAt": "2022-05-31T22:05:44Z",
+      "updatedAt": "2022-05-31T22:05:44Z",
+      "closedAt": null,
+      "comments": []
     }
   ],
   "pulls": [
@@ -50083,7 +50114,7 @@
       "labels": [],
       "body": "Based on #689 \r\n\r\nCloses #645 ",
       "createdAt": "2022-05-24T18:46:47Z",
-      "updatedAt": "2022-05-28T18:57:49Z",
+      "updatedAt": "2022-06-01T22:56:19Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "b209e1744abd6c4224c45069361a89e5d78d728b",
@@ -50154,6 +50185,56 @@
               "body": "The point of the \"depth-first, left-first\" language is to clarify the order in which the nodes in the resolution are listed.  As I read it, the language is correct, or maybe better as \"left-first, depth first\", in the sense that you visit the left child before the right child, and if you find a blank left child, you descend before going to the right child.  Following those rules, you do indeed end up at [A, B, Z] in your example -- though of course the resolution of Y should be [Y] ;)\r\n\r\nIn any case, I think the wording here could probably be improved a bit, but I will handle this in a follow-on, since this text is an effect of #689, not this PR.",
               "createdAt": "2022-05-27T13:43:23Z",
               "updatedAt": "2022-05-27T13:43:44Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c47Jg7p",
+          "commit": {
+            "abbreviatedOid": "6d7c14d"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-06-01T17:19:08Z",
+          "updatedAt": "2022-06-01T22:56:19Z",
+          "comments": [
+            {
+              "originalPosition": 38,
+              "body": "2*n-1 is no longer true, right?",
+              "createdAt": "2022-06-01T17:19:08Z",
+              "updatedAt": "2022-06-01T22:56:19Z"
+            },
+            {
+              "originalPosition": 26,
+              "body": "```suggestion\r\nthe nodes' indices in the array.  A more traditional representation based on\r\n```",
+              "createdAt": "2022-06-01T17:20:11Z",
+              "updatedAt": "2022-06-01T22:56:19Z"
+            },
+            {
+              "originalPosition": 27,
+              "body": "```suggestion\r\nlinked node objects may also be used.  {{array-based-trees}} and\r\n```",
+              "createdAt": "2022-06-01T17:20:33Z",
+              "updatedAt": "2022-06-01T22:56:19Z"
+            },
+            {
+              "originalPosition": 105,
+              "body": "```suggestion\r\nnode's key pair would be equivalent to encrypting to its non-copath child.\r\n```",
+              "createdAt": "2022-06-01T17:26:25Z",
+              "updatedAt": "2022-06-01T22:56:19Z"
+            },
+            {
+              "originalPosition": 619,
+              "body": "```suggestion\r\n* F sends an empty Commit, setting X, Y, W\r\n* G removes C and D, blanking V, U, and setting Y, W\r\n* B sends an empty Commit, setting T and W\r\n```",
+              "createdAt": "2022-06-01T22:51:53Z",
+              "updatedAt": "2022-06-01T22:56:19Z"
+            },
+            {
+              "originalPosition": 627,
+              "body": "I would've leaned towards leaving this section as it was, since left-balanced and complete are supposed to be functionally equivalent but left-balanced is more memory efficient.",
+              "createdAt": "2022-06-01T22:56:02Z",
+              "updatedAt": "2022-06-01T22:56:19Z"
             }
           ]
         }
@@ -50715,13 +50796,13 @@
       "labels": [],
       "body": "Closes #678 \r\nReplaces #660 \r\n\r\nThis PR attempts to add precision to the credential validation requirements in the document, along the lines @raphaelrobert suggests in #678, in the spirit of what @Bren2010 wrote up in #660 and drawing inspiration from what RFC 6125 does in the context of TLS.  It seems like this gives a clearer definition of (a) what the AS's job is and (b) when it needs to be done.",
       "createdAt": "2022-05-27T19:52:23Z",
-      "updatedAt": "2022-05-30T06:20:30Z",
+      "updatedAt": "2022-05-31T16:22:33Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
-      "baseRefOid": "76b3c4710bf926b9bceea995b746da5a70bf5f3f",
+      "baseRefOid": "6526db8781ab70cf5e21aa5d8c994d26c0bebaea",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "cred-val",
-      "headRefOid": "53ff186a0e7540de2988a2b708bfd682706e63f9",
+      "headRefOid": "9df017b2541ae68d1ea853b83886f2e3224964bf",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -50804,6 +50885,46 @@
               "body": "We might want to also do this check whenever a new credential shows up in the External Senders extension. ",
               "createdAt": "2022-05-30T06:20:30Z",
               "updatedAt": "2022-05-30T06:20:30Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c47DUB5",
+          "commit": {
+            "abbreviatedOid": "53ff186"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-31T16:02:06Z",
+          "updatedAt": "2022-05-31T16:02:07Z",
+          "comments": [
+            {
+              "originalPosition": 55,
+              "body": "It's not so different in messaging applications.  When you add someone to the group, you type in some identifier for them.  And there's typically a way that the application tells you who is in the group, independent of the crypto.  E.g., if you were mapping this on to XMPP, you might compare the credentials to [the JIDs in the roster](https://xmpp.org/rfcs/rfc6121.html#roster-syntax-items-jid).",
+              "createdAt": "2022-05-31T16:02:06Z",
+              "updatedAt": "2022-05-31T16:02:07Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c47DUPp",
+          "commit": {
+            "abbreviatedOid": "53ff186"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2022-05-31T16:02:46Z",
+          "updatedAt": "2022-05-31T16:02:47Z",
+          "comments": [
+            {
+              "originalPosition": 55,
+              "body": "Good point, will do.",
+              "createdAt": "2022-05-31T16:02:46Z",
+              "updatedAt": "2022-05-31T16:02:47Z"
             }
           ]
         }
@@ -51016,7 +51137,7 @@
       "labels": [],
       "body": "Fixes #690 ",
       "createdAt": "2022-05-29T18:40:00Z",
-      "updatedAt": "2022-05-30T16:23:08Z",
+      "updatedAt": "2022-06-01T20:01:31Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "2976ea5b1e4d6de39bcbc6a969a9d85dd6c10602",
@@ -51027,7 +51148,15 @@
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "TWal",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "One argument for the other option (i.e. force the root to be in the filtered updatepath): it gives a parent-hash chain from the comitting leaf to up to the root, hence the whole tree is bound in the leaf signature (assuming #713).\r\nIt ensures you can't modify the empty subtree.\r\n\r\nI don't think that's a huge deal, because you can always do modifications like this: given a tree T1, you can create tree T2 and a new root R like this (with the parent-hash link of R coming from T2):\r\n```\r\n   R\r\n /  \\\r\nT1  T2\r\n```\r\n\r\nBut it's worth noting that this change is not purely a TreeKEM change.",
+          "createdAt": "2022-06-01T20:01:31Z",
+          "updatedAt": "2022-06-01T20:01:31Z"
+        }
+      ],
       "reviews": [
         {
           "id": "PRR_kwDOBoyH6c46-0kY",
@@ -51178,6 +51307,200 @@
           "updatedAt": "2022-05-30T17:10:13Z"
         }
       ],
+      "reviews": []
+    },
+    {
+      "number": 710,
+      "id": "PR_kwDOBoyH6c44wdh4",
+      "title": "Clarify validation rules for ReInit.",
+      "url": "https://github.com/mlswg/mls-protocol/pull/710",
+      "state": "OPEN",
+      "author": "Bren2010",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2022-05-31T17:17:48Z",
+      "updatedAt": "2022-05-31T17:17:48Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "6526db8781ab70cf5e21aa5d8c994d26c0bebaea",
+      "headRepository": "mlswg/mls-protocol",
+      "headRefName": "brendan/fix-reinit",
+      "headRefOid": "4e9aa5bff683302aa2a162fc38f524f3997ae42f",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 712,
+      "id": "PR_kwDOBoyH6c44xinv",
+      "title": "Clarify description of UpdatePath generation and processing",
+      "url": "https://github.com/mlswg/mls-protocol/pull/712",
+      "state": "OPEN",
+      "author": "bifurcation",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Fixes #671 \r\n\r\nConflicts with #707 (in derivation of `commit_secret`)\r\n\r\nThis is intended just to move around the required steps and give them clearer labels.  Please keep an eye out for things that might have accidentally been added or dropped.",
+      "createdAt": "2022-05-31T23:14:53Z",
+      "updatedAt": "2022-05-31T23:14:53Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "6526db8781ab70cf5e21aa5d8c994d26c0bebaea",
+      "headRepository": "mlswg/mls-protocol",
+      "headRefName": "create-update-path",
+      "headRefOid": "166073f764c3d592296603d1b590a4ff75e2da5f",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 713,
+      "id": "PR_kwDOBoyH6c4422gx",
+      "title": "Improve parent hash guarantees",
+      "url": "https://github.com/mlswg/mls-protocol/pull/713",
+      "state": "OPEN",
+      "author": "TWal",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "# A nice security property for parent-hash\r\n\r\nThe goal of #527 was to have a property similar to:\r\n\r\n> If there is a parent-hash chain from the leaf L to a node N, then the signature of L binds the tree Canonicalize(N)\r\n\r\n(where Canonicalize(N) is N with its unmerged leaves removed, i.e. the subtree of N the last time a Commit went through it)\r\n\r\nHowever, this is currently not true, there are a few places where we can do (hopefully benign) modifications on N.\r\n\r\nExample 1:\r\n```\r\n              W\r\n        ______|_____\r\n       /             \\\r\n      _               Y\r\n    __|__           __|__\r\n   /     \\         /     \\\r\n  T       _       X       Z\r\n / \\     / \\     / \\     / \\\r\nA   B   _   _   E   F   G   H\r\n```\r\n\r\nwith the parent-hash chain A-T-W (happening with filtered update path).\r\n\r\nWe can modify the blank subtree:\r\n\r\n```\r\n              W\r\n        ______|_____\r\n       /             \\\r\n      _               Y\r\n    __|__           __|__\r\n   /     \\         /     \\\r\n  T       V       X       Z\r\n / \\     / \\     / \\     / \\\r\nA   B   C   D   E   F   G   H\r\n```\r\n\r\nand the parent-hash chain A-T-W is still valid\r\n\r\nExample 2:\r\n\r\n```\r\n              W\r\n        ______|_____\r\n       /             \\\r\n      U               Y\r\n    __|__           __|__\r\n   /     \\         /     \\\r\n  T       V       X       Z\r\n / \\     / \\     / \\     / \\\r\nA   B   _   D   E   F   G   H\r\n```\r\n\r\nwith the parent-hash chain A-T-U-W.\r\n\r\nWe can add unmerged leaves:\r\n\r\n```\r\n              W\r\n        ______|_____\r\n       /             \\\r\n      U[C]            Y\r\n    __|__           __|__\r\n   /     \\         /     \\\r\n  T       V[C]    X       Z\r\n / \\     / \\     / \\     / \\\r\nA   B   C   D   E   F   G   H\r\n```\r\n\r\nand the parent-hash chain A-T-U-W is still valid.\r\n\r\n# How to get this property\r\n\r\nThese examples are not possible if we require the parent-hash check to verify other invariants that exists in MLS:\r\n- if there is a parent-hash link from U to P and there are blank nodes between U and P, these blank nodes are here because of the filtered update path so their sibling have empty resolution (this invariant forbids example 1)\r\n- if there is a parent-hash link from U to P, then there can't be a leaf which is merged for U but not for P, because U and P were last modified by a commit at the same time (this invariant forbids example 2)\r\n\r\nThis PR add these checks to the parent hash validation procedure.\r\n\r\n# Proof that we do have the property with this PR\r\n\r\n## Definitions\r\n\r\nUn-adding leaves:\r\nLet N be a node, and Ls a list of leaves.\r\nThen UnAdd(N, Ls) is a tree identical to N, except that the leaves of Ls are blanked and removed from every node's unmerged leaves list.\r\nInformally, this operation is the inverse of adding leaves Ls in N by participant not in N.\r\n\r\nCanonicalization:\r\nWe define Canonicalize(N) = UnAdd(N, N.unmerged_leaves).\r\n\r\nTree equivalence:\r\nWe say T1 ~= T2 when Canonicalize(T1) = Canonicalize(T2).\r\n\r\nParent-hash link:\r\nWe say C ~> P when \"the parent hash in a node C is valid with respect to a parent node P\" as described in the \"Verifying Parent Hashes\" section (modified by this PR)\r\n\r\n# Key property on ~= and ~>\r\n\r\nWe prove the following property:\r\nIf C ~> P\r\nand C' ~> P'\r\nand C ~= C'\r\nthen P ~= P'.\r\n\r\nThis is better understood with a nice square:\r\n```\r\nIf we have:\r\n\r\nC ~= C'\r\n~    ~\r\nV    V\r\nP    P'\r\n\r\nThen there is a ~= between P and P'\r\n```\r\n\r\nProof of this property:\r\n\r\nLet S (resp. S') be the sibling in the C ~> P (resp. C' ~> P') relation. Because leaf indices are inside the tree hash, S and S' are both on the same side of P and P'.\r\n\r\nFact 1: UnAdd(S, P.unmerged_leaves) = UnAdd(S', P'.unmerged_leaves).\r\nProof: By definition of the parent hash and injectivity of tree-hash.\r\n\r\nFact 2: UnAdd(C, P.unmerged_leaves) = UnAdd(C', P'.unmerged_leaves).\r\nProof:\r\n\r\n```\r\n  UnAdd(C, P.unmerged_leaves)\r\n= UnAdd(C, Intersection(P.unmerged_leaves, Leaves(C))     by a simple lemma on UnAdd\r\n= UnAdd(C, C.unmerged_leaves)                             by C ~> P (we use the second new invariant here!)\r\n= UnAdd(C', C'.unmerged_leaves)                           by C ~= C'\r\n= UnAdd(C', Intersection(P'.unmerged_leaves, Leaves(C'))) by C' ~> P' (we use the second new invariant here!)\r\n= UnAdd(C', P'.unmerged_leaves)                           by a simple lemma on UnAdd\r\n```\r\n\r\nWith Fact 1 and Fact 2, we deduce that P ~= P' (we use the first new invariant here!).\r\n\r\n# Proof of signature binding\r\n\r\nA leaf signature binds the existence of nodes Mi suh that L ~> M1 ~> ... ~> Mm = root\r\n\r\nWhen there is a parent-hash-link path to a node P starting from a leaf L like L ~> N1 ~> ... ~> Nn ~> P, by applying inductively the property on ~= and ~> you get P ~= Mi for some i, hence L's signature binds Canonicalize(P) = Canonicalize(Mi).\r\n",
+      "createdAt": "2022-06-01T13:25:02Z",
+      "updatedAt": "2022-06-01T21:30:12Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "6526db8781ab70cf5e21aa5d8c994d26c0bebaea",
+      "headRepository": "TWal/mls-protocol",
+      "headRefName": "twal_parent_hash_invariants",
+      "headRefOid": "ef03e1acca1eed34df0fc0ec89889079f86cf899",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "mulmarta",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I haven\u2019t had tome to look at the proofs, but I have questions:\r\n\r\nRe. Example 1 (and the first new check) what about the following scenario: We start with this tree. \r\n\r\n~~~ aasvg\r\n                ________________R\r\n               /                |\r\n              W                 |\r\n        ______|_____            |\r\n       /             \\          |\r\n      _               Y         |\r\n    __|__           __|__       |\r\n   /     \\         /     \\      |\r\n  T       _       X       Z     |\r\n / \\     / \\     / \\     / \\    |\r\nA   B   _   _   E   F   G   H   I\r\n~~~\r\n\r\nThen `A` commits, setting the A-T-W path then `I` commits adding `C` and we have\r\n\r\n~~~ aasvg\r\n                ________________R\r\n               /                |\r\n              W[C]              |\r\n        ______|_____            |\r\n       /             \\          |\r\n      _               Y         |\r\n    __|__           __|__       |\r\n   /     \\         /     \\      |\r\n  T       _       X       Z     |\r\n / \\     / \\     / \\     / \\    |\r\nA   B   C   _   E   F   G   H   I\r\n~~~\r\n\r\nAccording to your rules, verification of the parent hash of W no longer works, because the blank sibling of T doesn\u2019t have an empty resolution \u2014 it contains C.\r\n\r\n\r\nRe. Example 2 (and the second new check), consider analogous scenario: We start with this tree:\r\n\r\n~~~ aasvg               \r\n              W                 \r\n        ______|_____            \r\n       /             \\          \r\n      U               Y         \r\n    __|__           __|__       \r\n   /     \\         /     \\      \r\n  T       V       X       Z     \r\n / \\     / \\     / \\     / \\   \r\nA   B   _   D   E   F   G   H\r\n~~~\r\n\r\nThen `A` commits setting the A-T-U path and then `G` commits adding `C` and we get\r\n\r\n~~~ aasv\r\n              W              \r\n        ______|_____            \r\n       /             \\          \r\n      U[C]            Y         \r\n    __|__           __|__       \r\n   /     \\         /     \\      \r\n  T       V[C]    X       Z     \r\n / \\     / \\     / \\     / \\    \r\nA   B   C   D   E   F   G   H   \r\n~~~\r\n\r\nThe result look the same as the \u201cbad case\u201d in Example 2. On the other hand, the second new check still passes. So why do you think it prevents the example?",
+          "createdAt": "2022-06-01T18:34:17Z",
+          "updatedAt": "2022-06-01T18:34:17Z"
+        },
+        {
+          "author": "TWal",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "About example 2:\r\nIn my example, with the new invariants, the link U ~> W is broken since U.unmerged_leaves = [C] and Intersection(W.unmerged_leaves, Leaves(U)) = []. Therefore it won't be accepted by the parent hash verification procedure.\r\nIn you example, with the new invariants, W is authenticated by Y ~> W, so there is no problem.\r\n\r\nAbout example 1:\r\nYou are right, there is a problem here.\r\nA quick fix coming to my mind would be: \"The sibling of every node with a blank parent between U (included) and P (excluded) has a resolution included in P.unmerged_leaves\".\r\n\r\nIt doesn't affect my proof, and I think it is this time actually an invariant of MLS (didn't do the proof thoroughly yet so I might be mistaken).",
+          "createdAt": "2022-06-01T19:29:57Z",
+          "updatedAt": "2022-06-01T19:29:57Z"
+        },
+        {
+          "author": "mulmarta",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "I think that the quick fix for rule 1 may work. Rule 2 shouldn't hurt correctness either. Nevertheless, I'd feel more confident after seeing a thorough proof of correctness.\r\n\r\nRe. example 2, you're right and thanks for explaining!",
+          "createdAt": "2022-06-01T20:14:34Z",
+          "updatedAt": "2022-06-01T20:14:34Z"
+        },
+        {
+          "author": "TWal",
+          "authorAssociation": "CONTRIBUTOR",
+          "body": "Here is a quick proof:\r\n\r\nGiven a parent-hash link C ~> P, we write Trees(C ~> P) the list of subtrees of siblings of nodes whose parents are blank between C and P.\r\n\r\nWhen a parent-hash link C ~> P is created, it because there is a Commit going through C and P, the blank nodes between C and P are here because of the filtered direct path, so every tree in Trees(C ~> P) have empty resolution, hence they are included in P.unmerged_leaves.\r\n\r\nGiven a parent-hash link C ~> P, let's see what happens if a tree Ti of Trees(C ~> P) is modified.\r\n- If the operation is a Remove, then P is blanked and the parent-hash link C ~> P don't exist in the new tree\r\n- If the operation is an Add, and the new leaf is L, then we have (before the operation) Resolution(Ti) included in P.unmerged_leaves, so Resolution(Ti) + L included in P.unmerged_leaves + L, and Resolution(NewTi) included in Resolution(Ti) + L, and NewP.unmerged_leaves = P.unmerged_leaves + L. So Resolution(NewTi) is included in NewP.unmerged_leaves.\r\n- If the operation is a UpdatePath, then P has a new parent-hash link.\r\n\r\nIn the case analysis I consider that Adds are always add-only commit, because an Add in a full commit (in this part of the protocol) is equivalent to an add-only Add followed by an UpdatePath.\r\n\r\nThis proof isn't super well-written (did it quickly) but I hope it's convincing enough.",
+          "createdAt": "2022-06-01T21:30:12Z",
+          "updatedAt": "2022-06-01T21:30:12Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOBoyH6c47KBlR",
+          "commit": {
+            "abbreviatedOid": "ef03e1a"
+          },
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "Thanks for the thorough write-up @TWal.  This makes sense to me, especially given that it's a pretty small change.",
+          "createdAt": "2022-06-01T18:10:50Z",
+          "updatedAt": "2022-06-01T18:13:30Z",
+          "comments": [
+            {
+              "originalPosition": 7,
+              "body": "I would merge this with the bullet above about the intermediate nodes being blanks.  So something like:\r\n\r\n> Each node between U and P in the tree is blank, and the \"copath child\" of P (its child that is not in the direct path of U) has an empty resolution",
+              "createdAt": "2022-06-01T18:10:50Z",
+              "updatedAt": "2022-06-01T18:13:30Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 714,
+      "id": "PR_kwDOBoyH6c445YYV",
+      "title": "Require that unmerged_leaves be ordered",
+      "url": "https://github.com/mlswg/mls-protocol/pull/714",
+      "state": "OPEN",
+      "author": "bifurcation",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "While reviewing #713, I realized that we have a potential interop problem around `ParentNode.unmerged_leaves`.  This struct feeds into the tree hash, so everyone in the group needs to have the entries in the same order or else they'll disagree on the tree hash.  But the order isn't specified anywhere: All the document says right now is \"add L's leaf index to the unmerged_leaves list\", which could be implemented as an insert anywhere in the list.  This PR resolves the ambiguity by requiring the list be sorted.",
+      "createdAt": "2022-06-01T18:23:11Z",
+      "updatedAt": "2022-06-01T22:58:42Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "6526db8781ab70cf5e21aa5d8c994d26c0bebaea",
+      "headRepository": "mlswg/mls-protocol",
+      "headRefName": "ordered-unmerged-leaves",
+      "headRefOid": "7f92260f14fa8627382bfb304d4d72fb3d3b5bb5",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOBoyH6c47LGoZ",
+          "commit": {
+            "abbreviatedOid": "7f92260"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2022-06-01T22:58:42Z",
+          "updatedAt": "2022-06-01T22:58:42Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 715,
+      "id": "PR_kwDOBoyH6c447bie",
+      "title": "Clarify tree hash and parent hash",
+      "url": "https://github.com/mlswg/mls-protocol/pull/715",
+      "state": "OPEN",
+      "author": "bifurcation",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Closes #655 \r\n\r\nDepends on #694 \r\nConflicts with #713 \r\n\r\nThe diff here is messy because it includes #694.  The biggest change is the extended example, for which you can just scroll to the bottom.",
+      "createdAt": "2022-06-01T23:26:03Z",
+      "updatedAt": "2022-06-01T23:26:03Z",
+      "baseRepository": "mlswg/mls-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "6526db8781ab70cf5e21aa5d8c994d26c0bebaea",
+      "headRepository": "mlswg/mls-protocol",
+      "headRefName": "tree-clarify-rohan",
+      "headRefOid": "fab4643074fd4aae24e95c9f07bc2152fc879c2b",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
       "reviews": []
     }
   ]
