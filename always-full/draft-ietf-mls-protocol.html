@@ -2711,15 +2711,15 @@ subtree</em> is the subtree with its left child as head (respectively
 balanced binary tree with <code>2^d</code> leaves all at the same depth <code>d</code>.  This
 structure is unique for a given depth <code>d</code>.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
 <p id="section-5.1-4">There are multiple ways that an implementation might represent a ratchet tree in
-memory.  A convenient property of the complete trees used here is that they can
-be represented as an array of nodes, with node relationships computed based on
-the nodes' indices in the array.  A more traditional representation based on
-linked node objects may also be used.  <a href="#array-based-trees" class="xref">Appendix B</a> and
-<a href="#link-based-trees" class="xref">Appendix C</a> provide some details on how to implement the tree
-operations required for MLS in these representations.  MLS places no
-requirements on implementations' internal representations
-of ratchet trees.  An implementation MAY use any tree representation and
-associated algorithms, as long as they produce correct protocol messages.<a href="#section-5.1-4" class="pilcrow">¶</a></p>
+memory.  A convenient property of left-balanced binary trees (including the
+complete trees used here) is that they can be represented as an array of nodes,
+with node relationships computed based on the nodes' indices in the array.  A
+more traditional representation based on linked node objects may also be used.
+<a href="#array-based-trees" class="xref">Appendix B</a> and <a href="#link-based-trees" class="xref">Appendix C</a> provide some details on how to
+implement the tree operations required for MLS in these representations.  MLS
+places no requirements on implementations' internal representations of ratchet
+trees.  An implementation MAY use any tree representation and associated
+algorithms, as long as they produce correct protocol messages.<a href="#section-5.1-4" class="pilcrow">¶</a></p>
 <div id="ratchet-tree-nodes">
 <section id="section-5.1.1">
           <h4 id="name-ratchet-tree-nodes">
@@ -6778,10 +6778,10 @@ tree, or the null optional for a blank node.<a href="#section-13.3-4" class="pil
 traversal of the ratchet tree. Each node is listed between its left subtree and
 its right subtree.  (This is the same ordering as specified for the array-based
 trees outlined in <a href="#array-based-trees" class="xref">Appendix B</a>.)<a href="#section-13.3-5" class="pilcrow">¶</a></p>
-<p id="section-13.3-6">If the tree has <code>2^d</code> leaves, then it has <code>2^{d+1} - 1</code> nodes.  The
+<p id="section-13.3-6">If the tree has <code>2^d</code> leaves, then it has <code>2^(d+1) - 1</code> nodes.  The
 <code>ratchet_tree</code> vector logically has this number of entries, but the sender
 SHOULD NOT include blank nodes after the last non-blank node.  If a receiver
-encounters a vector whose length <code>L</code> is not of the form <code>2^{d+1} - 1</code>, then the
+encounters a vector whose length <code>L</code> is not of the form <code>2^(d+1) - 1</code>, then the
 receiver MUST extend it to the right with blank values until it has such a
 length, adding the minimum number of blank values possible.  (Obviously, this
 may be done "virtually", by synthesizing blank nodes when required, as opposed
