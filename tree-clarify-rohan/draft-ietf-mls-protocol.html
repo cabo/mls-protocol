@@ -4364,17 +4364,20 @@ so that the signature on a leaf node, by covering the leaf node's parent hash,
 indirectly includes information about the structure of the tree at the time the
 leaf node was last updated.<a href="#section-8.8-1" class="pilcrow">¶</a></p>
 <p id="section-8.8-2">Consider a ratchet tree with a non-blank parent node P and children D and S (for
-"parent", "direct path", and "sibling"):<a href="#section-8.8-2" class="pilcrow">¶</a></p>
+"parent", "direct path", and "sibling"), with D and P in the direct path of a
+leaf node L (for "leaf"):<a href="#section-8.8-2" class="pilcrow">¶</a></p>
 <div class="alignLeft art-ascii-art art-text artwork" id="section-8.8-3">
 <pre>
-        ...
-        /
-       P
-     __|__
-    /     \
-   D       S
-  / \     / \
-... ... ... ...
+         ...
+         /
+        P
+      __|__
+     /     \
+    D       S
+   / \     / \
+ ... ... ... ...
+ /
+L
 </pre><a href="#section-8.8-3" class="pilcrow">¶</a>
 </div>
 <p id="section-8.8-4">The parent hash of P changes whenever an <code>UpdatePath</code> object is applied to

@@ -2465,16 +2465,19 @@ A   B       A   B   _   _                           A   B   C   _
    structure of the tree at the time the leaf node was last updated.
 
    Consider a ratchet tree with a non-blank parent node P and children D
-   and S (for "parent", "direct path", and "sibling"):
+   and S (for "parent", "direct path", and "sibling"), with D and P in
+   the direct path of a leaf node L (for "leaf"):
 
-           ...
-           /
-          P
-        __|__
-       /     \
-      D       S
-     / \     / \
-   ... ... ... ...
+            ...
+            /
+           P
+         __|__
+        /     \
+       D       S
+      / \     / \
+    ... ... ... ...
+    /
+   L
 
    The parent hash of P changes whenever an UpdatePath object is applied
    to the ratchet tree along a path from a leaf L traversing node D (and
