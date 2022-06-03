@@ -5720,7 +5720,7 @@ Appendix A.  Protocol Origins of Example Trees
 
    *  F sends an empty Commit, setting Y and its ancestors
 
-   *  D removes B, C, and F, with the following effects:
+   *  D removes B, C, and G, with the following effects:
 
       -  Blank the direct paths of B, C, and G
 
