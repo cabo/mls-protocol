@@ -1044,7 +1044,7 @@ svg :is([stroke="fill"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Barnes, et al.</td>
-<td class="center">Expires 5 December 2022</td>
+<td class="center">Expires 9 December 2022</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1057,12 +1057,12 @@ svg :is([stroke="fill"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-ietf-mls-protocol-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2022-06-03" class="published">3 June 2022</time>
+<time datetime="2022-06-07" class="published">7 June 2022</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2022-12-05">5 December 2022</time></dd>
+<dd class="expires"><time datetime="2022-12-09">9 December 2022</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1132,7 +1132,7 @@ in size ranging from two to thousands.<a href="#section-abstract-1" class="pilcr
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 5 December 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 9 December 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1290,7 +1290,7 @@ in size ranging from two to thousands.<a href="#section-abstract-1" class="pilcr
                 <p id="section-toc.1-1.8.2.7.1"><a href="#section-8.7" class="xref">8.7</a>.  <a href="#name-tree-hashes" class="xref">Tree Hashes</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.8">
-                <p id="section-toc.1-1.8.2.8.1"><a href="#section-8.8" class="xref">8.8</a>.  <a href="#name-parent-hash" class="xref">Parent Hash</a></p>
+                <p id="section-toc.1-1.8.2.8.1"><a href="#section-8.8" class="xref">8.8</a>.  <a href="#name-parent-hashes" class="xref">Parent Hashes</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.8.2.1">
                     <p id="section-toc.1-1.8.2.8.2.1.1"><a href="#section-8.8.1" class="xref">8.8.1</a>.  <a href="#name-using-parent-hashes" class="xref">Using Parent Hashes</a></p>
@@ -1511,13 +1511,16 @@ in size ranging from two to thousands.<a href="#section-abstract-1" class="pilcr
             <p id="section-toc.1-1.20.1"><a href="#appendix-A" class="xref">Appendix A</a>.  <a href="#name-protocol-origins-of-example" class="xref">Protocol Origins of Example Trees</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.21">
-            <p id="section-toc.1-1.21.1"><a href="#appendix-B" class="xref">Appendix B</a>.  <a href="#name-array-based-trees" class="xref">Array-Based Trees</a></p>
+            <p id="section-toc.1-1.21.1"><a href="#appendix-B" class="xref">Appendix B</a>.  <a href="#name-evolution-of-parent-hashes" class="xref">Evolution of Parent Hashes</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.22">
-            <p id="section-toc.1-1.22.1"><a href="#appendix-C" class="xref">Appendix C</a>.  <a href="#name-link-based-trees" class="xref">Link-Based Trees</a></p>
+            <p id="section-toc.1-1.22.1"><a href="#appendix-C" class="xref">Appendix C</a>.  <a href="#name-array-based-trees" class="xref">Array-Based Trees</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.23">
-            <p id="section-toc.1-1.23.1"><a href="#appendix-D" class="xref"></a><a href="#name-authors-addresses" class="xref">Authors' Addresses</a></p>
+            <p id="section-toc.1-1.23.1"><a href="#appendix-D" class="xref">Appendix D</a>.  <a href="#name-link-based-trees" class="xref">Link-Based Trees</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.24">
+            <p id="section-toc.1-1.24.1"><a href="#appendix-E" class="xref"></a><a href="#name-authors-addresses" class="xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -2705,7 +2708,7 @@ memory.  A convenient property of left-balanced binary trees (including the
 complete trees used here) is that they can be represented as an array of nodes,
 with node relationships computed based on the nodes' indices in the array.  A
 more traditional representation based on linked node objects may also be used.
-<a href="#array-based-trees" class="xref">Appendix B</a> and <a href="#link-based-trees" class="xref">Appendix C</a> provide some details on how to
+<a href="#array-based-trees" class="xref">Appendix C</a> and <a href="#link-based-trees" class="xref">Appendix D</a> provide some details on how to
 implement the tree operations required for MLS in these representations.  MLS
 places no requirements on implementations' internal representations of ratchet
 trees.  An implementation MAY use any tree representation and associated
@@ -2730,7 +2733,7 @@ an asymmetric key pair with some associated data:<a href="#section-5.1.1-2" clas
             <li class="normal" id="section-5.1.1-3.4">An ordered list of "unmerged" leaves (see <a href="#views" class="xref">Section 5.2</a>)<a href="#section-5.1.1-3.4" class="pilcrow">¶</a>
 </li>
             <li class="normal" id="section-5.1.1-3.5">A hash of certain information about the node's parent, as of the last time the
-node was changed (see <a href="#parent-hash" class="xref">Section 8.8</a>).<a href="#section-5.1.1-3.5" class="pilcrow">¶</a>
+node was changed (see <a href="#parent-hashes" class="xref">Section 8.8</a>).<a href="#section-5.1.1-3.5" class="pilcrow">¶</a>
 </li>
           </ul>
 <p id="section-5.1.1-4">Every node, regardless of whether the node is blank or populated, has
@@ -3728,7 +3731,7 @@ struct {
 </div>
 <p id="section-8.1-3">The <code>encryption_key</code> field contains an HPKE public key whose private key is held only
 by the members at the leaves among its descendants.  The <code>parent_hash</code> field
-contains a hash of this node's parent node, as described in <a href="#parent-hash" class="xref">Section 8.8</a>.
+contains a hash of this node's parent node, as described in <a href="#parent-hashes" class="xref">Section 8.8</a>.
 The <code>unmerged_leaves</code> field lists the leaves under this parent node that are
 unmerged, according to their indices among all the leaves in the tree.  The
 entries in the <code>unmerged_leaves</code> vector MUST be sorted in increasing order.<a href="#section-8.1-3" class="pilcrow">¶</a></p>
@@ -3859,7 +3862,7 @@ MUST define a maximum total lifetime that is acceptable for a LeafNode, and
 reject any LeafNode where the total lifetime is longer than this duration.<a href="#section-8.2-6" class="pilcrow">¶</a></p>
 <p id="section-8.2-7">In the case where the leaf node was inserted into the tree via a Commit message,
 the <code>parent_hash</code> field contains the parent hash for this leaf node (see
-<a href="#parent-hash" class="xref">Section 8.8</a>).<a href="#section-8.2-7" class="pilcrow">¶</a></p>
+<a href="#parent-hashes" class="xref">Section 8.8</a>).<a href="#section-8.2-7" class="pilcrow">¶</a></p>
 <p id="section-8.2-8">The LeafNodeTBS structure covers the fields above the signature in the LeafNode.
 In addition, when the leaf node was created in the context of a group (the
 update and commit cases), the group ID of the group is added as context to the
@@ -4174,7 +4177,7 @@ removed member --+
 <a href="#name-cleaning-up-after-removing-" class="selfRef">Cleaning up after removing the third member</a>
           </figcaption></figure>
 <p id="section-8.5-6">Concrete algorithms for these operations on array-based and link-based trees are
-provided in <a href="#array-based-trees" class="xref">Appendix B</a> and <a href="#link-based-trees" class="xref">Appendix C</a>.  The concrete
+provided in <a href="#array-based-trees" class="xref">Appendix C</a> and <a href="#link-based-trees" class="xref">Appendix D</a>.  The concrete
 algorithms are non-normative.  An implementation MAY use any algorithm that
 produces the correct tree in its internal representation.<a href="#section-8.5-6" class="pilcrow">¶</a></p>
 </section>
@@ -4300,17 +4303,39 @@ specifically:<a href="#section-8.6-10" class="pilcrow">¶</a></p>
         <h3 id="name-tree-hashes">
 <a href="#section-8.7" class="section-number selfRef">8.7. </a><a href="#name-tree-hashes" class="section-name selfRef">Tree Hashes</a>
         </h3>
-<p id="section-8.7-1">To allow group members to verify that they agree on the public cryptographic state
-of the group, this section defines a scheme for generating a hash value (called
-the "tree hash") that represents the contents of the group's ratchet tree and the
-members' leaf nodes.<a href="#section-8.7-1" class="pilcrow">¶</a></p>
-<p id="section-8.7-2">The tree hash of an individual node is the hash of the node's <code>TreeHashInput</code>
+<p id="section-8.7-1">MLS hashes the contents of the tree in two ways to authenticate different
+properties of the tree.  This section defines <em>tree hashes</em>, and <em>parent hashes</em>
+are defined in <a href="#parent-hashes" class="xref">Section 8.8</a>.<a href="#section-8.7-1" class="pilcrow">¶</a></p>
+<p id="section-8.7-2">Each node in a ratchet tree has a tree hash that summarizes the subtree below
+that node.  The tree hash of the root is used in the GroupContext to confirm
+that the group agrees on the whole tree.  Tree hashes are computed recursively
+from the leaves up to the root.<a href="#section-8.7-2" class="pilcrow">¶</a></p>
+<div id="section-8.7-3">
+          <div class="alignLeft art-svg artwork" id="section-8.7-3.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="112" width="128" viewBox="0 0 128 112" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
+              <path d="M 24,32 L 40,32" fill="none" stroke="black"></path>
+              <path d="M 72,48 L 88,80" fill="none" stroke="black"></path>
+              <path d="M 40,80 L 56,48" fill="none" stroke="black"></path>
+              <polygon class="arrowhead" points="80,48 68,42.4 68,53.6" fill="black" transform="rotate(243.43494882292202,72,48)"></polygon>
+              <polygon class="arrowhead" points="64,48 52,42.4 52,53.6" fill="black" transform="rotate(296.565051177078,56,48)"></polygon>
+              <polygon class="arrowhead" points="48,32 36,26.4 36,37.6" fill="black" transform="rotate(0,40,32)"></polygon>
+              <g class="text">
+                <text x="8" y="36">P</text>
+                <text x="72" y="36">th(P)</text>
+                <text x="24" y="100">th(L)</text>
+                <text x="104" y="100">th(R)</text>
+              </g>
+            </svg><a href="#section-8.7-3.1" class="pilcrow">¶</a>
+</div>
+</div>
+<p id="section-8.7-4">The tree hash of an individual node is the hash of the node's <code>TreeHashInput</code>
 object, which may contain either a <code>LeafNodeHashInput</code> or a
 <code>ParentNodeHashInput</code> depending on the type of node. <code>LeafNodeHashInput</code> objects
 contain the <code>leaf_index</code> and the <code>LeafNode</code> (if any). <code>ParentNodeHashInput</code>
 objects contain the <code>ParentNode</code> (if any) and the tree hash of the node's left
-and right children.<a href="#section-8.7-2" class="pilcrow">¶</a></p>
-<div id="section-8.7-3">
+and right children.  For both parent and leaf nodes, the optional node value
+MUST be absent if the node is blank and present if the node contains a value.<a href="#section-8.7-4" class="pilcrow">¶</a></p>
+<div id="section-8.7-5">
 <pre class="lang-tls sourcecode">
 enum {
     reserved(0),
@@ -4337,65 +4362,112 @@ struct {
     opaque left_hash&lt;V&gt;;
     opaque right_hash&lt;V&gt;;
 } ParentNodeHashInput;
-</pre><a href="#section-8.7-3" class="pilcrow">¶</a>
+</pre><a href="#section-8.7-5" class="pilcrow">¶</a>
 </div>
-<p id="section-8.7-4">The tree hash of an entire tree corresponds to the tree hash of the root node,
-which is computed recursively by starting at the leaf nodes and building up.<a href="#section-8.7-4" class="pilcrow">¶</a></p>
+<p id="section-8.7-6">The tree hash of an entire tree corresponds to the tree hash of the root node,
+which is computed recursively by starting at the leaf nodes and building up.<a href="#section-8.7-6" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="parent-hash">
+<div id="parent-hashes">
 <section id="section-8.8">
-        <h3 id="name-parent-hash">
-<a href="#section-8.8" class="section-number selfRef">8.8. </a><a href="#name-parent-hash" class="section-name selfRef">Parent Hash</a>
+        <h3 id="name-parent-hashes">
+<a href="#section-8.8" class="section-number selfRef">8.8. </a><a href="#name-parent-hashes" class="section-name selfRef">Parent Hashes</a>
         </h3>
-<p id="section-8.8-1">The <code>parent_hash</code> field in ratchet tree nodes carries information to
-authenticate the information in the ratchet tree.  Parent hashes chain together
-so that the signature on a leaf node, by covering the leaf node's parent hash,
-indirectly includes information about the structure of the tree at the time the
-leaf node was last updated.<a href="#section-8.8-1" class="pilcrow">¶</a></p>
-<p id="section-8.8-2">Consider a ratchet tree with a non-blank parent node P and children V and S.<a href="#section-8.8-2" class="pilcrow">¶</a></p>
-<div class="alignLeft art-ascii-art art-text artwork" id="section-8.8-3">
-<pre>
-        ...
-        /
-       P
-     __|__
-    /     \
-   V       S
-  / \     / \
-... ... ... ...
-</pre><a href="#section-8.8-3" class="pilcrow">¶</a>
+<p id="section-8.8-1">While tree hashes summarize the state of a tree at point in time, parent hashes
+capture information about how keys in the tree were populated.<a href="#section-8.8-1" class="pilcrow">¶</a></p>
+<p id="section-8.8-2">When a client sends a commit to change a group, it can include an UpdatePath to
+assign new keys to the nodes along its filtered direct path.  When a client
+computes an UpdatePath (as defined in <a href="#synchronizing-views-of-the-tree" class="xref">Section 8.6</a>), it
+computes and signs a parent hash that summarizes the state of the tree after the
+UpdatePath has been applied.  These summaries are constructed in a chain from
+the root to the member's leaf so that the part of the chain closer to the root
+can be overwritten as nodes set in one UpdatePath are reset by a later
+UpdatePath.<a href="#section-8.8-2" class="pilcrow">¶</a></p>
+<div id="section-8.8-3">
+          <div class="alignLeft art-svg artwork" id="section-8.8-3.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="176" width="216" viewBox="0 0 216 176" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
+              <path d="M 112,96 L 128,96" fill="none" stroke="black"></path>
+              <path d="M 160,112 L 176,144" fill="none" stroke="black"></path>
+              <path d="M 128,144 L 144,112" fill="none" stroke="black"></path>
+              <path d="M 160,80 L 176,48" fill="none" stroke="black"></path>
+              <polygon class="arrowhead" points="168,112 156,106.4 156,117.6" fill="black" transform="rotate(243.43494882292202,160,112)"></polygon>
+              <polygon class="arrowhead" points="168,80 156,74.4 156,85.6" fill="black" transform="rotate(116.56505117707799,160,80)"></polygon>
+              <polygon class="arrowhead" points="136,144 124,138.4 124,149.6" fill="black" transform="rotate(116.56505117707799,128,144)"></polygon>
+              <polygon class="arrowhead" points="136,96 124,90.4 124,101.6" fill="black" transform="rotate(0,128,96)"></polygon>
+              <g class="text">
+                <text x="192" y="36">ph(Q)</text>
+                <text x="52" y="100">P.public_key</text>
+                <text x="160" y="100">ph(P)</text>
+                <text x="80" y="164">N.parent_hash</text>
+                <text x="192" y="164">th(S)</text>
+              </g>
+            </svg><a href="#section-8.8-3.1" class="pilcrow">¶</a>
 </div>
-<p id="section-8.8-4">The parent hash of P changes whenever an <code>UpdatePath</code> object is applied to
-the ratchet tree along a path from a leaf U traversing node V (and hence also
+</div>
+<p id="section-8.8-4">As a result, the signature over the parent hash in each member's leaf
+effectively signs the subtree of the tree that hasn't been changed since that
+leaf was last changed in an UpdatePath.  A new member joining the group uses
+these parent hashes to verify that the parent nodes in the tree were set by
+members of the group, not chosen by an external attacker.  For an example of how
+this works, see <a href="#ph-evolution" class="xref">Appendix B</a>.<a href="#section-8.8-4" class="pilcrow">¶</a></p>
+<p id="section-8.8-5">Consider a ratchet tree with a non-blank parent node P and children D and S (for
+"parent", "direct path", and "sibling"), with D and P in the direct path of a
+leaf node L (for "leaf"):<a href="#section-8.8-5" class="pilcrow">¶</a></p>
+<span id="name-inputs-to-a-parent-hash"></span><div id="parent-hash-inputs">
+<figure id="figure-14">
+          <div class="alignLeft art-ascii-art art-text artwork" id="section-8.8-6.1">
+<pre>
+         ...
+         /
+        P
+      __|__
+     /     \
+    D       S
+   / \     / \
+ ... ... ... ...
+ /
+L
+</pre>
+</div>
+<figcaption><a href="#figure-14" class="selfRef">Figure 14</a>:
+<a href="#name-inputs-to-a-parent-hash" class="selfRef">Inputs to a parent hash.</a>
+          </figcaption></figure>
+</div>
+<p id="section-8.8-7">The parent hash of P changes whenever an <code>UpdatePath</code> object is applied to
+the ratchet tree along a path from a leaf L traversing node D (and hence also
 P). The new "Parent hash of P (with copath child S)" is obtained by hashing P's
-<code>ParentHashInput</code> struct.<a href="#section-8.8-4" class="pilcrow">¶</a></p>
-<div id="section-8.8-5">
+<code>ParentHashInput</code> struct.<a href="#section-8.8-7" class="pilcrow">¶</a></p>
+<div id="section-8.8-8">
 <pre class="lang-tls sourcecode">
 struct {
     HPKEPublicKey encryption_key;
     opaque parent_hash&lt;V&gt;;
     opaque original_sibling_tree_hash&lt;V&gt;;
 } ParentHashInput;
-</pre><a href="#section-8.8-5" class="pilcrow">¶</a>
+</pre><a href="#section-8.8-8" class="pilcrow">¶</a>
 </div>
-<p id="section-8.8-6">The field <code>encryption_key</code> contains the HPKE public key of P. If P is the root,
+<p id="section-8.8-9">The field <code>encryption_key</code> contains the HPKE public key of P. If P is the root,
 then the <code>parent_hash</code> field is set to a zero-length octet string. Otherwise,
 <code>parent_hash</code> is the Parent Hash of the next node after P on the filtered
-direct path of U. This way, P's Parent Hash fixes
-the new HPKE public key of each node V on the path from P to the root. Note
+direct path of the leaf L. This way, P's Parent Hash fixes
+the new HPKE public key of each non-blank node on the path from P to the root. Note
 that the path from P to the root may contain some blank nodes that are not
 fixed by P's Parent Hash. However, for each node that has an HPKE key, this key
-is fixed by P's Parent Hash.<a href="#section-8.8-6" class="pilcrow">¶</a></p>
-<p id="section-8.8-7">Finally, <code>original_sibling_tree_hash</code> is the tree hash of S in the ratchet tree
+is fixed by P's Parent Hash.<a href="#section-8.8-9" class="pilcrow">¶</a></p>
+<p id="section-8.8-10">Finally, <code>original_sibling_tree_hash</code> is the tree hash of S in the ratchet tree
 modified as follows: For each leaf L in <code>P.unmerged_leaves</code>, blank L and remove
-it from the <code>unmerged_leaves</code> sets of all parent nodes.<a href="#section-8.8-7" class="pilcrow">¶</a></p>
-<p id="section-8.8-8">Observe that <code>original_sibling_tree_hash</code> does not change between updates of P.
-This property is crucial for the correctness of the protocol.<a href="#section-8.8-8" class="pilcrow">¶</a></p>
-<p id="section-8.8-9">For example, in the following tree:<a href="#section-8.8-9" class="pilcrow">¶</a></p>
+it from the <code>unmerged_leaves</code> sets of all parent nodes.<a href="#section-8.8-10" class="pilcrow">¶</a></p>
+<p id="section-8.8-11">Observe that <code>original_sibling_tree_hash</code> does not change between updates of P.
+This property is crucial for the correctness of the protocol.<a href="#section-8.8-11" class="pilcrow">¶</a></p>
+<p id="section-8.8-12">Note that <code>original_sibling_tree_hash</code> is the tree hash of S, not the parent
+hash.  The <code>parent_hash</code> field in ParentHashInput captures information about the
+nodes above P. the <code>original_sibling_tree_hash</code> captures information about the
+subtree under S that is not being updated (and thus the subtree to which a path
+secret for P would be encrypted according to <a href="#synchronizing-views-of-the-tree" class="xref">Section 8.6</a>).<a href="#section-8.8-12" class="pilcrow">¶</a></p>
+<p id="section-8.8-13">For example, in the following tree:<a href="#section-8.8-13" class="pilcrow">¶</a></p>
 <span id="name-a-tree-illustrating-parent-"></span><div id="parent-hash-tree">
-<figure id="figure-14">
-          <div class="alignLeft art-ascii-art art-text artwork" id="section-8.8-10.1">
+<figure id="figure-15">
+          <div class="alignLeft art-ascii-art art-text artwork" id="section-8.8-14.1">
 <pre>
               W [F]
         ______|_____
@@ -4408,13 +4480,13 @@ This property is crucial for the correctness of the protocol.<a href="#section-8
 A   B   C   D   E   F   G   _
 </pre>
 </div>
-<figcaption><a href="#figure-14" class="selfRef">Figure 14</a>:
+<figcaption><a href="#figure-15" class="selfRef">Figure 15</a>:
 <a href="#name-a-tree-illustrating-parent-" class="selfRef">A tree illustrating parent hash computations.</a>
           </figcaption></figure>
 </div>
-<p id="section-8.8-11">With P = W and S = Y, <code>original_sibling_tree_hash</code> is the tree hash of the
-following tree:<a href="#section-8.8-11" class="pilcrow">¶</a></p>
-<div class="alignLeft art-ascii-art art-text artwork" id="section-8.8-12">
+<p id="section-8.8-15">With P = W and S = Y, <code>original_sibling_tree_hash</code> is the tree hash of the
+following tree:<a href="#section-8.8-15" class="pilcrow">¶</a></p>
+<div class="alignLeft art-ascii-art art-text artwork" id="section-8.8-16">
 <pre>
       Y
     __|__
@@ -4422,43 +4494,41 @@ following tree:<a href="#section-8.8-11" class="pilcrow">¶</a></p>
   _       _
  / \     / \
 E   _   G   _
-</pre><a href="#section-8.8-12" class="pilcrow">¶</a>
+</pre><a href="#section-8.8-16" class="pilcrow">¶</a>
 </div>
-<p id="section-8.8-13">Because <code>W.unmerged_leaves</code> includes F, F is blanked and removed from
-<code>Y.unmerged_leaves</code>.<a href="#section-8.8-13" class="pilcrow">¶</a></p>
-<p id="section-8.8-14">Note that no recomputation is needed if the tree hash of S is unchanged since
+<p id="section-8.8-17">Because <code>W.unmerged_leaves</code> includes F, F is blanked and removed from
+<code>Y.unmerged_leaves</code>.<a href="#section-8.8-17" class="pilcrow">¶</a></p>
+<p id="section-8.8-18">Note that no recomputation is needed if the tree hash of S is unchanged since
 the last time P was updated. This is the case for computing or processing a
 Commit whose UpdatePath traverses P, since the Commit itself resets P. (In
 other words, it is only necessary to recompute the original sibling tree hash
 when validating a group's tree on joining.) More generally, if none of the entries
 in <code>P.unmerged_leaves</code> is in the subtree under S (and thus no leaves were blanked),
-then the original tree hash at S is the tree hash of S in the current tree.<a href="#section-8.8-14" class="pilcrow">¶</a></p>
-<p id="section-8.8-15">If it is necessary to recompute the original tree hash of a node, the efficiency
+then the original tree hash at S is the tree hash of S in the current tree.<a href="#section-8.8-18" class="pilcrow">¶</a></p>
+<p id="section-8.8-19">If it is necessary to recompute the original tree hash of a node, the efficiency
 of recomputation can be improved by caching intermediate tree hashes, to avoid
 recomputing over the subtree when the subtree is included in multiple parent
 hashes.  A subtree hash can be reused as long as the intersection of the
 parent's unmerged leaves with the subtree is the same as in the earlier
-computation.<a href="#section-8.8-15" class="pilcrow">¶</a></p>
+computation.<a href="#section-8.8-19" class="pilcrow">¶</a></p>
 <div id="using-parent-hashes">
 <section id="section-8.8.1">
           <h4 id="name-using-parent-hashes">
 <a href="#section-8.8.1" class="section-number selfRef">8.8.1. </a><a href="#name-using-parent-hashes" class="section-name selfRef">Using Parent Hashes</a>
           </h4>
-<p id="section-8.8.1-1">The Parent Hash of P appears in three types of structs. If V is itself a parent node
-then P's Parent Hash is stored in the <code>parent_hash</code> field of the structs
-<code>ParentHashInput</code> and <code>ParentNode</code> of the node before P on the filtered direct
-path of U. (The <code>ParentNode</code> struct is used to encapsulate all public
-information about that node that must be conveyed to a new
-member joining the group as well as to define its Tree Hash.)<a href="#section-8.8.1-1" class="pilcrow">¶</a></p>
-<p id="section-8.8.1-2">If, on the other hand, V is the leaf U and its LeafNode has <code>leaf_node_source</code> set to <code>commit</code>,
-then the Parent Hash of P (with V's sibling as copath child) is stored in
-the <code>parent_hash</code> field.  This is true in particular of the LeafNode object sent
-in the <code>leaf_node</code> field of an UpdatePath. The signature of such a LeafNode thus also
-attests to which keys the group member introduced into the ratchet tree and
-to whom the corresponding secret keys were sent. This helps prevent malicious insiders
-from constructing artificial ratchet trees with a node V whose HPKE secret key is
-known to the insider yet where the insider isn't assigned a leaf in the subtree rooted
-at V. Indeed, such a ratchet tree would violate the tree invariant.<a href="#section-8.8.1-2" class="pilcrow">¶</a></p>
+<p id="section-8.8.1-1">In ParentNode objects and LeafNode objects with <code>leaf_node_source</code> set to
+<code>commit</code>, the value of the <code>parent_hash</code> field is the parent hash of the next
+non-blank parent node above the node in question (the next node in the filtered
+direct path).  Using the node labels in <a href="#parent-hash-inputs" class="xref">Figure 14</a>, the
+<code>parent_hash</code> field of D is equal to the parent hash of P with copath child S.
+This is the case even when the node D is a leaf node.<a href="#section-8.8.1-1" class="pilcrow">¶</a></p>
+<p id="section-8.8.1-2">The <code>parent_hash</code> field of a LeafNode is signed by the member.  The signature of
+such a LeafNode thus also attests to which keys the group member introduced into
+the ratchet tree and to whom the corresponding secret keys were sent. This
+prevents malicious insiders from constructing artificial ratchet trees with a
+node D whose HPKE secret key is known to the insider yet where the insider isn't
+assigned a leaf in the subtree rooted at D. Indeed, such a ratchet tree would
+violate the tree invariant.<a href="#section-8.8.1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="verifying-parent-hashes">
@@ -4468,15 +4538,15 @@ at V. Indeed, such a ratchet tree would violate the tree invariant.<a href="#sec
           </h4>
 <p id="section-8.8.2-1">Parent hashes are verified at two points in the protocol: When joining a group
 and when processing a Commit.<a href="#section-8.8.2-1" class="pilcrow">¶</a></p>
-<p id="section-8.8.2-2">The parent hash in a node U is valid with respect to a parent node P if the
+<p id="section-8.8.2-2">The parent hash in a node D is valid with respect to a parent node P if the
 following criteria hold:<a href="#section-8.8.2-2" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-8.8.2-3.1">U is a descendant of P in the tree<a href="#section-8.8.2-3.1" class="pilcrow">¶</a>
+<li class="normal" id="section-8.8.2-3.1">D is a descendant of P in the tree<a href="#section-8.8.2-3.1" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-8.8.2-3.2">The nodes between U and P in the tree are all blank<a href="#section-8.8.2-3.2" class="pilcrow">¶</a>
+            <li class="normal" id="section-8.8.2-3.2">Any nodes between D and P in the tree are all blank<a href="#section-8.8.2-3.2" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-8.8.2-3.3">The <code>parent_hash</code> field of U is equal to the parent hash of P with copath
-child S, where S is the child of P that is not on the path from U to P.<a href="#section-8.8.2-3.3" class="pilcrow">¶</a>
+            <li class="normal" id="section-8.8.2-3.3">The <code>parent_hash</code> field of D is equal to the parent hash of P with copath
+child S, where S is the child of P that is not on the path from D to P.<a href="#section-8.8.2-3.3" class="pilcrow">¶</a>
 </li>
           </ul>
 <p id="section-8.8.2-4">A parent node P is "parent-hash valid" if it can be chained back to a leaf node
@@ -4495,43 +4565,6 @@ recompute the expected value of <code>parent_hash</code> for the committer's new
 verify that it matches the <code>parent_hash</code> value in the supplied <code>leaf_node</code>.
 After being merged into the tree, the nodes in the UpdatePath form a parent-hash
 chain from the committer's leaf to the root.<a href="#section-8.8.2-6" class="pilcrow">¶</a></p>
-<p id="section-8.8.2-7">For example, nodes the tree in <a href="#full-tree" class="xref">Figure 10</a> might have been populated by full
-Commits from A, E, F, G, and B (in that order).  These Commits would create the
-following parent-hash validity relationship (where the value for a node is reset
-each time it is listed):<a href="#section-8.8.2-7" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-8.8.2-8">
-<li id="section-8.8.2-8.1">Commit from A: A -- U -- X<a href="#section-8.8.2-8.1" class="pilcrow">¶</a>
-</li>
-            <li id="section-8.8.2-8.2">Commit from E: E -- Y -- Z -- X<a href="#section-8.8.2-8.2" class="pilcrow">¶</a>
-</li>
-            <li id="section-8.8.2-8.3">Commit from F: F -- Y -- Z -- X<a href="#section-8.8.2-8.3" class="pilcrow">¶</a>
-</li>
-            <li id="section-8.8.2-8.4">Commit from G: G -- Z -- X<a href="#section-8.8.2-8.4" class="pilcrow">¶</a>
-</li>
-            <li id="section-8.8.2-8.5">Commit from B: B -- U -- X<a href="#section-8.8.2-8.5" class="pilcrow">¶</a>
-</li>
-          </ol>
-<p id="section-8.8.2-9">After these commits, the tree will have the following parent-hash chains:<a href="#section-8.8.2-9" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-8.8.2-10.1">A<a href="#section-8.8.2-10.1" class="pilcrow">¶</a>
-</li>
-            <li class="normal" id="section-8.8.2-10.2">B -- U -- X<a href="#section-8.8.2-10.2" class="pilcrow">¶</a>
-</li>
-            <li class="normal" id="section-8.8.2-10.3">E<a href="#section-8.8.2-10.3" class="pilcrow">¶</a>
-</li>
-            <li class="normal" id="section-8.8.2-10.4">F -- Y<a href="#section-8.8.2-10.4" class="pilcrow">¶</a>
-</li>
-            <li class="normal" id="section-8.8.2-10.5">G -- Z<a href="#section-8.8.2-10.5" class="pilcrow">¶</a>
-</li>
-          </ul>
-<p id="section-8.8.2-11">Since these chains collectively cover all non-blank parent nodes in the tree,
-the tree is parent-hash valid.<a href="#section-8.8.2-11" class="pilcrow">¶</a></p>
-<p id="section-8.8.2-12">Note that this tree, though valid, contains invalid parent-hash links. If a
-client were checking parent hashes top-down from X, for example, they would find
-that Z has an invalid parent hash relative to X, but that U has valid parent
-hash.  Likewise, if the client were checking bottom-up, they would find that the
-chain from F ends in an invalid link from Y to Z.  These invalid links are the
-natural result of multiple clients having committed.<a href="#section-8.8.2-12" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -5252,7 +5285,7 @@ the ratchet is called a "generation".<a href="#section-10.1-4" class="pilcrow">�
 handshake and application ratchets that member D will use for sending and the
 first two application keys and nonces.<a href="#section-10.1-5" class="pilcrow">¶</a></p>
 <span id="name-secret-tree-for-a-four-memb"></span><div id="secret-tree-example">
-<figure id="figure-15">
+<figure id="figure-16">
           <div id="section-10.1-6.1">
             <div class="alignLeft art-svg artwork" id="section-10.1-6.1.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="320" width="200" viewBox="0 0 200 320" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
@@ -5294,7 +5327,7 @@ first two application keys and nonces.<a href="#section-10.1-5" class="pilcrow">
               </svg><a href="#section-10.1-6.1.1" class="pilcrow">¶</a>
 </div>
 </div>
-<figcaption><a href="#figure-15" class="selfRef">Figure 15</a>:
+<figcaption><a href="#figure-16" class="selfRef">Figure 16</a>:
 <a href="#name-secret-tree-for-a-four-memb" class="selfRef">Secret tree for a four-member group</a>
           </figcaption></figure>
 </div>
@@ -5390,7 +5423,7 @@ node L,<a href="#section-10.2-6.2" class="pilcrow">¶</a>
             <code>application_ratchet_nonce_[L]_[j]</code> and <code>application_ratchet_key_[L]_[j]</code>.<a href="#section-10.2-6.4" class="pilcrow">¶</a>
 </li>
         </ul>
-<p id="section-10.2-7">Concretely, consider the Secret Tree shown in <a href="#secret-tree-example" class="xref">Figure 15</a>.  Client
+<p id="section-10.2-7">Concretely, consider the Secret Tree shown in <a href="#secret-tree-example" class="xref">Figure 16</a>.  Client
 A, B, or C would generate the illustrated values on receiving a message from D
 with generation equal to 1, having not received a message with generation 0
 (e.g., due to out-of-order delivery).  In such a case, the following values
@@ -6869,7 +6902,7 @@ tree, or the null optional for a blank node.<a href="#section-13.5-4" class="pil
 <p id="section-13.5-5">The nodes are listed in the order specified by a left-to-right in-order
 traversal of the ratchet tree. Each node is listed between its left subtree and
 its right subtree.  (This is the same ordering as specified for the array-based
-trees outlined in <a href="#array-based-trees" class="xref">Appendix B</a>.)<a href="#section-13.5-5" class="pilcrow">¶</a></p>
+trees outlined in <a href="#array-based-trees" class="xref">Appendix C</a>.)<a href="#section-13.5-5" class="pilcrow">¶</a></p>
 <p id="section-13.5-6">If the tree has <code>2^d</code> leaves, then it has <code>2^(d+1) - 1</code> nodes.  The
 <code>ratchet_tree</code> vector logically has this number of entries, but the sender
 SHOULD NOT include blank nodes after the last non-blank node.  If a receiver
@@ -6907,7 +6940,7 @@ def subtree_root(nodes):
 </pre><a href="#section-13.5-8" class="pilcrow">¶</a>
 </div>
 <p id="section-13.5-9">(Note that this is the same ordering of nodes as in the array-based tree representation
-described in <a href="#array-based-trees" class="xref">Appendix B</a>.  The algorithms in that section may be used to
+described in <a href="#array-based-trees" class="xref">Appendix C</a>.  The algorithms in that section may be used to
 simplify decoding this extension into other representations.)<a href="#section-13.5-9" class="pilcrow">¶</a></p>
 <p id="section-13.5-10">For example, the following tree with six non-blank leaves would be represented
 as an array of eleven elements, <code>[A, W, B, X, C, _, D, Y, E, Z, F]</code>.  The above
@@ -8246,7 +8279,7 @@ direct path)<a href="#appendix-A-5.2" class="pilcrow">¶</a>
           </ul>
 </li>
       </ul>
-<p id="appendix-A-8">To construct the tree in <a href="#parent-hash-tree" class="xref">Figure 14</a>:<a href="#appendix-A-8" class="pilcrow">¶</a></p>
+<p id="appendix-A-8">To construct the tree in <a href="#parent-hash-tree" class="xref">Figure 15</a>:<a href="#appendix-A-8" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="appendix-A-9.1">A creates a group with B, ..., G<a href="#appendix-A-9.1" class="pilcrow">¶</a>
 </li>
@@ -8259,18 +8292,215 @@ direct path)<a href="#appendix-A-5.2" class="pilcrow">¶</a>
       </ul>
 </section>
 </div>
-<div id="array-based-trees">
+<div id="ph-evolution">
 <section id="appendix-B">
-      <h2 id="name-array-based-trees">
-<a href="#appendix-B" class="section-number selfRef">Appendix B. </a><a href="#name-array-based-trees" class="section-name selfRef">Array-Based Trees</a>
+      <h2 id="name-evolution-of-parent-hashes">
+<a href="#appendix-B" class="section-number selfRef">Appendix B. </a><a href="#name-evolution-of-parent-hashes" class="section-name selfRef">Evolution of Parent Hashes</a>
       </h2>
-<p id="appendix-B-1">One benefit of using complete balanced trees is that they admit a simple
+<p id="appendix-B-1">To better understand how parent hashes are maintained, let's look in detail at
+how they evolve in a small group.  Consider the following sequence of
+operations:<a href="#appendix-B-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="appendix-B-2">
+<li id="appendix-B-2.1">A initializes a new group<a href="#appendix-B-2.1" class="pilcrow">¶</a>
+</li>
+        <li id="appendix-B-2.2">A adds B to the group with a full Commit<a href="#appendix-B-2.2" class="pilcrow">¶</a>
+</li>
+        <li id="appendix-B-2.3">B adds C and D to the group with a full Commit<a href="#appendix-B-2.3" class="pilcrow">¶</a>
+</li>
+        <li id="appendix-B-2.4">C sends an empty Commit.<a href="#appendix-B-2.4" class="pilcrow">¶</a>
+</li>
+      </ol>
+<div id="appendix-B-3">
+        <div class="alignLeft art-svg artwork" id="appendix-B-3.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="144" width="432" viewBox="0 0 432 144" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
+            <path d="M 216,48 L 216,64" fill="none" stroke="black"></path>
+            <path d="M 376,48 L 376,64" fill="none" stroke="black"></path>
+            <path d="M 200,64 L 232,64" fill="none" stroke="black"></path>
+            <path d="M 360,64 L 392,64" fill="none" stroke="black"></path>
+            <path d="M 32,78 L 48,78" fill="none" stroke="black"></path>
+            <path d="M 32,82 L 48,82" fill="none" stroke="black"></path>
+            <path d="M 128,78 L 144,78" fill="none" stroke="black"></path>
+            <path d="M 128,82 L 144,82" fill="none" stroke="black"></path>
+            <path d="M 288,78 L 304,78" fill="none" stroke="black"></path>
+            <path d="M 288,82 L 304,82" fill="none" stroke="black"></path>
+            <path d="M 232,64 L 240,80" fill="none" stroke="black"></path>
+            <path d="M 252,104 L 256,112" fill="none" stroke="black"></path>
+            <path d="M 392,64 L 400,80" fill="none" stroke="black"></path>
+            <path d="M 192,80 L 200,64" fill="none" stroke="black"></path>
+            <path d="M 240,112 L 244,104" fill="none" stroke="black"></path>
+            <path d="M 352,80 L 360,64" fill="none" stroke="black"></path>
+            <polygon class="arrowhead" points="312,80 300,74.4 300,85.6" fill="black" transform="rotate(0,304,80)"></polygon>
+            <polygon class="arrowhead" points="152,80 140,74.4 140,85.6" fill="black" transform="rotate(0,144,80)"></polygon>
+            <polygon class="arrowhead" points="56,80 44,74.4 44,85.6" fill="black" transform="rotate(0,48,80)"></polygon>
+            <g class="text">
+              <text x="216" y="36">Y</text>
+              <text x="380" y="36">Y'</text>
+              <text x="88" y="100">X</text>
+              <text x="188" y="100">X'</text>
+              <text x="256" y="100">_=Z</text>
+              <text x="348" y="100">X'</text>
+              <text x="412" y="100">Z'</text>
+              <text x="80" y="116">/</text>
+              <text x="96" y="116">\</text>
+              <text x="176" y="116">/</text>
+              <text x="192" y="116">\</text>
+              <text x="336" y="116">/</text>
+              <text x="352" y="116">\</text>
+              <text x="400" y="116">/</text>
+              <text x="416" y="116">\</text>
+              <text x="8" y="132">A</text>
+              <text x="72" y="132">A</text>
+              <text x="104" y="132">B</text>
+              <text x="168" y="132">A</text>
+              <text x="200" y="132">B</text>
+              <text x="232" y="132">C</text>
+              <text x="264" y="132">D</text>
+              <text x="328" y="132">A</text>
+              <text x="360" y="132">B</text>
+              <text x="392" y="132">C</text>
+              <text x="424" y="132">D</text>
+            </g>
+          </svg><a href="#appendix-B-3.1" class="pilcrow">¶</a>
+</div>
+</div>
+<p id="appendix-B-4">Then the parent hashes associated to the nodes will be updated as follows (where
+we use the shorthand <code>ph</code> for parent hash, <code>th</code> for tree hash, and <code>osth</code> for
+original sibling tree hash):<a href="#appendix-B-4" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="appendix-B-5">
+<li id="appendix-B-5.1">
+          <p id="appendix-B-5.1.1">A adds B: set X<a href="#appendix-B-5.1.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="appendix-B-5.1.2.1">
+              <code>A.parent_hash = ph(X) = H(X, ph="", osth=th(B))</code><a href="#appendix-B-5.1.2.1" class="pilcrow">¶</a>
+</li>
+          </ul>
+</li>
+        <li id="appendix-B-5.2">
+          <p id="appendix-B-5.2.1">B adds C, D: set B', X', Y<a href="#appendix-B-5.2.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="appendix-B-5.2.2.1">
+              <code>X'.parent_hash = ph(Y)  = H(Y, ph="", osth=th(Z))</code>,
+where <code>th(Z)</code> covers <code>(C, _, D)</code><a href="#appendix-B-5.2.2.1" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="appendix-B-5.2.2.2">
+              <code>B'.parent_hash = ph(X') = H(X', ph=X'.parent_hash, osth=th(A))</code><a href="#appendix-B-5.2.2.2" class="pilcrow">¶</a>
+</li>
+          </ul>
+</li>
+        <li id="appendix-B-5.3">
+          <p id="appendix-B-5.3.1">C sends empty Commit: set C', Z', Y'<a href="#appendix-B-5.3.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="appendix-B-5.3.2.1">
+              <code>Z'.parent_hash = ph(Y') = H(Y', ph="", osth=th(X'))</code>, where
+<code>th(X')</code> covers <code>(A, X', B')</code><a href="#appendix-B-5.3.2.1" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="appendix-B-5.3.2.2">
+              <code>C'.parent_hash = ph(Z') = H(Z', ph=Z'.parent_hash, osth=th(D))</code><a href="#appendix-B-5.3.2.2" class="pilcrow">¶</a>
+</li>
+          </ul>
+</li>
+      </ol>
+<p id="appendix-B-6">When a new member joins, they will receive a tree that has the following parent
+hash values, and compute the indicated parent-hash validity relationships:<a href="#appendix-B-6" class="pilcrow">¶</a></p>
+<table class="center" id="table-11">
+        <caption><a href="#table-11" class="selfRef">Table 11</a></caption>
+<thead>
+          <tr>
+            <th class="text-left" rowspan="1" colspan="1">Node</th>
+            <th class="text-left" rowspan="1" colspan="1">Parent hash value</th>
+            <th class="text-left" rowspan="1" colspan="1">Valid?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">A</td>
+            <td class="text-left" rowspan="1" colspan="1">H(X, ph="", osth=th(B))</td>
+            <td class="text-left" rowspan="1" colspan="1">No, B changed</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">B'</td>
+            <td class="text-left" rowspan="1" colspan="1">H(X', ph=X'.parent_hash, osth=th(A))</td>
+            <td class="text-left" rowspan="1" colspan="1">Yes</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">C'</td>
+            <td class="text-left" rowspan="1" colspan="1">H(Z', ph=Z'.parent_hash, osth=th(D))</td>
+            <td class="text-left" rowspan="1" colspan="1">Yes</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">D</td>
+            <td class="text-left" rowspan="1" colspan="1">(none, never sent an UpdatePath)</td>
+            <td class="text-left" rowspan="1" colspan="1">N/A</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">X'</td>
+            <td class="text-left" rowspan="1" colspan="1">H(Y, ph="", osth=th(Z))</td>
+            <td class="text-left" rowspan="1" colspan="1">No, Y and Z changed</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">Z'</td>
+            <td class="text-left" rowspan="1" colspan="1">H(Y', ph="", osth=th(X'))</td>
+            <td class="text-left" rowspan="1" colspan="1">Yes</td>
+          </tr>
+        </tbody>
+      </table>
+<p id="appendix-B-8">In other words, the joiner will find the following path-hash links in the tree:<a href="#appendix-B-8" class="pilcrow">¶</a></p>
+<div id="appendix-B-9">
+        <div class="alignLeft art-svg artwork" id="appendix-B-9.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="160" width="112" viewBox="0 0 112 160" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
+            <path d="M 56,48 L 56,64" fill="none" stroke="black"></path>
+            <path d="M 56,64 L 72,64" fill="none" stroke="black"></path>
+            <path d="M 72,64 L 80,80" fill="none" stroke="black"></path>
+            <g class="text">
+              <text x="60" y="36">Y'</text>
+              <text x="28" y="100">X'</text>
+              <text x="92" y="100">Z'</text>
+              <text x="32" y="116">\</text>
+              <text x="80" y="116">/</text>
+              <text x="8" y="132">A</text>
+              <text x="44" y="132">B'</text>
+              <text x="76" y="132">C'</text>
+              <text x="104" y="132">D</text>
+            </g>
+          </svg><a href="#appendix-B-9.1" class="pilcrow">¶</a>
+</div>
+</div>
+<p id="appendix-B-10">Since these chains collectively cover all non-blank parent nodes in the tree,
+the tree is parent-hash valid.<a href="#appendix-B-10" class="pilcrow">¶</a></p>
+<p id="appendix-B-11">Note that this tree, though valid, contains invalid parent-hash links. If a
+client were checking parent hashes top-down from Y', for example, they would
+find that X' has an invalid parent hash relative to Y', but that Z' has valid
+parent hash.  Likewise, if the client were checking bottom-up, they would find
+that the chain from B' ends in an invalid link from X' to Y'.  These invalid
+links are the natural result of multiple clients having committed.<a href="#appendix-B-11" class="pilcrow">¶</a></p>
+<p id="appendix-B-12">Note also the way the tree hash and the parent hash interact.  The parent hash
+of node C' includes the tree hash of node D.  The parent hash of node Z'
+includes the tree hash of X', which covers nodes A and B' (including the parent
+hash of B').  Although the tree hash and the parent hash depend on each other,
+the dependency relationships are structured so that there's never a circular
+dependency.<a href="#appendix-B-12" class="pilcrow">¶</a></p>
+<p id="appendix-B-13">In the particular case where a new member first receives the tree for a group
+(e.g., in a ratchet tree GroupInfo extension <a href="#ratchet-tree-extension" class="xref">Section 13.5</a>), the
+parent hashes will be expressed in the tree representation, but the tree hash
+need not be.  Instead, the new member will recompute the tree hashes for all the
+nodes in the tree, verifying that this matches the tree hash in the GroupInfo
+object.  Then, if the tree is valid, then the subtree hashes computed in this
+way will align with the inputs needed for parent hash validation (except where
+recomputation is needed to account for unmerged leaves).<a href="#appendix-B-13" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="array-based-trees">
+<section id="appendix-C">
+      <h2 id="name-array-based-trees">
+<a href="#appendix-C" class="section-number selfRef">Appendix C. </a><a href="#name-array-based-trees" class="section-name selfRef">Array-Based Trees</a>
+      </h2>
+<p id="appendix-C-1">One benefit of using complete balanced trees is that they admit a simple
 flat array representation.  In this representation, leaf nodes are
 even-numbered nodes, with the <code>n</code>-th leaf at <code>2*n</code>.  Intermediate nodes
 are held in odd-numbered nodes.  For example, the tree with 8 leaves has
-the following structure:<a href="#appendix-B-1" class="pilcrow">¶</a></p>
-<div id="appendix-B-2">
-        <div class="alignLeft art-svg artwork" id="appendix-B-2.1">
+the following structure:<a href="#appendix-C-1" class="pilcrow">¶</a></p>
+<div id="appendix-C-2">
+        <div class="alignLeft art-svg artwork" id="appendix-C-2.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="288" width="400" viewBox="0 0 400 288" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
             <path d="M 128,112 L 128,128" fill="none" stroke="black"></path>
             <path d="M 224,48 L 224,64" fill="none" stroke="black"></path>
@@ -8334,30 +8564,30 @@ the following structure:<a href="#appendix-B-1" class="pilcrow">¶</a></p>
               <text x="344" y="276">6</text>
               <text x="392" y="276">7</text>
             </g>
-          </svg><a href="#appendix-B-2.1" class="pilcrow">¶</a>
+          </svg><a href="#appendix-C-2.1" class="pilcrow">¶</a>
 </div>
 </div>
-<p id="appendix-B-3">This allows us to compute relationships between tree nodes simply by
+<p id="appendix-C-3">This allows us to compute relationships between tree nodes simply by
 manipulating indices, rather than having to maintain complicated structures in
 memory. The basic rule is that the high-order bits of parent and child nodes
-indices have the following relation (where <code>x</code> is an arbitrary bit string):<a href="#appendix-B-3" class="pilcrow">¶</a></p>
-<div id="appendix-B-4">
+indices have the following relation (where <code>x</code> is an arbitrary bit string):<a href="#appendix-C-3" class="pilcrow">¶</a></p>
+<div id="appendix-C-4">
 <pre class="lang-pseudocode sourcecode">
 parent=01x =&gt; left=00x, right=10x
-</pre><a href="#appendix-B-4" class="pilcrow">¶</a>
+</pre><a href="#appendix-C-4" class="pilcrow">¶</a>
 </div>
-<p id="appendix-B-5">Since node relationships are implicit, the algorithms for adding and removing
+<p id="appendix-C-5">Since node relationships are implicit, the algorithms for adding and removing
 nodes at the right edge of the tree are quite simple.  If there are <code>N</code> nodes in
-the array:<a href="#appendix-B-5" class="pilcrow">¶</a></p>
+the array:<a href="#appendix-C-5" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="appendix-B-6.1">Add: Append <code>N + 1</code> blank values to the end of the array.<a href="#appendix-B-6.1" class="pilcrow">¶</a>
+<li class="normal" id="appendix-C-6.1">Add: Append <code>N + 1</code> blank values to the end of the array.<a href="#appendix-C-6.1" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="appendix-B-6.2">Remove: Truncate the array to its first <code>(N-1) / 2</code> entries.<a href="#appendix-B-6.2" class="pilcrow">¶</a>
+        <li class="normal" id="appendix-C-6.2">Remove: Truncate the array to its first <code>(N-1) / 2</code> entries.<a href="#appendix-C-6.2" class="pilcrow">¶</a>
 </li>
       </ul>
-<p id="appendix-B-7">The following python code demonstrates the tree computations necessary to use an
-array-based tree for MLS.<a href="#appendix-B-7" class="pilcrow">¶</a></p>
-<div id="appendix-B-8">
+<p id="appendix-C-7">The following python code demonstrates the tree computations necessary to use an
+array-based tree for MLS.<a href="#appendix-C-7" class="pilcrow">¶</a></p>
+<div id="appendix-C-8">
 <pre class="breakable lang-python sourcecode">
 # The exponent of the largest power of 2 less than x. Equivalent to:
 #   int(math.floor(math.log(x, 2)))
@@ -8477,25 +8707,25 @@ def common_ancestor_direct(x, y, _):
        xn, yn = xn &gt;&gt; 1, yn &gt;&gt; 1
        k += 1
     return (xn &lt;&lt; k) + (1 &lt;&lt; (k-1)) - 1
-</pre><a href="#appendix-B-8" class="pilcrow">¶</a>
+</pre><a href="#appendix-C-8" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="link-based-trees">
-<section id="appendix-C">
+<section id="appendix-D">
       <h2 id="name-link-based-trees">
-<a href="#appendix-C" class="section-number selfRef">Appendix C. </a><a href="#name-link-based-trees" class="section-name selfRef">Link-Based Trees</a>
+<a href="#appendix-D" class="section-number selfRef">Appendix D. </a><a href="#name-link-based-trees" class="section-name selfRef">Link-Based Trees</a>
       </h2>
-<p id="appendix-C-1">An implementation may choose to store ratchet trees in a "link-based"
+<p id="appendix-D-1">An implementation may choose to store ratchet trees in a "link-based"
 representation, where each node stores references to its parents and/or
 children.   (As opposed to the array-based representation suggested above, where
 these relationships are computed from relationships between nodes' indices in
 the array.)  Such an implementation needs to update these links to maintain the
 balanced structure of the tree as the tree is extended to add new members,
-or truncated when members are removed.<a href="#appendix-C-1" class="pilcrow">¶</a></p>
-<p id="appendix-C-2">The following code snippet shows how these algorithms could be implemented in
-Python.<a href="#appendix-C-2" class="pilcrow">¶</a></p>
-<div id="appendix-C-3">
+or truncated when members are removed.<a href="#appendix-D-1" class="pilcrow">¶</a></p>
+<p id="appendix-D-2">The following code snippet shows how these algorithms could be implemented in
+Python.<a href="#appendix-D-2" class="pilcrow">¶</a></p>
+<div id="appendix-D-3">
 <pre class="lang-python sourcecode">
 class Node:
     def __init__(self, value, left=None, right=None):
@@ -8543,12 +8773,12 @@ class Tree:
 
         self.depth -= 1
         self.root = self.root.left
-</pre><a href="#appendix-C-3" class="pilcrow">¶</a>
+</pre><a href="#appendix-D-3" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="authors-addresses">
-<section id="appendix-D">
+<section id="appendix-E">
       <h2 id="name-authors-addresses">
 <a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
       </h2>
