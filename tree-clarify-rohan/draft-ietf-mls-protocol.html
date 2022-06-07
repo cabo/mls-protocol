@@ -1521,7 +1521,7 @@ in size ranging from two to thousands.<a href="#section-abstract-1" class="pilcr
             <p id="section-toc.1-1.21.1"><a href="#appendix-A" class="xref">Appendix A</a>.  <a href="#name-protocol-origins-of-example" class="xref">Protocol Origins of Example Trees</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.22">
-            <p id="section-toc.1-1.22.1"><a href="#appendix-B" class="xref">Appendix B</a>.  <a href="#name-interaction-of-tree-hashes-" class="xref">Interaction of Tree Hashes and Parent Hashes</a></p>
+            <p id="section-toc.1-1.22.1"><a href="#appendix-B" class="xref">Appendix B</a>.  <a href="#name-evolution-of-parent-hashes" class="xref">Evolution of Parent Hashes</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.23">
             <p id="section-toc.1-1.23.1"><a href="#appendix-C" class="xref">Appendix C</a>.  <a href="#name-array-based-trees" class="xref">Array-Based Trees</a></p>
@@ -4415,11 +4415,13 @@ effectively signs the subtree of the tree that hasn't been changed since that
 leaf was last changed in an UpdatePath.  A new member joining the group uses
 these parent hashes to verify that the parent nodes in the tree were set by
 members of the group, not chosen by an external attacker.  For an example of how
-this works, see <a href="#th-ph-interaction" class="xref">Appendix B</a>.<a href="#section-8.8-4" class="pilcrow">¶</a></p>
+this works, see <a href="#ph-evolution" class="xref">Appendix B</a>.<a href="#section-8.8-4" class="pilcrow">¶</a></p>
 <p id="section-8.8-5">Consider a ratchet tree with a non-blank parent node P and children D and S (for
 "parent", "direct path", and "sibling"), with D and P in the direct path of a
 leaf node L (for "leaf"):<a href="#section-8.8-5" class="pilcrow">¶</a></p>
-<div class="alignLeft art-ascii-art art-text artwork" id="section-8.8-6">
+<span id="name-inputs-to-a-parent-hash"></span><div id="parent-hash-inputs">
+<figure id="figure-14">
+          <div class="alignLeft art-ascii-art art-text artwork" id="section-8.8-6.1">
 <pre>
          ...
          /
@@ -4431,7 +4433,11 @@ leaf node L (for "leaf"):<a href="#section-8.8-5" class="pilcrow">¶</a></p>
  ... ... ... ...
  /
 L
-</pre><a href="#section-8.8-6" class="pilcrow">¶</a>
+</pre>
+</div>
+<figcaption><a href="#figure-14" class="selfRef">Figure 14</a>:
+<a href="#name-inputs-to-a-parent-hash" class="selfRef">Inputs to a parent hash.</a>
+          </figcaption></figure>
 </div>
 <p id="section-8.8-7">The parent hash of P changes whenever an <code>UpdatePath</code> object is applied to
 the ratchet tree along a path from a leaf L traversing node D (and hence also
@@ -4466,7 +4472,7 @@ subtree under S that is not being updated (and thus the subtree to which a path
 secret for P would be encrypted according to <a href="#synchronizing-views-of-the-tree" class="xref">Section 8.6</a>).<a href="#section-8.8-12" class="pilcrow">¶</a></p>
 <p id="section-8.8-13">For example, in the following tree:<a href="#section-8.8-13" class="pilcrow">¶</a></p>
 <span id="name-a-tree-illustrating-parent-"></span><div id="parent-hash-tree">
-<figure id="figure-14">
+<figure id="figure-15">
           <div class="alignLeft art-ascii-art art-text artwork" id="section-8.8-14.1">
 <pre>
               W [F]
@@ -4480,7 +4486,7 @@ secret for P would be encrypted according to <a href="#synchronizing-views-of-th
 A   B   C   D   E   F   G   _
 </pre>
 </div>
-<figcaption><a href="#figure-14" class="selfRef">Figure 14</a>:
+<figcaption><a href="#figure-15" class="selfRef">Figure 15</a>:
 <a href="#name-a-tree-illustrating-parent-" class="selfRef">A tree illustrating parent hash computations.</a>
           </figcaption></figure>
 </div>
@@ -4516,21 +4522,19 @@ computation.<a href="#section-8.8-19" class="pilcrow">¶</a></p>
           <h4 id="name-using-parent-hashes">
 <a href="#section-8.8.1" class="section-number selfRef">8.8.1. </a><a href="#name-using-parent-hashes" class="section-name selfRef">Using Parent Hashes</a>
           </h4>
-<p id="section-8.8.1-1">The Parent Hash of P appears in three types of structs. If D is itself a parent node
-then P's Parent Hash is stored in the <code>parent_hash</code> field of the structs
-<code>ParentHashInput</code> and <code>ParentNode</code> of the node before P on the filtered direct
-path of U. (The <code>ParentNode</code> struct is used to encapsulate all public
-information about that node that must be conveyed to a new
-member joining the group as well as to define its Tree Hash.)<a href="#section-8.8.1-1" class="pilcrow">¶</a></p>
-<p id="section-8.8.1-2">If, on the other hand, D is the leaf L and its LeafNode has <code>leaf_node_source</code> set to <code>commit</code>,
-then the Parent Hash of P (with D's sibling as copath child) is stored in
-the <code>parent_hash</code> field.  This is true in particular of the LeafNode object sent
-in the <code>leaf_node</code> field of an UpdatePath. The signature of such a LeafNode thus also
-attests to which keys the group member introduced into the ratchet tree and
-to whom the corresponding secret keys were sent. This helps prevent malicious insiders
-from constructing artificial ratchet trees with a node D whose HPKE secret key is
-known to the insider yet where the insider isn't assigned a leaf in the subtree rooted
-at D. Indeed, such a ratchet tree would violate the tree invariant.<a href="#section-8.8.1-2" class="pilcrow">¶</a></p>
+<p id="section-8.8.1-1">In ParentNode objects and LeafNode objects with <code>leaf_node_source</code> set to
+<code>commit</code>, the value of the <code>parent_hash</code> field is the parent hash of the next
+non-blank parent node above the node in question (the next node in the filtered
+direct path).  Using the node labels in <a href="#parent-hash-inputs" class="xref">Figure 14</a>, the
+<code>parent_hash</code> field of D is equal to the parent hash of P with copath child S.
+This is the case even when the node D is a leaf node.<a href="#section-8.8.1-1" class="pilcrow">¶</a></p>
+<p id="section-8.8.1-2">The <code>parent_hash</code> field of a LeafNode is signed by the member.  The signature of
+such a LeafNode thus also attests to which keys the group member introduced into
+the ratchet tree and to whom the corresponding secret keys were sent. This
+prevents malicious insiders from constructing artificial ratchet trees with a
+node D whose HPKE secret key is known to the insider yet where the insider isn't
+assigned a leaf in the subtree rooted at D. Indeed, such a ratchet tree would
+violate the tree invariant.<a href="#section-8.8.1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="verifying-parent-hashes">
@@ -5287,7 +5291,7 @@ the ratchet is called a "generation".<a href="#section-10.1-4" class="pilcrow">�
 handshake and application ratchets that member D will use for sending and the
 first two application keys and nonces.<a href="#section-10.1-5" class="pilcrow">¶</a></p>
 <span id="name-secret-tree-for-a-four-memb"></span><div id="secret-tree-example">
-<figure id="figure-15">
+<figure id="figure-16">
           <div id="section-10.1-6.1">
             <div class="alignLeft art-svg artwork" id="section-10.1-6.1.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="320" width="200" viewBox="0 0 200 320" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
@@ -5329,7 +5333,7 @@ first two application keys and nonces.<a href="#section-10.1-5" class="pilcrow">
               </svg><a href="#section-10.1-6.1.1" class="pilcrow">¶</a>
 </div>
 </div>
-<figcaption><a href="#figure-15" class="selfRef">Figure 15</a>:
+<figcaption><a href="#figure-16" class="selfRef">Figure 16</a>:
 <a href="#name-secret-tree-for-a-four-memb" class="selfRef">Secret tree for a four-member group</a>
           </figcaption></figure>
 </div>
@@ -5425,7 +5429,7 @@ node L,<a href="#section-10.2-6.2" class="pilcrow">¶</a>
             <code>application_ratchet_nonce_[L]_[j]</code> and <code>application_ratchet_key_[L]_[j]</code>.<a href="#section-10.2-6.4" class="pilcrow">¶</a>
 </li>
         </ul>
-<p id="section-10.2-7">Concretely, consider the Secret Tree shown in <a href="#secret-tree-example" class="xref">Figure 15</a>.  Client
+<p id="section-10.2-7">Concretely, consider the Secret Tree shown in <a href="#secret-tree-example" class="xref">Figure 16</a>.  Client
 A, B, or C would generate the illustrated values on receiving a message from D
 with generation equal to 1, having not received a message with generation 0
 (e.g., due to out-of-order delivery).  In such a case, the following values
@@ -8310,7 +8314,7 @@ direct path)<a href="#appendix-A-5.2" class="pilcrow">¶</a>
           </ul>
 </li>
       </ul>
-<p id="appendix-A-8">To construct the tree in <a href="#parent-hash-tree" class="xref">Figure 14</a>:<a href="#appendix-A-8" class="pilcrow">¶</a></p>
+<p id="appendix-A-8">To construct the tree in <a href="#parent-hash-tree" class="xref">Figure 15</a>:<a href="#appendix-A-8" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="appendix-A-9.1">A creates a group with B, ..., G<a href="#appendix-A-9.1" class="pilcrow">¶</a>
 </li>
@@ -8323,13 +8327,13 @@ direct path)<a href="#appendix-A-5.2" class="pilcrow">¶</a>
       </ul>
 </section>
 </div>
-<div id="th-ph-interaction">
+<div id="ph-evolution">
 <section id="appendix-B">
-      <h2 id="name-interaction-of-tree-hashes-">
-<a href="#appendix-B" class="section-number selfRef">Appendix B. </a><a href="#name-interaction-of-tree-hashes-" class="section-name selfRef">Interaction of Tree Hashes and Parent Hashes</a>
+      <h2 id="name-evolution-of-parent-hashes">
+<a href="#appendix-B" class="section-number selfRef">Appendix B. </a><a href="#name-evolution-of-parent-hashes" class="section-name selfRef">Evolution of Parent Hashes</a>
       </h2>
-<p id="appendix-B-1">To better understand how tree hashes and parent hashes interact, let's look in
-detail at how they evolve in a small group.  Consider the following sequence of
+<p id="appendix-B-1">To better understand how parent hashes are maintained, let's look in detail at
+how they evolve in a small group.  Consider the following sequence of
 operations:<a href="#appendix-B-1" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="appendix-B-2">
 <li id="appendix-B-2.1">A initializes a new group<a href="#appendix-B-2.1" class="pilcrow">¶</a>
