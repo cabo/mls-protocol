@@ -4515,21 +4515,21 @@ computation.<a href="#section-8.8-19" class="pilcrow">¶</a></p>
           <h4 id="name-using-parent-hashes">
 <a href="#section-8.8.1" class="section-number selfRef">8.8.1. </a><a href="#name-using-parent-hashes" class="section-name selfRef">Using Parent Hashes</a>
           </h4>
-<p id="section-8.8.1-1">The Parent Hash of P appears in three types of structs. If V is itself a parent node
+<p id="section-8.8.1-1">The Parent Hash of P appears in three types of structs. If D is itself a parent node
 then P's Parent Hash is stored in the <code>parent_hash</code> field of the structs
 <code>ParentHashInput</code> and <code>ParentNode</code> of the node before P on the filtered direct
 path of U. (The <code>ParentNode</code> struct is used to encapsulate all public
 information about that node that must be conveyed to a new
 member joining the group as well as to define its Tree Hash.)<a href="#section-8.8.1-1" class="pilcrow">¶</a></p>
-<p id="section-8.8.1-2">If, on the other hand, V is the leaf L and its LeafNode has <code>leaf_node_source</code> set to <code>commit</code>,
-then the Parent Hash of P (with V's sibling as copath child) is stored in
+<p id="section-8.8.1-2">If, on the other hand, D is the leaf L and its LeafNode has <code>leaf_node_source</code> set to <code>commit</code>,
+then the Parent Hash of P (with D's sibling as copath child) is stored in
 the <code>parent_hash</code> field.  This is true in particular of the LeafNode object sent
 in the <code>leaf_node</code> field of an UpdatePath. The signature of such a LeafNode thus also
 attests to which keys the group member introduced into the ratchet tree and
 to whom the corresponding secret keys were sent. This helps prevent malicious insiders
-from constructing artificial ratchet trees with a node V whose HPKE secret key is
+from constructing artificial ratchet trees with a node D whose HPKE secret key is
 known to the insider yet where the insider isn't assigned a leaf in the subtree rooted
-at V. Indeed, such a ratchet tree would violate the tree invariant.<a href="#section-8.8.1-2" class="pilcrow">¶</a></p>
+at D. Indeed, such a ratchet tree would violate the tree invariant.<a href="#section-8.8.1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="verifying-parent-hashes">
@@ -8397,18 +8397,37 @@ operations:<a href="#appendix-B-1" class="pilcrow">¶</a></p>
 we use the shorthand <code>ph</code> for parent hash, <code>th</code> for tree hash, and <code>osth</code> for
 original sibling tree hash):<a href="#appendix-B-4" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="appendix-B-5">
-<li id="appendix-B-5.1">A adds B: set X
-  * <code>A.parent_hash = ph(X) = H(X, ph="", osth=th(B))</code><a href="#appendix-B-5.1" class="pilcrow">¶</a>
+<li id="appendix-B-5.1">
+          <p id="appendix-B-5.1.1">A adds B: set X<a href="#appendix-B-5.1.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="appendix-B-5.1.2.1">
+              <code>A.parent_hash = ph(X) = H(X, ph="", osth=th(B))</code><a href="#appendix-B-5.1.2.1" class="pilcrow">¶</a>
 </li>
-        <li id="appendix-B-5.2">B adds C, D: set B', X', Y
-  * <code>X'.parent_hash = ph(Y)  = H(Y, ph="", osth=th(Z))</code>,
- where <code>th(Z)</code> covers <code>(C, _, D)</code>
-  * <code>B'.parent_hash = ph(X') = H(X', ph=X'.parent_hash, osth=th(A))</code><a href="#appendix-B-5.2" class="pilcrow">¶</a>
+          </ul>
 </li>
-        <li id="appendix-B-5.3">C sends empty Commit: set C', Z', Y'
-  * <code>Z'.parent_hash = ph(Y') = H(Y', ph="", osth=th(X'))</code>, where
- <code>th(X')</code> covers <code>(A, X', B')</code>
-  * <code>C'.parent_hash = ph(Z') = H(Z', ph=Z'.parent_hash, osth=th(D))</code><a href="#appendix-B-5.3" class="pilcrow">¶</a>
+        <li id="appendix-B-5.2">
+          <p id="appendix-B-5.2.1">B adds C, D: set B', X', Y<a href="#appendix-B-5.2.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="appendix-B-5.2.2.1">
+              <code>X'.parent_hash = ph(Y)  = H(Y, ph="", osth=th(Z))</code>,
+where <code>th(Z)</code> covers <code>(C, _, D)</code><a href="#appendix-B-5.2.2.1" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="appendix-B-5.2.2.2">
+              <code>B'.parent_hash = ph(X') = H(X', ph=X'.parent_hash, osth=th(A))</code><a href="#appendix-B-5.2.2.2" class="pilcrow">¶</a>
+</li>
+          </ul>
+</li>
+        <li id="appendix-B-5.3">
+          <p id="appendix-B-5.3.1">C sends empty Commit: set C', Z', Y'<a href="#appendix-B-5.3.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="appendix-B-5.3.2.1">
+              <code>Z'.parent_hash = ph(Y') = H(Y', ph="", osth=th(X'))</code>, where
+<code>th(X')</code> covers <code>(A, X', B')</code><a href="#appendix-B-5.3.2.1" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="appendix-B-5.3.2.2">
+              <code>C'.parent_hash = ph(Z') = H(Z', ph=Z'.parent_hash, osth=th(D))</code><a href="#appendix-B-5.3.2.2" class="pilcrow">¶</a>
+</li>
+          </ul>
 </li>
       </ol>
 <p id="appendix-B-6">When a new member joins, they will receive a tree that has the following parent
