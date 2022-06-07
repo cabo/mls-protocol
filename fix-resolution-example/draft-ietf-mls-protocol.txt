@@ -5,7 +5,7 @@
 Network Working Group                                          R. Barnes
 Internet-Draft                                                     Cisco
 Intended status: Informational                             B. Beurdouche
-Expires: 5 December 2022                                 Inria & Mozilla
+Expires: 9 December 2022                                 Inria & Mozilla
                                                                R. Robert
                                                                         
                                                              J. Millican
@@ -14,7 +14,7 @@ Expires: 5 December 2022                                 Inria & Mozilla
                                                                   Google
                                                           K. Cohn-Gordon
                                                     University of Oxford
-                                                             3 June 2022
+                                                             7 June 2022
 
 
               The Messaging Layer Security (MLS) Protocol
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 5 December 2022.
+   This Internet-Draft will expire on 9 December 2022.
 
 Copyright Notice
 
@@ -1171,12 +1171,12 @@ Table of Contents
                  _
            ______|______
           /             \
-         X[C]            _
+         X[B]            _
        __|__           __|__
       /     \         /     \
      _       _       Y       _
     / \     / \     / \     / \
-   A   _   C   D   E   F   _   H
+   A   B   _   D   E   F   _   H
 
    0   1   2   3   4   5   6   7
 
@@ -1184,11 +1184,11 @@ Table of Contents
 
    In this tree, we can see all of the above rules in play:
 
-   *  The resolution of node X is the list [X, C]
+   *  The resolution of node X is the list [X, B]
 
-   *  The resolution of leaf 1 or leaf 6 is the empty list []
+   *  The resolution of leaf 2 or leaf 6 is the empty list []
 
-   *  The resolution of top node is the list [X, C, Y, H]
+   *  The resolution of top node is the list [X, B, Y, H]
 
 5.1.2.  Paths through a Ratchet Tree
 
@@ -5720,14 +5720,17 @@ Appendix A.  Protocol Origins of Example Trees
 
    *  F sends an empty Commit, setting Y and its ancestors
 
-   *  D removes B, C, and G, with the following effects:
+   *  D removes B and C, with the following effects:
 
-      -  Blank the direct paths of B, C, and G
+      -  Blank the direct paths of B and C
 
       -  Set X, the top node, and any further nodes in the direct path
          of D
 
-   *  A adds a new member at C with a partial Commit, adding C as
+   *  Someone outside this subtree removes G, blanking the direct path
+      of G
+
+   *  A adds a new member at B with a partial Commit, adding B as
       unmerged at X
 
    To construct the tree in Figure 11:

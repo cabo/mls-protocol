@@ -1044,7 +1044,7 @@ svg :is([stroke="fill"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Barnes, et al.</td>
-<td class="center">Expires 5 December 2022</td>
+<td class="center">Expires 9 December 2022</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1057,12 +1057,12 @@ svg :is([stroke="fill"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-ietf-mls-protocol-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2022-06-03" class="published">3 June 2022</time>
+<time datetime="2022-06-07" class="published">7 June 2022</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2022-12-05">5 December 2022</time></dd>
+<dd class="expires"><time datetime="2022-12-09">9 December 2022</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1132,7 +1132,7 @@ in size ranging from two to thousands.<a href="#section-abstract-1" class="pilcr
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 5 December 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 9 December 2022.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -2774,12 +2774,12 @@ brackets:<a href="#section-5.1.1-7" class="pilcrow">¶</a></p>
               _
         ______|______
        /             \
-      X[C]            _
+      X[B]            _
     __|__           __|__
    /     \         /     \
   _       _       Y       _
  / \     / \     / \     / \
-A   _   C   D   E   F   _   H
+A   B   _   D   E   F   _   H
 
 0   1   2   3   4   5   6   7
 </pre>
@@ -2790,11 +2790,11 @@ A   _   C   D   E   F   _   H
 </div>
 <p id="section-5.1.1-9">In this tree, we can see all of the above rules in play:<a href="#section-5.1.1-9" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-5.1.1-10.1">The resolution of node X is the list [X, C]<a href="#section-5.1.1-10.1" class="pilcrow">¶</a>
+<li class="normal" id="section-5.1.1-10.1">The resolution of node X is the list [X, B]<a href="#section-5.1.1-10.1" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-5.1.1-10.2">The resolution of leaf 1 or leaf 6 is the empty list []<a href="#section-5.1.1-10.2" class="pilcrow">¶</a>
+            <li class="normal" id="section-5.1.1-10.2">The resolution of leaf 2 or leaf 6 is the empty list []<a href="#section-5.1.1-10.2" class="pilcrow">¶</a>
 </li>
-            <li class="normal" id="section-5.1.1-10.3">The resolution of top node is the list [X, C, Y, H]<a href="#section-5.1.1-10.3" class="pilcrow">¶</a>
+            <li class="normal" id="section-5.1.1-10.3">The resolution of top node is the list [X, B, Y, H]<a href="#section-5.1.1-10.3" class="pilcrow">¶</a>
 </li>
           </ul>
 </section>
@@ -8260,15 +8260,17 @@ in this document.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
         <li class="normal" id="appendix-A-5.2">F sends an empty Commit, setting Y and its ancestors<a href="#appendix-A-5.2" class="pilcrow">¶</a>
 </li>
         <li class="normal" id="appendix-A-5.3">
-          <p id="appendix-A-5.3.1">D removes B, C, and G, with the following effects:<a href="#appendix-A-5.3.1" class="pilcrow">¶</a></p>
+          <p id="appendix-A-5.3.1">D removes B and C, with the following effects:<a href="#appendix-A-5.3.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="appendix-A-5.3.2.1">Blank the direct paths of B, C, and G<a href="#appendix-A-5.3.2.1" class="pilcrow">¶</a>
+<li class="normal" id="appendix-A-5.3.2.1">Blank the direct paths of B and C<a href="#appendix-A-5.3.2.1" class="pilcrow">¶</a>
 </li>
             <li class="normal" id="appendix-A-5.3.2.2">Set X, the top node, and any further nodes in the direct path of D<a href="#appendix-A-5.3.2.2" class="pilcrow">¶</a>
 </li>
           </ul>
 </li>
-        <li class="normal" id="appendix-A-5.4">A adds a new member at C with a partial Commit, adding C as unmerged at X<a href="#appendix-A-5.4" class="pilcrow">¶</a>
+        <li class="normal" id="appendix-A-5.4">Someone outside this subtree removes G, blanking the direct path of G<a href="#appendix-A-5.4" class="pilcrow">¶</a>
+</li>
+        <li class="normal" id="appendix-A-5.5">A adds a new member at B with a partial Commit, adding B as unmerged at X<a href="#appendix-A-5.5" class="pilcrow">¶</a>
 </li>
       </ul>
 <p id="appendix-A-6">To construct the tree in <a href="#evolution-tree" class="xref">Figure 11</a>:<a href="#appendix-A-6" class="pilcrow">¶</a></p>
