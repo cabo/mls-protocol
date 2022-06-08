@@ -4216,56 +4216,110 @@ rooted at the parent's non-updated child, i.e., the child
 on the copath of the sender's leaf node.
 There is one encryption of the path secret to each public key in the resolution
 of the non-updated child.<a href="#section-8.6-4" class="pilcrow">¶</a></p>
-<p id="section-8.6-5">The recipient of an UpdatePath processes it with the following steps:<a href="#section-8.6-5" class="pilcrow">¶</a></p>
+<p id="section-8.6-5">A member of the group <em>updates their direct path</em> by computing new values for
+their leaf node and the nodes along their filtered direct path:<a href="#section-8.6-5" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-8.6-6">
-<li id="section-8.6-6.1">
-            <p id="section-8.6-6.1.1">Compute the updated path secrets.<a href="#section-8.6-6.1.1" class="pilcrow">¶</a></p>
+<li id="section-8.6-6.1">Blank all nodes along the direct path of the sender's leaf.<a href="#section-8.6-6.1" class="pilcrow">¶</a>
+</li>
+          <li id="section-8.6-6.2">
+            <p id="section-8.6-6.2.1">Compute updated path secrets and public keys for the nodes on the sender's
+filtered direct path.<a href="#section-8.6-6.2.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-8.6-6.1.2.1">Identify a node in the filtered direct path for which the recipient
-is in the subtree of the non-updated child.<a href="#section-8.6-6.1.2.1" class="pilcrow">¶</a>
+<li class="normal" id="section-8.6-6.2.2.1">Generate a sequence of path secrets of the same length as the filtered
+direct path, as defined in <a href="#ratchet-tree-evolution" class="xref">Section 8.4</a><a href="#section-8.6-6.2.2.1" class="pilcrow">¶</a>
 </li>
-              <li class="normal" id="section-8.6-6.1.2.2">Identify a node in the resolution of the copath node for
-which the recipient has a private key.<a href="#section-8.6-6.1.2.2" class="pilcrow">¶</a>
-</li>
-              <li class="normal" id="section-8.6-6.1.2.3">Decrypt the path secret for the parent of the copath node using
-the private key from the resolution node.<a href="#section-8.6-6.1.2.3" class="pilcrow">¶</a>
-</li>
-              <li class="normal" id="section-8.6-6.1.2.4">Derive path secrets for ancestors of that node using the
-algorithm described above.<a href="#section-8.6-6.1.2.4" class="pilcrow">¶</a>
-</li>
-              <li class="normal" id="section-8.6-6.1.2.5">The recipient SHOULD verify that the received public keys agree
-with the public keys derived from the new path_secret values.<a href="#section-8.6-6.1.2.5" class="pilcrow">¶</a>
+              <li class="normal" id="section-8.6-6.2.2.2">For each node in the filtered direct path, replace the node's public key
+with the <code>node_pub[n]</code> value derived from the corresponding path secret
+<code>path_secret[n]</code>.<a href="#section-8.6-6.2.2.2" class="pilcrow">¶</a>
 </li>
             </ul>
 </li>
-          <li id="section-8.6-6.2">
-            <p id="section-8.6-6.2.1">Merge the updated path secrets into the tree.<a href="#section-8.6-6.2.1" class="pilcrow">¶</a></p>
+          <li id="section-8.6-6.3">Compute the new parent hashes for the nodes along the filtered direct path
+and the sender's leaf node.<a href="#section-8.6-6.3" class="pilcrow">¶</a>
+</li>
+          <li id="section-8.6-6.4">
+            <p id="section-8.6-6.4.1">Update the leaf node for the sender.<a href="#section-8.6-6.4.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-8.6-6.2.2.1">Blank all nodes on the direct path of the sender's leaf.<a href="#section-8.6-6.2.2.1" class="pilcrow">¶</a>
+<li class="normal" id="section-8.6-6.4.2.1">Set the <code>leaf_node_source</code> to <code>commit</code>.<a href="#section-8.6-6.4.2.1" class="pilcrow">¶</a>
 </li>
-              <li class="normal" id="section-8.6-6.2.2.2">
-                <p id="section-8.6-6.2.2.2.1">For all nodes on the filtered direct path of the sender's leaf,<a href="#section-8.6-6.2.2.2.1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-8.6-6.2.2.2.2.1">Set the public key to the received public key.<a href="#section-8.6-6.2.2.2.2.1" class="pilcrow">¶</a>
+              <li class="normal" id="section-8.6-6.4.2.2">Set the <code>encryption_key</code> to the public key of a freshly sampled key pair<a href="#section-8.6-6.4.2.2" class="pilcrow">¶</a>
 </li>
-                  <li class="normal" id="section-8.6-6.2.2.2.2.2">Set the list of unmerged leaves to the empty list.<a href="#section-8.6-6.2.2.2.2.2" class="pilcrow">¶</a>
+              <li class="normal" id="section-8.6-6.4.2.3">Set the parent hash to the parent hash for the leaf.<a href="#section-8.6-6.4.2.3" class="pilcrow">¶</a>
 </li>
-                  <li class="normal" id="section-8.6-6.2.2.2.2.3">Store the updated hash of the next node on the filtered direct path
-(represented as a ParentNode struct), going from root to leaf, so that
-each hash incorporates all the non-blank nodes above it. The root node
-always has a zero-length hash for this value.<a href="#section-8.6-6.2.2.2.2.3" class="pilcrow">¶</a>
-</li>
-                </ul>
-</li>
-              <li class="normal" id="section-8.6-6.2.2.3">For nodes where a path secret was recovered in step 1 ("Compute the
-updated path secrets"), compute and store the node's updated private key.<a href="#section-8.6-6.2.2.3" class="pilcrow">¶</a>
+              <li class="normal" id="section-8.6-6.4.2.4">Re-sign the leaf node with its new contents<a href="#section-8.6-6.4.2.4" class="pilcrow">¶</a>
 </li>
             </ul>
 </li>
         </ol>
-<p id="section-8.6-7">For example, in order to communicate the example update described in
-<a href="#ratchet-tree-evolution" class="xref">Section 8.4</a>, the sender would transmit the following
-values:<a href="#section-8.6-7" class="pilcrow">¶</a></p>
+<p id="section-8.6-7">Since the new leaf node effectively updates an existing leaf node in the group,
+it MUST adhere to the same restrictions as LeafNodes used in <code>Update</code> proposals
+(aside from <code>leaf_node_source</code>). The application MAY specify other changes to
+the leaf node, e.g., providing a new signature key, updated capabilities, or
+different extensions.<a href="#section-8.6-7" class="pilcrow">¶</a></p>
+<p id="section-8.6-8">The member then <em>encrypts path secrets to the group</em>.  For each node in the
+member's filtered direct path, the member takes the following steps:<a href="#section-8.6-8" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-8.6-9">
+<li id="section-8.6-9.1">Compute the resolution of the node's child that is on the copath of the
+sender (the child that is not in the direct path of the sender).  Any new
+member (from an Add proposal) added in the same Commit MUST be excluded from
+this resolution.<a href="#section-8.6-9.1" class="pilcrow">¶</a>
+</li>
+          <li id="section-8.6-9.2">For each node in the resolution, encrypt the path secret for the direct
+path node using the public key of the resolution node, as defined in
+<a href="#update-paths" class="xref">Section 8.9</a><a href="#section-8.6-9.2" class="pilcrow">¶</a>
+</li>
+        </ol>
+<p id="section-8.6-10">The recipient of an UpdatePath performs the corresponding steps.  First, the
+recipient <em>merges UpdatePath into the tree</em>:<a href="#section-8.6-10" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-8.6-11">
+<li id="section-8.6-11.1">Blank all nodes on the direct path of the sender's leaf.<a href="#section-8.6-11.1" class="pilcrow">¶</a>
+</li>
+          <li id="section-8.6-11.2">
+            <p id="section-8.6-11.2.1">For all nodes on the filtered direct path of the sender's leaf,<a href="#section-8.6-11.2.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-8.6-11.2.2.1">Set the public key to the public key in the UpdatePath.<a href="#section-8.6-11.2.2.1" class="pilcrow">¶</a>
+</li>
+              <li class="normal" id="section-8.6-11.2.2.2">Set the list of unmerged leaves to the empty list.<a href="#section-8.6-11.2.2.2" class="pilcrow">¶</a>
+</li>
+            </ul>
+</li>
+          <li id="section-8.6-11.3">
+            <p id="section-8.6-11.3.1">Compute parent hashes for the nodes in the sender's filtered direct path,
+and verify that the <code>parent_hash</code> field of the leaf node matches the parent
+hash for the first node in its filtered direct path.<a href="#section-8.6-11.3.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-8.6-11.3.2.1">Note that these hashes are computed from root to leaf, so that
+each hash incorporates all the non-blank nodes above it. The root node
+always has a zero-length hash for its parent hash.<a href="#section-8.6-11.3.2.1" class="pilcrow">¶</a>
+</li>
+            </ul>
+</li>
+        </ol>
+<p id="section-8.6-12">Second, the recipient <em>decrypts the path secrets</em>:<a href="#section-8.6-12" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-8.6-13">
+<li id="section-8.6-13.1">Identify a node in the filtered direct path for which the recipient
+is in the subtree of the non-updated child.<a href="#section-8.6-13.1" class="pilcrow">¶</a>
+</li>
+          <li id="section-8.6-13.2">Identify a node in the resolution of the copath node for
+which the recipient has a private key.<a href="#section-8.6-13.2" class="pilcrow">¶</a>
+</li>
+          <li id="section-8.6-13.3">Decrypt the path secret for the parent of the copath node using
+the private key from the resolution node.<a href="#section-8.6-13.3" class="pilcrow">¶</a>
+</li>
+          <li id="section-8.6-13.4">Derive path secrets for ancestors of that node in the sender's filtered
+direct path using the algorithm described above.<a href="#section-8.6-13.4" class="pilcrow">¶</a>
+</li>
+          <li id="section-8.6-13.5">Derive the node secrets and node key pairs from the path secrets.<a href="#section-8.6-13.5" class="pilcrow">¶</a>
+</li>
+          <li id="section-8.6-13.6">Verify that the derived public keys are the same as the corresponding public
+keys sent in the UpdatePath.<a href="#section-8.6-13.6" class="pilcrow">¶</a>
+</li>
+          <li id="section-8.6-13.7">Store the derived private keys in the corresponding ratchet tree nodes.<a href="#section-8.6-13.7" class="pilcrow">¶</a>
+</li>
+        </ol>
+<p id="section-8.6-14">For example, in order to communicate the example update described in
+<a href="#ratchet-tree-evolution" class="xref">Section 8.4</a>, the member at node B would transmit the following
+values:<a href="#section-8.6-14" class="pilcrow">¶</a></p>
 <table class="center" id="table-3">
           <caption><a href="#table-3" class="selfRef">Table 3</a></caption>
 <thead>
@@ -4276,26 +4330,41 @@ values:<a href="#section-8.6-7" class="pilcrow">¶</a></p>
           </thead>
           <tbody>
             <tr>
-              <td class="text-left" rowspan="1" colspan="1">node_pub[1]</td>
-              <td class="text-left" rowspan="1" colspan="1">E(pk(Z), path_secret[1]), E(pk(C), path_secret[1])</td>
+              <td class="text-left" rowspan="1" colspan="1">
+                <code>node_pub[1]</code>
+</td>
+              <td class="text-left" rowspan="1" colspan="1">
+                <code>E(pk(Z), path_secret[1])</code>, <code>E(pk(C), path_secret[1]</code>)</td>
             </tr>
             <tr>
-              <td class="text-left" rowspan="1" colspan="1">node_pub[0]</td>
-              <td class="text-left" rowspan="1" colspan="1">E(pk(A), path_secret[0])</td>
+              <td class="text-left" rowspan="1" colspan="1">
+                <code>node_pub[0]</code>
+</td>
+              <td class="text-left" rowspan="1" colspan="1">
+                <code>E(pk(A), path_secret[0])</code>
+</td>
             </tr>
           </tbody>
         </table>
-<p id="section-8.6-9">In this table, the value node_pub[i] represents the public key
+<p id="section-8.6-16">In this table, the value node_pub[i] represents the public key
 derived from node_secret[i], pk(X) represents the current public key
 of node X, and E(K, S) represents
 the public-key encryption of the path secret S to the
-public key K (using HPKE).<a href="#section-8.6-9" class="pilcrow">¶</a></p>
-<p id="section-8.6-10">After processing the update, each recipient MUST delete outdated key material,
-specifically:<a href="#section-8.6-10" class="pilcrow">¶</a></p>
+public key K (using HPKE).<a href="#section-8.6-16" class="pilcrow">¶</a></p>
+<p id="section-8.6-17">A recipient at node A would decrypt <code>E(pk(A), path_secret\[0\])</code> to obtain
+<code>path_secret\[0\]</code>, then use it to derive <code>path_secret[1]</code> and the resulting
+node secrets and key pairs.  Thus A would have the private keys to nodes X'
+and Y', in accordance with the tree invariant.<a href="#section-8.6-17" class="pilcrow">¶</a></p>
+<p id="section-8.6-18">Similarly, a recipient at node D would decrypt <code>E(pk(Z), path_secret[1])</code> to
+obtain <code>path_secret[1]</code>, then use it to derive the node secret and and key pair
+for the node Y'.  As required to maintain the tree invariant, node D does not
+receive the private key for the node X', since X' is not an ancestor of D.<a href="#section-8.6-18" class="pilcrow">¶</a></p>
+<p id="section-8.6-19">After processing the update, each recipient MUST delete outdated key material,
+specifically:<a href="#section-8.6-19" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-8.6-11.1">The path secrets used to derive each updated node key pair.<a href="#section-8.6-11.1" class="pilcrow">¶</a>
+<li class="normal" id="section-8.6-20.1">The path secrets and node secrets used to derive each updated node key pair.<a href="#section-8.6-20.1" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-8.6-11.2">Each outdated node key pair that was replaced by the update.<a href="#section-8.6-11.2" class="pilcrow">¶</a>
+          <li class="normal" id="section-8.6-20.2">Each outdated node key pair that was replaced by the update.<a href="#section-8.6-20.2" class="pilcrow">¶</a>
 </li>
         </ul>
 </section>
@@ -6303,56 +6372,39 @@ node in the new ratchet tree.  If there are no blank leaf nodes in the new
 ratchet tree, add a blank leaf to the right side of the new ratchet tree and
 assign it to the sender.<a href="#section-13.4.1-3.5.2.1" class="pilcrow">¶</a>
 </li>
-                <li class="normal" id="section-13.4.1-3.5.2.2">Generate path secrets for the parent nodes along the sender's filtered
-direct path, as described in <a href="#synchronizing-views-of-the-tree" class="xref">Section 8.6</a>.  Define
+                <li class="normal" id="section-13.4.1-3.5.2.2">Update the sender's direct path in the ratchet tree as described in
+<a href="#synchronizing-views-of-the-tree" class="xref">Section 8.6</a>.  Define
 <code>commit_secret</code> as the value <code>path_secret[n+1]</code> derived from the
 last path secret value (<code>path_secret[n]</code>) derived for the UpdatePath.<a href="#section-13.4.1-3.5.2.2" class="pilcrow">¶</a>
 </li>
                 <li class="normal" id="section-13.4.1-3.5.2.3">
-                  <p id="section-13.4.1-3.5.2.3.1">Update the new ratchet tree by setting the parent nodes on the sender's
-filtered direct path based on the path secrets. Compute parent hashes for
-these nodes.  Set the sender's leaf node in the new tree to a new leaf node
-including the resulting parent hash for its nearest ancestor.<a href="#section-13.4.1-3.5.2.3.1" class="pilcrow">¶</a></p>
+                  <p id="section-13.4.1-3.5.2.3.1">Construct a provisional GroupContext object containing the following values:<a href="#section-13.4.1-3.5.2.3.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-13.4.1-3.5.2.3.2.1">The new leaf node MUST have <code>leaf_node_source</code> set to <code>commit</code>.<a href="#section-13.4.1-3.5.2.3.2.1" class="pilcrow">¶</a>
+<li class="normal" id="section-13.4.1-3.5.2.3.2.1">
+                      <code>group_id</code>: Same as the old GroupContext<a href="#section-13.4.1-3.5.2.3.2.1" class="pilcrow">¶</a>
 </li>
-                    <li class="normal" id="section-13.4.1-3.5.2.3.2.2">Since the new leaf node effectively updates an existing leaf node in the
-group, it MUST adhere to the same restrictions as LeafNodes used in
-<code>Update</code> proposals (aside from <code>leaf_node_source</code>).<a href="#section-13.4.1-3.5.2.3.2.2" class="pilcrow">¶</a>
+                    <li class="normal" id="section-13.4.1-3.5.2.3.2.2">
+                      <code>epoch</code>: The epoch number for the new epoch<a href="#section-13.4.1-3.5.2.3.2.2" class="pilcrow">¶</a>
 </li>
-                    <li class="normal" id="section-13.4.1-3.5.2.3.2.3">The application MAY specify other changes to the leaf node, e.g.,
-providing a new signature key, updated capabilities, or different
-extensions.<a href="#section-13.4.1-3.5.2.3.2.3" class="pilcrow">¶</a>
+                    <li class="normal" id="section-13.4.1-3.5.2.3.2.3">
+                      <code>tree_hash</code>: The tree hash of the new ratchet tree<a href="#section-13.4.1-3.5.2.3.2.3" class="pilcrow">¶</a>
 </li>
-                  </ul>
+                    <li class="normal" id="section-13.4.1-3.5.2.3.2.4">
+                      <code>confirmed_transcript_hash</code>: Same as the old GroupContext<a href="#section-13.4.1-3.5.2.3.2.4" class="pilcrow">¶</a>
 </li>
-                <li class="normal" id="section-13.4.1-3.5.2.4">
-                  <p id="section-13.4.1-3.5.2.4.1">Construct a provisional GroupContext object containing the following values:<a href="#section-13.4.1-3.5.2.4.1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-13.4.1-3.5.2.4.2.1">
-                      <code>group_id</code>: Same as the old GroupContext<a href="#section-13.4.1-3.5.2.4.2.1" class="pilcrow">¶</a>
-</li>
-                    <li class="normal" id="section-13.4.1-3.5.2.4.2.2">
-                      <code>epoch</code>: The epoch number for the new epoch<a href="#section-13.4.1-3.5.2.4.2.2" class="pilcrow">¶</a>
-</li>
-                    <li class="normal" id="section-13.4.1-3.5.2.4.2.3">
-                      <code>tree_hash</code>: The tree hash of the new ratchet tree<a href="#section-13.4.1-3.5.2.4.2.3" class="pilcrow">¶</a>
-</li>
-                    <li class="normal" id="section-13.4.1-3.5.2.4.2.4">
-                      <code>confirmed_transcript_hash</code>: Same as the old GroupContext<a href="#section-13.4.1-3.5.2.4.2.4" class="pilcrow">¶</a>
-</li>
-                    <li class="normal" id="section-13.4.1-3.5.2.4.2.5">
+                    <li class="normal" id="section-13.4.1-3.5.2.3.2.5">
                       <code>extensions</code>: The new GroupContext extensions (possibly updated by a
-GroupContextExtensions proposal)<a href="#section-13.4.1-3.5.2.4.2.5" class="pilcrow">¶</a>
+GroupContextExtensions proposal)<a href="#section-13.4.1-3.5.2.3.2.5" class="pilcrow">¶</a>
 </li>
                   </ul>
 </li>
-                <li class="normal" id="section-13.4.1-3.5.2.5">Create an UpdatePath that encrypts the path secrets for the nodes along the
-sender's filtered direct path to the new ratchet tree, using the provisional
-GroupContext as context. Any new member (from an Add proposal) MUST be
-excluded from the resolution during the computation of the UpdatePath.<a href="#section-13.4.1-3.5.2.5" class="pilcrow">¶</a>
+                <li class="normal" id="section-13.4.1-3.5.2.4">Encrypt the path secrets resulting from the tree update to the group as
+described in <a href="#synchronizing-views-of-the-tree" class="xref">Section 8.6</a>, using the provisional
+group context as the context for HPKE encryption.<a href="#section-13.4.1-3.5.2.4" class="pilcrow">¶</a>
 </li>
-                <li class="normal" id="section-13.4.1-3.5.2.6">Assign this UpdatePath to the <code>path</code> field in the Commit.<a href="#section-13.4.1-3.5.2.6" class="pilcrow">¶</a>
+                <li class="normal" id="section-13.4.1-3.5.2.5">Create an UpdatePath containing the sender's new leaf node and the new
+public keys and encrypted path secrets along the sender's filtered direct
+path.  Assign this UpdatePath to the <code>path</code> field in the Commit.<a href="#section-13.4.1-3.5.2.5" class="pilcrow">¶</a>
 </li>
               </ul>
 </li>
@@ -6510,9 +6562,8 @@ assign it to the sender.<a href="#section-13.4.2-2.8.2.1" class="pilcrow">¶</a>
                 <li class="normal" id="section-13.4.2-2.8.2.3">Verify that the <code>encryption_key</code> value in the LeafNode is different from the
 committer's current leaf node.<a href="#section-13.4.2-2.8.2.3" class="pilcrow">¶</a>
 </li>
-                <li class="normal" id="section-13.4.2-2.8.2.4">Compute parent hashes for the parent nodes in the UpdatePath (relative to
-the new ratchet tree) and verify that the <code>parent_hash</code> field of the leaf
-node matches the parent hash for the first node its filtered direct path.<a href="#section-13.4.2-2.8.2.4" class="pilcrow">¶</a>
+                <li class="normal" id="section-13.4.2-2.8.2.4">Merge the UpdatePath into the new ratchet tree as described in
+<a href="#synchronizing-views-of-the-tree" class="xref">Section 8.6</a>.<a href="#section-13.4.2-2.8.2.4" class="pilcrow">¶</a>
 </li>
                 <li class="normal" id="section-13.4.2-2.8.2.5">
                   <p id="section-13.4.2-2.8.2.5.1">Construct a provisional GroupContext object containing the following values:<a href="#section-13.4.2-2.8.2.5.1" class="pilcrow">¶</a></p>
@@ -6535,9 +6586,9 @@ GroupContextExtensions proposal)<a href="#section-13.4.2-2.8.2.5.2.5" class="pil
 </li>
                   </ul>
 </li>
-                <li class="normal" id="section-13.4.2-2.8.2.6">Apply the UpdatePath to the tree, as described in
-<a href="#synchronizing-views-of-the-tree" class="xref">Section 8.6</a>, using the provisional GroupContext when
-decrypting the path secret and storing <code>leaf_node</code> at the committer's leaf.<a href="#section-13.4.2-2.8.2.6" class="pilcrow">¶</a>
+                <li class="normal" id="section-13.4.2-2.8.2.6">Decrypt the path secrets for UpdatePath as described in
+<a href="#synchronizing-views-of-the-tree" class="xref">Section 8.6</a>, using the provisional GroupContext as
+the context for HPKE decryption.<a href="#section-13.4.2-2.8.2.6" class="pilcrow">¶</a>
 </li>
                 <li class="normal" id="section-13.4.2-2.8.2.7">Define <code>commit_secret</code> as the value <code>path_secret[n+1]</code> derived from the
 last path secret value (<code>path_secret[n]</code>) derived for the UpdatePath.<a href="#section-13.4.2-2.8.2.7" class="pilcrow">¶</a>
