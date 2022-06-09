@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2022-06-07T01:49:23.731914+00:00",
+  "timestamp": "2022-06-09T01:50:38.543553+00:00",
   "repo": "mlswg/mls-protocol",
   "labels": [
     {
@@ -6846,15 +6846,15 @@
       "id": "I_kwDOBoyH6c5JK93L",
       "title": "Tree hash and Parent hash definitions are confusing",
       "url": "https://github.com/mlswg/mls-protocol/issues/655",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "rohan-wire",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "Regarding the Tree Hash\r\n1. Including the parent_node in the tree hash which is supposed to be computed from the leaves, makes the definition appear circular to a new reader. Since the situation when you have blank nodes in the middle of a tree but not at the root is a rather complicated, the situation when you could calculate a tree hash using the parent_node is non-obvious.\r\n2. In the description of Tree Hash the document says that the ParentNode object is optional \"depending on whether the node is blank or not.\" This isn't clear specification language. Saying the parent_node object is present if the node is blank or present if the node is not blank would be clear. \r\n3. What if the parent node is also blank? What if the root is blank? \r\n4. I think an example with and without blank nodes would be appropriate.\r\n5. Explaining the reason why the parent_node is included will help the reader establish a better mental model.\r\n\r\nRegarding the Parent Hash\r\nI still find this section super confusing. A few points\r\n1. Using a tree hash (sibling_tree_hash) inside the parent hash is non-obvious. There should be some explanation about what property this is providing and that it is a tree hash and not a parent hash. (Honestly it was the third time I read the section that I realized that it was really the tree hash and not the parent hash of the sibling.) \r\n2. Using P, V, and S for Parent, target node, and sibling node is introduced here and never used anywhere else in the document. P for parent and S for sibling make sense. I can't tell what V is supposed to stand for, and it unfortunately could cause people to confuse the <V> vector notation used throughout, but shortly after introducing V for the target node. I propose using \"N\" for node or \"X\" instead.\r\n3. There is one reference to the filtered direct path of U. Perhaps this is V, or a child of V?\r\n4. The calculations are sufficiently complicated that I think this warrants a complete, non-trivial, worked example (possibly in an appendix). At some point we should consider providing test vectors in a future document, and this would be an ideal candidate. \r\n",
       "createdAt": "2022-05-06T09:11:52Z",
-      "updatedAt": "2022-06-01T23:31:55Z",
-      "closedAt": null,
+      "updatedAt": "2022-06-07T22:48:13Z",
+      "closedAt": "2022-06-07T22:48:13Z",
       "comments": [
         {
           "author": "bifurcation",
@@ -7185,7 +7185,7 @@
       "id": "I_kwDOBoyH6c5JxyHb",
       "title": "Specify the algorithm for creating an UpdatePath",
       "url": "https://github.com/mlswg/mls-protocol/issues/671",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "bifurcation",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
@@ -7194,8 +7194,8 @@
       ],
       "body": "Currently, we only have explicit algorithm steps for *validating* an UpdatePath.  We should have a similar level of concreteness for the process of creating an UpdatePath.",
       "createdAt": "2022-05-16T22:10:09Z",
-      "updatedAt": "2022-05-20T17:59:43Z",
-      "closedAt": null,
+      "updatedAt": "2022-06-08T17:56:13Z",
+      "closedAt": "2022-06-08T17:56:13Z",
       "comments": []
     },
     {
@@ -7210,7 +7210,7 @@
       "labels": [],
       "body": "* \u201cAdding and Removing Leaves\u201d after \u201cSynchronizing Views of the Tree\u201d\r\n* Consider merging \u201cRatchet Tree Evolution\u201d and \u201cSynchronizing Views of the Tree\u201d and \u201cUpdate Paths\u201d\r\n* Swap \u201cJoining via External Commits\u201d and \u201cJoining via Welcome Message\u201d\r\n* Restore section break for \u201cExtensions\u201d",
       "createdAt": "2022-05-16T22:10:40Z",
-      "updatedAt": "2022-06-06T15:42:04Z",
+      "updatedAt": "2022-06-07T21:27:55Z",
       "closedAt": null,
       "comments": [
         {
@@ -7240,6 +7240,13 @@
           "body": "> * Consider merging \u201cRatchet Tree Evolution\u201d and \u201cSynchronizing Views of the Tree\u201d and \u201cUpdate Paths\u201d\r\n\r\nI would skip this one. I've now interviewed 4 developers and one product manager who are reading the spec for the first time. I think it is a lot clearer divided up.",
           "createdAt": "2022-06-06T15:42:03Z",
           "updatedAt": "2022-06-06T15:42:03Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "* Move \"Update Paths\" before \"TreeHashes\"",
+          "createdAt": "2022-06-07T21:27:55Z",
+          "updatedAt": "2022-06-07T21:27:55Z"
         }
       ]
     },
@@ -7609,6 +7616,30 @@
       "updatedAt": "2022-05-31T22:05:44Z",
       "closedAt": null,
       "comments": []
+    },
+    {
+      "number": 719,
+      "id": "I_kwDOBoyH6c5LY216",
+      "title": "Document compilation drop accents",
+      "url": "https://github.com/mlswg/mls-protocol/issues/719",
+      "state": "OPEN",
+      "author": "TWal",
+      "authorAssociation": "CONTRIBUTOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Hello,\r\n\r\nIn the [\"contributors\" section](https://github.com/mlswg/mls-protocol/blob/main/draft-ietf-mls-protocol.md?plain=1#L5101), my name is correctly written with the \"\u00e9\" accent, however when it is compiled, the accent is dropped, e.g. [here](https://messaginglayersecurity.rocks/mls-protocol/draft-ietf-mls-protocol.html#section-18-1.14) or [here](https://messaginglayersecurity.rocks/mls-protocol/draft-ietf-mls-protocol.txt).\r\n\r\nIt looks like this letter is the only non-ascii character in the whole document, is this the expected behavior when compiling an RFC, or is it an issue in [martinthomson/i-d-template](https://github.com/martinthomson/i-d-template) that I should track?\r\n\r\nThanks!",
+      "createdAt": "2022-06-08T14:04:05Z",
+      "updatedAt": "2022-06-08T17:55:47Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "This is a tooling issue.  Currently, the only way to include non-ASCII characters in an RFC is for them to be wrapped in a `<contact>` element in the XML.  Unfortunately, that can't be triggered from MD right now.  One this is approved, the RFC editor can massage the XML to add the required wrapping.  This was done in RFC 9147 ([md](https://github.com/tlswg/dtls13-spec/blob/master/draft-ietf-tls-dtls13.md?plain=1#L2732), [xml](https://www.rfc-editor.org/rfc/rfc9147.xml), [html](https://www.rfc-editor.org/rfc/rfc9147.html), search for \"Vyncke\").\r\n\r\nFlagging this for handling in AUTH48, which is the step in the process where we work with the RFC editor on things like this.",
+          "createdAt": "2022-06-08T17:55:05Z",
+          "updatedAt": "2022-06-08T17:55:05Z"
+        }
+      ]
     }
   ],
   "pulls": [
@@ -51567,24 +51598,26 @@
       "id": "PR_kwDOBoyH6c44xinv",
       "title": "Clarify description of UpdatePath generation and processing",
       "url": "https://github.com/mlswg/mls-protocol/pull/712",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "bifurcation",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Fixes #671 \r\n\r\nConflicts with #707 (in derivation of `commit_secret`)\r\n\r\nThis is intended just to move around the required steps and give them clearer labels.  Please keep an eye out for things that might have accidentally been added or dropped.",
       "createdAt": "2022-05-31T23:14:53Z",
-      "updatedAt": "2022-06-02T15:08:28Z",
+      "updatedAt": "2022-06-08T17:56:14Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "6526db8781ab70cf5e21aa5d8c994d26c0bebaea",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "create-update-path",
       "headRefOid": "166073f764c3d592296603d1b590a4ff75e2da5f",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2022-06-08T17:56:13Z",
+      "mergedAt": "2022-06-08T17:56:13Z",
+      "mergedBy": "bifurcation",
+      "mergeCommit": {
+        "oid": "83f8648a3ba0d39a16c7ec5c93b0d6b7b3decaab"
+      },
       "comments": [
         {
           "author": "bifurcation",
@@ -51594,7 +51627,21 @@
           "updatedAt": "2022-06-02T15:08:28Z"
         }
       ],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOBoyH6c47neTd",
+          "commit": {
+            "abbreviatedOid": "166073f"
+          },
+          "author": "kkohbrok",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2022-06-08T17:53:50Z",
+          "updatedAt": "2022-06-08T17:53:50Z",
+          "comments": []
+        }
+      ]
     },
     {
       "number": 713,
@@ -51608,13 +51655,13 @@
       "labels": [],
       "body": "# A nice security property for parent-hash\r\n\r\nThe goal of #527 was to have a property similar to:\r\n\r\n> If there is a parent-hash chain from the leaf L to a node N, then the signature of L binds the tree Canonicalize(N)\r\n\r\n(where Canonicalize(N) is N with its unmerged leaves removed, i.e. the subtree of N the last time a Commit went through it)\r\n\r\nHowever, this is currently not true, there are a few places where we can do (hopefully benign) modifications on N.\r\n\r\nExample 1:\r\n```\r\n              W\r\n        ______|_____\r\n       /             \\\r\n      _               Y\r\n    __|__           __|__\r\n   /     \\         /     \\\r\n  T       _       X       Z\r\n / \\     / \\     / \\     / \\\r\nA   B   _   _   E   F   G   H\r\n```\r\n\r\nwith the parent-hash chain A-T-W (happening with filtered update path).\r\n\r\nWe can modify the blank subtree:\r\n\r\n```\r\n              W\r\n        ______|_____\r\n       /             \\\r\n      _               Y\r\n    __|__           __|__\r\n   /     \\         /     \\\r\n  T       V       X       Z\r\n / \\     / \\     / \\     / \\\r\nA   B   C   D   E   F   G   H\r\n```\r\n\r\nand the parent-hash chain A-T-W is still valid\r\n\r\nExample 2:\r\n\r\n```\r\n              W\r\n        ______|_____\r\n       /             \\\r\n      U               Y\r\n    __|__           __|__\r\n   /     \\         /     \\\r\n  T       V       X       Z\r\n / \\     / \\     / \\     / \\\r\nA   B   _   D   E   F   G   H\r\n```\r\n\r\nwith the parent-hash chain A-T-U-W.\r\n\r\nWe can add unmerged leaves:\r\n\r\n```\r\n              W\r\n        ______|_____\r\n       /             \\\r\n      U[C]            Y\r\n    __|__           __|__\r\n   /     \\         /     \\\r\n  T       V[C]    X       Z\r\n / \\     / \\     / \\     / \\\r\nA   B   C   D   E   F   G   H\r\n```\r\n\r\nand the parent-hash chain A-T-U-W is still valid.\r\n\r\n# How to get this property\r\n\r\nThese examples are not possible if we require the parent-hash check to verify other invariants that exists in MLS:\r\n- if there is a parent-hash link from U to P and there are blank nodes between U and P, these blank nodes are here because of the filtered update path so their sibling have empty resolution (this invariant forbids example 1)\r\n- if there is a parent-hash link from U to P, then there can't be a leaf which is merged for U but not for P, because U and P were last modified by a commit at the same time (this invariant forbids example 2)\r\n\r\nThis PR add these checks to the parent hash validation procedure.\r\n\r\n# Proof that we do have the property with this PR\r\n\r\n## Definitions\r\n\r\nUn-adding leaves:\r\nLet N be a node, and Ls a list of leaves.\r\nThen UnAdd(N, Ls) is a tree identical to N, except that the leaves of Ls are blanked and removed from every node's unmerged leaves list.\r\nInformally, this operation is the inverse of adding leaves Ls in N by participant not in N.\r\n\r\nCanonicalization:\r\nWe define Canonicalize(N) = UnAdd(N, N.unmerged_leaves).\r\n\r\nTree equivalence:\r\nWe say T1 ~= T2 when Canonicalize(T1) = Canonicalize(T2).\r\n\r\nParent-hash link:\r\nWe say C ~> P when \"the parent hash in a node C is valid with respect to a parent node P\" as described in the \"Verifying Parent Hashes\" section (modified by this PR)\r\n\r\n# Key property on ~= and ~>\r\n\r\nWe prove the following property:\r\nIf C ~> P\r\nand C' ~> P'\r\nand C ~= C'\r\nthen P ~= P'.\r\n\r\nThis is better understood with a nice square:\r\n```\r\nIf we have:\r\n\r\nC ~= C'\r\n~    ~\r\nV    V\r\nP    P'\r\n\r\nThen there is a ~= between P and P'\r\n```\r\n\r\nProof of this property:\r\n\r\nLet S (resp. S') be the sibling in the C ~> P (resp. C' ~> P') relation. Because leaf indices are inside the tree hash, S and S' are both on the same side of P and P'.\r\n\r\nFact 1: UnAdd(S, P.unmerged_leaves) = UnAdd(S', P'.unmerged_leaves).\r\nProof: By definition of the parent hash and injectivity of tree-hash.\r\n\r\nFact 2: UnAdd(C, P.unmerged_leaves) = UnAdd(C', P'.unmerged_leaves).\r\nProof:\r\n\r\n```\r\n  UnAdd(C, P.unmerged_leaves)\r\n= UnAdd(C, Intersection(P.unmerged_leaves, Leaves(C))     by a simple lemma on UnAdd\r\n= UnAdd(C, C.unmerged_leaves)                             by C ~> P (we use the second new invariant here!)\r\n= UnAdd(C', C'.unmerged_leaves)                           by C ~= C'\r\n= UnAdd(C', Intersection(P'.unmerged_leaves, Leaves(C'))) by C' ~> P' (we use the second new invariant here!)\r\n= UnAdd(C', P'.unmerged_leaves)                           by a simple lemma on UnAdd\r\n```\r\n\r\nWith Fact 1 and Fact 2, we deduce that P ~= P' (we use the first new invariant here!).\r\n\r\n# Proof of signature binding\r\n\r\nA leaf signature binds the existence of nodes Mi suh that L ~> M1 ~> ... ~> Mm = root\r\n\r\nWhen there is a parent-hash-link path to a node P starting from a leaf L like L ~> N1 ~> ... ~> Nn ~> P, by applying inductively the property on ~= and ~> you get P ~= Mi for some i, hence L's signature binds Canonicalize(P) = Canonicalize(Mi).\r\n",
       "createdAt": "2022-06-01T13:25:02Z",
-      "updatedAt": "2022-06-06T16:34:08Z",
+      "updatedAt": "2022-06-08T10:36:47Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
-      "baseRefOid": "6526db8781ab70cf5e21aa5d8c994d26c0bebaea",
+      "baseRefOid": "839ebbb9b265a39a84cfcb3ac37c54d0a4a70134",
       "headRepository": "TWal/mls-protocol",
       "headRefName": "twal_parent_hash_invariants",
-      "headRefOid": "a59222cc4938bb7eabcc9ac865afb64a386c67ac",
+      "headRefOid": "698a343030d12419535477ee679da4849fac30fd",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -51803,24 +51850,26 @@
       "id": "PR_kwDOBoyH6c447bie",
       "title": "Clarify tree hash and parent hash",
       "url": "https://github.com/mlswg/mls-protocol/pull/715",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "bifurcation",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Closes #655 \r\n\r\nDepends on #694 \r\nConflicts with #713 \r\n\r\nThe diff here is messy because it includes #694.  The biggest change is the extended example, for which you can just scroll to the bottom.",
       "createdAt": "2022-06-01T23:26:03Z",
-      "updatedAt": "2022-06-02T21:48:43Z",
+      "updatedAt": "2022-06-07T22:48:13Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "731992b04a0861f11221e2975aae422476fa6465",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "tree-clarify-rohan",
-      "headRefOid": "a34f0b23d6d924bce46c6bf70242db4eeb86ec9f",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "dfa1ddc25e61bc7e9be8223b0b75eb2cbc84f2a3",
+      "closedAt": "2022-06-07T22:48:13Z",
+      "mergedAt": "2022-06-07T22:48:13Z",
+      "mergedBy": "bifurcation",
+      "mergeCommit": {
+        "oid": "839ebbb9b265a39a84cfcb3ac37c54d0a4a70134"
+      },
       "comments": [],
       "reviews": [
         {
@@ -51834,6 +51883,19 @@
           "body": "Interim 2022-06-02:\r\n\r\n* Hold for next week, should be easier to review after rebase.",
           "createdAt": "2022-06-02T15:21:46Z",
           "updatedAt": "2022-06-02T15:21:46Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOBoyH6c47ildn",
+          "commit": {
+            "abbreviatedOid": "dfa1ddc"
+          },
+          "author": "rohan-wire",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "This is a huge improvement. While I still prefer \"path hash\" to \"parent hash\", the new language in this PR is clear and I think will be straightforward for new implementers to read.",
+          "createdAt": "2022-06-07T22:41:19Z",
+          "updatedAt": "2022-06-07T22:41:19Z",
           "comments": []
         }
       ]
@@ -51981,24 +52043,26 @@
       "id": "PR_kwDOBoyH6c45FbBx",
       "title": "Fix resolution example",
       "url": "https://github.com/mlswg/mls-protocol/pull/718",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "bifurcation",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "The current resolution example tree can't be created by the protocol.  If C were not blank, then D would not populate Z in its filtered direct path.  (Note that this implies that there are never unmerged leaves at the first level of the tree.)  This PR expands the example tree so that it can have unmerged leaves while still having a blank top node.  This makes the example a little more complicated (you have to follow the recursion down two levels), but it doesn't seem too bad.",
       "createdAt": "2022-06-03T18:22:20Z",
-      "updatedAt": "2022-06-03T19:25:12Z",
+      "updatedAt": "2022-06-08T17:35:59Z",
       "baseRepository": "mlswg/mls-protocol",
       "baseRefName": "main",
       "baseRefOid": "fe11f6eaff7722ea72dc3fbb8d1d74908e3f545b",
       "headRepository": "mlswg/mls-protocol",
       "headRefName": "fix-resolution-example",
-      "headRefOid": "f1b746028d19a759397d650e37029e5f20005915",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "e131f525a5762e253040d1b968d3c464005c5c66",
+      "closedAt": "2022-06-08T17:35:59Z",
+      "mergedAt": "2022-06-08T17:35:58Z",
+      "mergedBy": "bifurcation",
+      "mergeCommit": {
+        "oid": "2f1e9135c5fdeeb920ddc0554548966ef47f9521"
+      },
       "comments": [
         {
           "author": "bifurcation",
@@ -52013,6 +52077,13 @@
           "body": "Good catch! It's kind of subtle in this case.",
           "createdAt": "2022-06-03T19:11:31Z",
           "updatedAt": "2022-06-03T19:11:31Z"
+        },
+        {
+          "author": "bifurcation",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@mulmarta - I think I have this patched up, would appreciate a quick re-review.",
+          "createdAt": "2022-06-07T21:39:41Z",
+          "updatedAt": "2022-06-07T21:39:41Z"
         }
       ],
       "reviews": [
@@ -52075,6 +52146,19 @@
               "updatedAt": "2022-06-03T19:24:58Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOBoyH6c47ilkP",
+          "commit": {
+            "abbreviatedOid": "e131f52"
+          },
+          "author": "rohan-wire",
+          "authorAssociation": "CONTRIBUTOR",
+          "state": "APPROVED",
+          "body": "I walked through the example tree on a whiteboard with different colored markers and it looks correct to me.",
+          "createdAt": "2022-06-07T22:42:08Z",
+          "updatedAt": "2022-06-07T22:42:08Z",
+          "comments": []
         }
       ]
     }
