@@ -5,7 +5,7 @@
 Network Working Group                                          R. Barnes
 Internet-Draft                                                     Cisco
 Intended status: Informational                             B. Beurdouche
-Expires: 10 December 2022                                Inria & Mozilla
+Expires: 11 December 2022                                Inria & Mozilla
                                                                R. Robert
                                                                         
                                                              J. Millican
@@ -14,7 +14,7 @@ Expires: 10 December 2022                                Inria & Mozilla
                                                                   Google
                                                           K. Cohn-Gordon
                                                     University of Oxford
-                                                             8 June 2022
+                                                             9 June 2022
 
 
               The Messaging Layer Security (MLS) Protocol
@@ -56,7 +56,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 10 December 2022.
+   This Internet-Draft will expire on 11 December 2022.
 
 Copyright Notice
 
@@ -2690,15 +2690,23 @@ A   B       A   B   _   _                           A   B   C   _
    joining a group and when processing a Commit.
 
    The parent hash in a node D is valid with respect to a parent node P
-   if the following criteria hold:
+   if the following criteria hold.  Here C and S are the children of P
+   (for "child" and "sibling"), with C being the child that is on the
+   direct path of D (possibly D itself) and S the other child:
 
-   *  D is a descendant of P in the tree
-
-   *  Any nodes between D and P in the tree are all blank
+   *  D is a descendant of P in the tree.
 
    *  The parent_hash field of D is equal to the parent hash of P with
-      copath child S, where S is the child of P that is not on the path
-      from D to P.
+      copath child S.
+
+   *  D is in the resolution of C, and the intersection of P's
+      unmerged_leaves with the subtree under C is equal to the
+      resolution of C with D removed.
+
+   These checks verify that D and P were updated at the same time (in
+   the same UpdatePath), and that they were neighbors in the UpdatePath
+   because the nodes in between them would have omitted from the
+   filtered direct path.
 
    A parent node P is "parent-hash valid" if it can be chained back to a
    leaf node in this way.  That is, if there is leaf node L and a
@@ -4615,17 +4623,15 @@ psk_secret (or 0) --> KDF.Extract
       -  Verify that the tree hash of the ratchet tree matches the
          tree_hash field in GroupInfo.
 
-      -  For each non-empty parent node, verify that exactly one of the
-         node's children are non-empty and have the hash of this node
-         set as their parent_hash value (if the child is another parent)
-         or has a parent_hash field in the LeafNode containing the same
-         value (if the child is a leaf).  If either of the node's
-         children is empty, and in particular does not have a parent
-         hash, then its respective children's parent_hash values have to
-         be considered instead.
+      -  For each non-empty parent node, verify that it is "parent-hash
+         valid", as described in Section 8.8.2.
 
       -  For each non-empty leaf node, validate the LeafNode as
          described in Section 8.3.
+
+      -  For each non-empty parent node, verify that each entry in the
+         node's unmerged_leaves represents a non-blank leaf node that is
+         a descendant of the parent node.
 
    *  Identify a leaf whose LeafNode is identical to the one in the
       KeyPackage.  If no such field exists, return an error.  Let
