@@ -2910,6 +2910,8 @@ psk_secret (or 0) --> KDF.Extract
    summarizes the state of the group:
 
    struct {
+       ProtocolVersion version = mls10;
+       CipherSuite cipher_suite;
        opaque group_id<V>;
        uint64 epoch;
        opaque tree_hash<V>;
@@ -2918,6 +2920,8 @@ psk_secret (or 0) --> KDF.Extract
    } GroupContext;
 
    The fields in this state have the following semantics:
+
+   *  The cipher_suite is the cipher suite used by the group.
 
    *  The group_id field is an application-defined identifier for the
       group.
@@ -3469,7 +3473,7 @@ psk_secret (or 0) --> KDF.Extract
    steps:
 
    *  Verify that the ciphersuite and protocol version of the KeyPackage
-      match those in use in the group.
+      match those in the GroupContext.
 
    *  Verify that the leaf_node of the KeyPackage is valid for a
       KeyPackage according to Section 8.3.
@@ -4413,7 +4417,6 @@ psk_secret (or 0) --> KDF.Extract
    local group state.
 
    struct {
-       CipherSuite cipher_suite;
        GroupContext group_context;
        Extension extensions<V>;
        MAC confirmation_tag;
@@ -4431,7 +4434,6 @@ psk_secret (or 0) --> KDF.Extract
    in the GroupInfo above signature:
 
    struct {
-       CipherSuite cipher_suite;
        GroupContext group_context;
        Extension extensions<V>;
        uint32 signer;
@@ -4511,7 +4513,7 @@ psk_secret (or 0) --> KDF.Extract
       the external init secret as described in Section 9.3.
 
    *  The sender type for the MLSAuthenticatedContent encapsulating the
-      External Commit MUST be new_member_commit
+      External Commit MUST be new_member_commit.
 
    External Commits come in two "flavors" -- a "join" commit that adds
    the sender to the group or a "resync" commit that replaces a member's
@@ -4617,6 +4619,9 @@ psk_secret (or 0) --> KDF.Extract
 
    *  Verify that the group_id is unique among the groups that the
       client is currently participating in.
+
+   *  Verify that the cipher_suite in the GroupInfo matches the
+      cipher_suite in the KeyPackage.
 
    *  Verify the integrity of the ratchet tree.
 
